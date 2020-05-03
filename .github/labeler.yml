@@ -1,0 +1,15 @@
+# Add 'repo' label to any root file changes
+repo:
+  - ./*
+  
+looker2datacatalog:
+  - looker2datacatalog/*
+  - looker2datacatalog/**/*
+
+tableau2datacatalog:
+  - tableau2datacatalog/*
+  - tableau2datacatalog/**/*
+
+# Add 'test' label to any change to test.py files
+test:
+  - ./**/*.test.py
