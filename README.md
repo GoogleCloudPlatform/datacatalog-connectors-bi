@@ -4,6 +4,8 @@ This repository contains sample code with integration between Data Catalog and B
 
 **Disclaimer: This is not an officially supported Google product.**
 
+![Python package](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/workflows/Python%20package/badge.svg?branch=master)
+
 ## Project structure
 
 Each subfolder contains a Python package. Please check components' README files for
