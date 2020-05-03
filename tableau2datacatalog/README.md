@@ -1,6 +1,10 @@
 # tableau2datacatalog
 
-Package for ingesting Tableau metadata into Google Cloud Data Catalog.
+Package for ingesting Tableau metadata into Google Cloud Data Catalog,
+currently supporting below asset types:
+- Workbook
+- Sheet
+- Dashboard
 
 **Disclaimer: This is not an officially supported Google product.**
 
@@ -9,8 +13,8 @@ Package for ingesting Tableau metadata into Google Cloud Data Catalog.
 ### 1.1. Get the code
 
 ````bash
-git clone https://.../tableau2datacatalog.git
-cd tableau2datacatalog
+git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi.git
+cd datacatalog-connectors-bi/tableau2datacatalog
 ````
 
 ### 1.2. Auth credentials
@@ -144,11 +148,17 @@ python setup.py test
 ```
 ## 5. Troubleshooting
 
-In the case a connector execution hits Data Catalog quota limit, an error will be raised and logged with the following detailement, depending on the performed operation READ/WRITE/SEARCH: 
+In the case a connector execution hits Data Catalog quota limit, an error will
+be raised and logged with the following detailment, depending on the performed
+operation READ/WRITE/SEARCH: 
+
 ```
 status = StatusCode.RESOURCE_EXHAUSTED
 details = "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'."
 debug_error_string = 
 "{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'.","grpc_status":8}"
 ```
-For more info about Data Catalog quota, go to: [Data Catalog quota docs](https://cloud.google.com/data-catalog/docs/resources/quotas).
+
+For more information on Data Catalog quota, please refer to: [Data Catalog quota docs][1]
+
+[1]: https://cloud.google.com/data-catalog/docs/resources/quotas
