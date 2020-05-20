@@ -10,6 +10,38 @@ supporting below asset types:
 
 **Disclaimer: This is not an officially supported Google product.**
 
+<!--
+  ⚠️ DO NOT UPDATE THE TABLE OF CONTENTS MANUALLY ️️⚠️
+  run `npx markdown-toc -i README.md`.
+
+  Please stick to 80-character line wraps as much as you can.
+-->
+
+## Table of Contents
+
+<!-- toc -->
+
+- [1. Environment setup](#1-environment-setup)
+  * [1.1. Get the code](#11-get-the-code)
+  * [1.2. Auth credentials](#12-auth-credentials)
+      - [1.2.1. Create a GCP Service Account and grant it below roles](#121-create-a-gcp-service-account-and-grant-it-below-roles)
+      - [1.2.2. Download a JSON key and save it as](#122-download-a-json-key-and-save-it-as)
+      - [1.2.3. Create Looker API3 credentials](#123-create-looker-api3-credentials)
+      - [1.2.4. Create a Looker configuration file](#124-create-a-looker-configuration-file)
+  * [1.3. Virtualenv](#13-virtualenv)
+      - [1.3.1. Install Python 3.7+](#131-install-python-37)
+      - [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
+      - [1.3.3. Install the dependencies](#133-install-the-dependencies)
+      - [1.3.4. Set environment variables](#134-set-environment-variables)
+  * [1.4. Docker](#14-docker)
+- [2. Sample application entry point](#2-sample-application-entry-point)
+  * [2.1. Run the looker2datacatalog script](#21-run-the-looker2datacatalog-script)
+- [3. Troubleshooting](#3-troubleshooting)
+
+<!-- tocstop -->
+
+-----
+
 ## 1. Environment setup
 
 ### 1.1. Get the code
