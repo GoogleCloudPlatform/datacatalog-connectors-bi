@@ -19,13 +19,13 @@ __TABLEAU_USER_FIELDS = """
     name
 """
 
-__DATABASE_FIELDS = f"""
+__DATABASE_FIELDS = """
     luid
     name
     connectionType
 """
 
-__DATABASE_TABLE_FIELDS = f"""
+__DATABASE_TABLE_FIELDS = """
     fullName
     database {{
         luid
