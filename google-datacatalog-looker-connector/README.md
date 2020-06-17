@@ -50,11 +50,11 @@ supporting below asset types:
 
 ## 1. Installation
 
-Install this library in a [virtualenv][2] using pip. [virtualenv][2] is a tool to
+Install this library in a [virtualenv][3] using pip. [virtualenv][3] is a tool to
 create isolated Python environments. The basic problem it addresses is one of
 dependencies and versions, and indirectly permissions.
 
-With [virtualenv][2], it's possible to install this library without needing system
+With [virtualenv][3], it's possible to install this library without needing system
 install permissions, and without clashing with the installed system
 dependencies. Make sure you use Python 3.7+.
 
@@ -209,3 +209,4 @@ For more information on Data Catalog quota, please refer to: [Data Catalog quota
 
 [1]: https://github.com/looker-open-source/sdk-codegen/blob/master/looker-sample.ini
 [2]: https://cloud.google.com/data-catalog/docs/resources/quotas
+[3]: https://virtualenv.pypa.io/en/latest/
