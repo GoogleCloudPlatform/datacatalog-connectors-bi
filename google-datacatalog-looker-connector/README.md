@@ -1,4 +1,4 @@
-# looker2datacatalog
+# google-datacatalog-looker-connector
 
 Package for ingesting Looker metadata into Google Cloud Data Catalog, currently
 supporting below asset types:
@@ -21,46 +21,97 @@ supporting below asset types:
 
 <!-- toc -->
 
-- [1. Environment setup](#1-environment-setup)
-  * [1.1. Get the code](#11-get-the-code)
-  * [1.2. Auth credentials](#12-auth-credentials)
-      - [1.2.1. Create a GCP Service Account and grant it below roles](#121-create-a-gcp-service-account-and-grant-it-below-roles)
-      - [1.2.2. Download a JSON key and save it as](#122-download-a-json-key-and-save-it-as)
-      - [1.2.3. Create Looker API3 credentials](#123-create-looker-api3-credentials)
-      - [1.2.4. Create a Looker configuration file](#124-create-a-looker-configuration-file)
-  * [1.3. Virtualenv](#13-virtualenv)
-      - [1.3.1. Install Python 3.7+](#131-install-python-37)
-      - [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
-      - [1.3.3. Install the dependencies](#133-install-the-dependencies)
-      - [1.3.4. Set environment variables](#134-set-environment-variables)
-  * [1.4. Docker](#14-docker)
-- [2. Sample application entry point](#2-sample-application-entry-point)
-  * [2.1. Run the looker2datacatalog script](#21-run-the-looker2datacatalog-script)
-- [3. Troubleshooting](#3-troubleshooting)
+- [1. Installation](#1-installation)
+  * [1.1. Mac/Linux](#11-maclinux)
+  * [1.2. Windows](#12-windows)
+  * [1.3. Install from source](#13-install-from-source)
+    + [1.3.1. Get the code](#131-get-the-code)
+    + [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
+    + [1.3.3. Install the library](#133-install-the-library)
+- [2. Environment setup](#2-environment-setup)
+  * [2.2. Auth credentials](#22-auth-credentials)
+    + [2.1.1. Create a GCP Service Account and grant it below roles](#211-create-a-gcp-service-account-and-grant-it-below-roles)
+    + [2.1.2. Download a JSON key and save it as](#212-download-a-json-key-and-save-it-as)
+    + [2.1.3. Create Looker API3 credentials](#213-create-looker-api3-credentials)
+    + [2.1.4. Create a Looker configuration file](#214-create-a-looker-configuration-file)
+  * [2.3. Set environment variables](#23-set-environment-variables)
+- [3. Run entry point](#3-run-entry-point)
+  * [3.1. Run Python entry point](#31-run-python-entry-point)
+  * [3.2. Run Docker entry point](#32-run-docker-entry-point)
+- [4. Developer environment](#4-developer-environment)
+  * [4.1. Install and run Yapf formatter](#41-install-and-run-yapf-formatter)
+  * [4.2. Install and run Flake8 linter](#42-install-and-run-flake8-linter)
+  * [4.3. Run Tests](#43-run-tests)
+- [5. Troubleshooting](#5-troubleshooting)
 
 <!-- tocstop -->
 
 -----
 
-## 1. Environment setup
+## 1. Installation
 
-### 1.1. Get the code
+Install this library in a [virtualenv][2] using pip. [virtualenv][2] is a tool to
+create isolated Python environments. The basic problem it addresses is one of
+dependencies and versions, and indirectly permissions.
+
+With [virtualenv][2], it's possible to install this library without needing system
+install permissions, and without clashing with the installed system
+dependencies. Make sure you use Python 3.7+.
+
+
+### 1.1. Mac/Linux
+
+```bash
+pip install virtualenv
+virtualenv <your-env>
+source <your-env>/bin/activate
+<your-env>/bin/pip install google-datacatalog-looker-connector
+```
+
+### 1.2. Windows
+
+```bash
+pip install virtualenv
+virtualenv <your-env>
+<your-env>\Scripts\activate
+<your-env>\Scripts\pip.exe install google-datacatalog-looker-connector
+```
+
+### 1.3. Install from source
+
+#### 1.3.1. Get the code
 
 ````bash
-git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi.git
-cd datacatalog-connectors-bi/looker2datacatalog
+git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/
+cd datacatalog-connectors-bi/google-datacatalog-looker-connector
 ````
 
-### 1.2. Auth credentials
+#### 1.3.2. Create and activate a *virtualenv*
 
-##### 1.2.1. Create a GCP Service Account and grant it below roles
+```bash
+pip install virtualenv
+virtualenv <your-env>
+source <your-env>/bin/activate
+```
+
+#### 1.3.3. Install the library
+
+```bash
+pip install .
+```
+
+## 2. Environment setup
+
+### 2.2. Auth credentials
+
+#### 2.1.1. Create a GCP Service Account and grant it below roles
 
 - Data Catalog Admin
 
-##### 1.2.2. Download a JSON key and save it as
+#### 2.1.2. Download a JSON key and save it as
 - `<YOUR-CREDENTIALS_FILES_FOLDER>/looker2dc-datacatalog-credentials.json`
 
-##### 1.2.3. Create Looker API3 credentials
+#### 2.1.3. Create Looker API3 credentials
 
 The credentials required for API access must be obtained by creating an
 API3 key on a user account in the Looker Admin console. The API3 key consists
@@ -69,38 +120,15 @@ of a public `client_id` and a private `client_secret`.
 The shortcut for Looker Admin console is
 https://<YOUR-LOOKER-ENDPOINT>/admin/users/api3_key/<YOUR-USER-ID>
 
-##### 1.2.4. Create a Looker configuration file
+#### 2.1.4. Create a Looker configuration file
 
 File content is described in [Looker SDK documentation][1].
 Save the file as
 `<YOUR-CREDENTIALS_FILES_FOLDER>/looker2dc-looker-credentials.ini`
 
-
 > Please notice this folder and files will be required in next steps.
 
-### 1.3. Virtualenv
-
-Using *virtualenv* is optional, but strongly recommended unless you use Docker
-or a PEX file.
-
-##### 1.3.1. Install Python 3.7+
-
-##### 1.3.2. Create and activate a *virtualenv*
-
-```bash
-pip install --upgrade virtualenv
-python3 -m virtualenv --python python3 env
-source ./env/bin/activate
-```
-
-##### 1.3.3. Install the dependencies
-
-```bash
-pip install ./lib/datacatalog_connectors_commons-1.0.0-py2.py3-none-any.whl
-pip install --editable .
-```
-
-##### 1.3.4. Set environment variables
+### 2.3. Set environment variables
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
@@ -109,23 +137,19 @@ export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 > Replace above values according to your environment. The Data Catalog
 > credentials file was saved in step 1.2.2.
 
-### 1.4. Docker
+## 3. Run entry point
 
-See instructions below.
-
-## 2. Sample application entry point
-
-### 2.1. Run the looker2datacatalog script
+### 3.1. Run Python entry point
 
 - Virtualenv
 
 ```bash
-looker2datacatalog \
+google-datacatalog-looker-connector \
   --datacatalog-project-id <YOUR-DATACATALOG-PROJECT-ID> \
   --looker-credentials-file looker_credentials_ini_file
 ```
 
-- Or using Docker
+### 3.2. Run Docker entry point
 
 ```bash
 docker build --rm --tag looker2datacatalog .
@@ -135,7 +159,40 @@ docker run --rm --tty -v <YOUR-CREDENTIALS_FILES_FOLDER>:/data \
   --looker-credentials-file /data/looker2dc-looker-credentials.ini
 ```
 
-## 3. Troubleshooting
+## 4. Developer environment
+
+### 4.1. Install and run Yapf formatter
+
+```bash
+pip install --upgrade yapf
+
+# Auto update files
+yapf --in-place --recursive src tests
+
+# Show diff
+yapf --diff --recursive src tests
+
+# Set up pre-commit hook
+# From the root of your git project.
+curl -o pre-commit.sh https://raw.githubusercontent.com/google/yapf/master/plugins/pre-commit.sh
+chmod a+x pre-commit.sh
+mv pre-commit.sh .git/hooks/pre-commit
+```
+
+### 4.2. Install and run Flake8 linter
+
+```bash
+pip install --upgrade flake8
+flake8 src tests
+```
+
+### 4.3. Run Tests
+
+```bash
+python setup.py test
+```
+
+## 5. Troubleshooting
 
 In the case a connector execution hits Data Catalog quota limit, an error will
 be raised and logged with the following detailment, depending on the performed

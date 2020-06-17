@@ -27,10 +27,10 @@ currently supporting below asset types:
     + [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
     + [1.3.3. Install the library](#133-install-the-library)
 - [2. Environment setup](#2-environment-setup)
-  * [2.2. Auth credentials](#22-auth-credentials)
-    + [2.2.1. Create a service account and grant it below roles](#221-create-a-service-account-and-grant-it-below-roles)
-    + [2.2.2. Download a JSON key and save it as](#222-download-a-json-key-and-save-it-as)
-  * [2.3. Set environment variables](#23-set-environment-variables)
+  * [2.1. Auth credentials](#21-auth-credentials)
+    + [2.1.1. Create a service account and grant it below roles](#211-create-a-service-account-and-grant-it-below-roles)
+    + [2.1.2. Download a JSON key and save it as](#212-download-a-json-key-and-save-it-as)
+  * [2.2. Set environment variables](#22-set-environment-variables)
 - [3. Run entry point](#3-run-entry-point)
   * [3.1. Run Python entry point](#31-run-python-entry-point)
   * [3.2. Run Docker entry point](#32-run-docker-entry-point)
@@ -44,7 +44,6 @@ currently supporting below asset types:
 <!-- tocstop -->
 
 -----
-
 
 ## 1. Installation
 
@@ -81,7 +80,7 @@ virtualenv <your-env>
 
 ````bash
 git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/
-cd google-datacatalog-tableau-connector
+cd datacatalog-connectors-bi/google-datacatalog-tableau-connector
 ````
 
 #### 1.3.2. Create and activate a *virtualenv*
@@ -100,18 +99,18 @@ pip install .
 
 ## 2. Environment setup
 
-### 2.2. Auth credentials
+### 2.1. Auth credentials
 
-#### 2.2.1. Create a service account and grant it below roles
+#### 2.1.1. Create a service account and grant it below roles
 
 - Data Catalog Admin
 
-#### 2.2.2. Download a JSON key and save it as
+#### 2.1.2. Download a JSON key and save it as
 - `<YOUR-CREDENTIALS_FILES_FOLDER>/tableau2dc-datacatalog-credentials.json`
 
 > Please notice this folder and file will be required in next steps.
 
-### 2.3. Set environment variables
+### 2.2. Set environment variables
 
 Replace below values according to your environment:
 
