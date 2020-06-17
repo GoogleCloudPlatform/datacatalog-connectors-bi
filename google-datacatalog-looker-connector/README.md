@@ -29,12 +29,12 @@ supporting below asset types:
     + [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
     + [1.3.3. Install the library](#133-install-the-library)
 - [2. Environment setup](#2-environment-setup)
-  * [2.2. Auth credentials](#22-auth-credentials)
+  * [2.1. Auth credentials](#21-auth-credentials)
     + [2.1.1. Create a GCP Service Account and grant it below roles](#211-create-a-gcp-service-account-and-grant-it-below-roles)
     + [2.1.2. Download a JSON key and save it as](#212-download-a-json-key-and-save-it-as)
     + [2.1.3. Create Looker API3 credentials](#213-create-looker-api3-credentials)
     + [2.1.4. Create a Looker configuration file](#214-create-a-looker-configuration-file)
-  * [2.3. Set environment variables](#23-set-environment-variables)
+  * [2.2. Set environment variables](#22-set-environment-variables)
 - [3. Run entry point](#3-run-entry-point)
   * [3.1. Run Python entry point](#31-run-python-entry-point)
   * [3.2. Run Docker entry point](#32-run-docker-entry-point)
@@ -102,7 +102,7 @@ pip install .
 
 ## 2. Environment setup
 
-### 2.2. Auth credentials
+### 2.1. Auth credentials
 
 #### 2.1.1. Create a GCP Service Account and grant it below roles
 
@@ -128,7 +128,7 @@ Save the file as
 
 > Please notice this folder and files will be required in next steps.
 
-### 2.3. Set environment variables
+### 2.2. Set environment variables
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
