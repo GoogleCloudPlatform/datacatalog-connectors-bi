@@ -66,10 +66,10 @@ class AssembledEntryFactory:
                     self.__make_assembled_entries_for_looks(
                         folder.looks, look_tag_template))
 
-        assembled_entries.extend([
-            self.__make_assembled_entry_for_query(query, query_tag_template)
-            for query in queries
-        ])
+        #assembled_entries.extend([
+        #    self.__make_assembled_entry_for_query(query, query_tag_template)
+        #    for query in queries
+        #])
 
         return assembled_entries
 

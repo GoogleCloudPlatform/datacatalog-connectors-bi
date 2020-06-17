@@ -6,6 +6,9 @@ This repository contains sample code with integration between Data Catalog and B
 
 ![Python package](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/workflows/Python%20package/badge.svg?branch=master)
 
+**Note:**
+The package names were renamed, if you are still using the older version use the branch: [release-v0.0.0](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/release-v0.0.0)
+
 ## Project structure
 
 Each subfolder contains a Python package. Please check components' README files for
@@ -15,5 +18,5 @@ The following components are available in this repo:
 
 | Component | Description | Folder | Language | 
 |-----------|-------------|--------|----------|
-| looker2datacatalog |  Sample code for Looker data source. | [./looker2datacatalog](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/looker2datacatalog) | Python |
-| tableau2datacatalog | Sample code for Tableau data source. | [./tableau2datacatalog](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/tableau2datacatalog) | Python | 
+| google-datacatalog-looker-connector |  Sample code for Looker data source. | [google-datacatalog-looker-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-looker-connector) | Python |
+| google-datacatalog-tableau-connector | Sample code for Tableau data source. | [google-datacatalog-tableau-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-tableau-connector) | Python | 
