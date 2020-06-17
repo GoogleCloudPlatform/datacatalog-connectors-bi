@@ -79,7 +79,7 @@ class MetadataSynchronizer:
 
         logging.info('')
         logging.info('Queries...')
-        #queries_dict = self.__scrape_queries(folders_dict)
+        queries_dict = self.__scrape_queries(folders_dict)
         logging.info('==== DONE ========================================')
 
         # Prepare: convert Looker metadata into Data Catalog entities model.
@@ -90,7 +90,7 @@ class MetadataSynchronizer:
         tag_templates_dict = self.__make_tag_templates_dict()
 
         assembled_entries_dict = self.__make_assembled_entries_dict(
-            folders_dict, None, tag_templates_dict)
+            folders_dict, queries_dict, tag_templates_dict)
         logging.info('==== DONE ========================================')
 
         # Data Catalog entries relationship mapping.
@@ -321,15 +321,13 @@ class MetadataSynchronizer:
 
     def __scrape_query(self, query_id):
         query = self.__metadata_scraper.scrape_query(query_id)
+        generated_sql = \
+            self.__metadata_scraper.scrape_query_generated_sql(query_id)
 
-        generated_sql = None
         model_explore = None
         connection = None
 
         try:
-            generated_sql = \
-                self.__metadata_scraper.scrape_query_generated_sql(query_id)
-
             model_explore = self.__metadata_scraper\
                 .scrape_lookml_model_explore(query.model, query.view)
             connection = self.__metadata_scraper.scrape_connection(
@@ -388,7 +386,7 @@ class MetadataSynchronizer:
         for folder_id, folders in folders_dict.items():
             assembled_entries[folder_id] = self.__assembled_entry_factory\
                 .make_assembled_entries_list(
-                    folders, None, tag_templates_dict)
+                    folders, queries_dict[folder_id], tag_templates_dict)
 
         return assembled_entries
 
