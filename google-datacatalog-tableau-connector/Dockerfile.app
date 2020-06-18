@@ -3,11 +3,6 @@ FROM python:3.7
 
 # Copy the local client library dependency and install it (temporary).
 WORKDIR /lib
-COPY ./lib/datacatalog_connectors_commons-1.0.0-py2.py3-none-any.whl .
-RUN pip install datacatalog_connectors_commons-1.0.0-py2.py3-none-any.whl
-
-COPY ./lib/datacatalog_connectors_commons_test-1.0.0-py2.py3-none-any.whl .
-RUN pip install datacatalog_connectors_commons_test-1.0.0-py2.py3-none-any.whl
 
 RUN pip install google-cloud-logging
 

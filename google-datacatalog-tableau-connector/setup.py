@@ -16,9 +16,14 @@
 
 import setuptools
 
+release_status='Development Status :: 4 - Beta'
+
+with open('README.md') as readme_file:
+    readme = readme_file.read()
+
 setuptools.setup(
-    name='tableau2datacatalog',
-    version='1.0.0',
+    name='google-datacatalog-tableau-connector',
+    version='0.5.0',
     author='Google LLC',
     description='Package for ingesting Tableau metadata'
     ' into Google Cloud Data Catalog',
@@ -28,18 +33,20 @@ setuptools.setup(
     package_dir={'': 'src'},
     entry_points={
         'console_scripts': [
-            'tableau2datacatalog = google.datacatalog_connectors.tableau:main',
+            'google-datacatalog-tableau-connector = google.datacatalog_connectors.tableau:main',
         ],
     },
     include_package_data=True,
-    install_requires=('requests',),
+    install_requires=('requests', 'google-datacatalog-connectors-commons'),
     setup_requires=('pytest-runner',),
     tests_require=('pytest-cov',),
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        release_status,
         'Natural Language :: English',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
+    long_description=readme,
+    long_description_content_type='text/markdown',
 )

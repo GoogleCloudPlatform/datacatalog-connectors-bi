@@ -16,9 +16,14 @@
 
 import setuptools
 
+release_status='Development Status :: 4 - Beta'
+
+with open('README.md') as readme_file:
+    readme = readme_file.read()
+
 setuptools.setup(
-    name='looker2datacatalog',
-    version='1.0.0',
+    name='google-datacatalog-looker-connector',
+    version='0.5.0',
     author='Google LLC',
     description='Package for ingesting Looker metadata'
     ' into Google Cloud Data Catalog',
@@ -28,17 +33,19 @@ setuptools.setup(
     package_dir={'': 'src'},
     entry_points={
         'console_scripts': [
-            'looker2datacatalog = google.datacatalog_connectors.looker:main',
+            'google-datacatalog-looker-connector = google.datacatalog_connectors.looker:main',
         ],
     },
     include_package_data=True,
-    install_requires=('looker_sdk==0.1.3b7',),
+    install_requires=('looker_sdk==0.1.3b7', 'google-datacatalog-connectors-commons'),
     setup_requires=('pytest-runner',),
     tests_require=('pytest-cov',),
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        release_status,
         'Natural Language :: English',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.7',
     ],
+    long_description=readme,
+    long_description_content_type='text/markdown',
 )
