@@ -8,7 +8,7 @@ supporting below asset types:
 - Dashboard Element (aka Tile)
 - Query
 
-![Python package](4)[![PyPi][5]][6] [![License][7]][7] [![Issues][8]][9]
+[![Python package][4]][4] [![PyPi][5]][6] [![License][7]][7] [![Issues][8]][9]
 
 **Disclaimer: This is not an officially supported Google product.**
 

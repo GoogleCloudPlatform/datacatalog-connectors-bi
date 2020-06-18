@@ -6,7 +6,7 @@ currently supporting below asset types:
 - Sheet
 - Dashboard
 
-![Python package](3)[![PyPi][4]][5] [![License][6]][6] [![Issues][7]][8]
+[![Python package][3]][3] [![PyPi][4]][5] [![License][6]][6] [![Issues][7]][8]
 
 **Disclaimer: This is not an officially supported Google product.**
 
