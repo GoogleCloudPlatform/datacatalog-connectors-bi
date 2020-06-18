@@ -222,8 +222,8 @@ For more information on Data Catalog quota, please refer to: [Data Catalog quota
 [1]: https://cloud.google.com/data-catalog/docs/resources/quotas
 [2]: https://virtualenv.pypa.io/en/latest/
 [3]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/workflows/Python%20package/badge.svg?branch=master
-[4]: https://img.shields.io/pypi/v/google-datacatalog-looker-connector.svg
-[5]: https://pypi.org/project/google-datacatalog-looker-connector/
+[4]: https://img.shields.io/pypi/v/google-datacatalog-tableau-connector.svg
+[5]: https://pypi.org/project/google-datacatalog-tableau-connector/
 [6]: https://img.shields.io/github/license/GoogleCloudPlatform/datacatalog-connectors-bi.svg
 [7]: https://img.shields.io/github/issues/GoogleCloudPlatform/datacatalog-connectors-bi.svg
 [8]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues
