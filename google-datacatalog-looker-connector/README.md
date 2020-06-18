@@ -8,6 +8,8 @@ supporting below asset types:
 - Dashboard Element (aka Tile)
 - Query
 
+![Python package](4)[![PyPi][5]][6] [![License][7]][7] [![Issues][8]][9]
+
 **Disclaimer: This is not an officially supported Google product.**
 
 <!--
@@ -210,3 +212,9 @@ For more information on Data Catalog quota, please refer to: [Data Catalog quota
 [1]: https://github.com/looker-open-source/sdk-codegen/blob/master/looker-sample.ini
 [2]: https://cloud.google.com/data-catalog/docs/resources/quotas
 [3]: https://virtualenv.pypa.io/en/latest/
+[4]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/workflows/Python%20package/badge.svg?branch=master
+[5]: https://img.shields.io/pypi/v/google-datacatalog-looker-connector.svg
+[6]: https://pypi.org/project/google-datacatalog-looker-connector/
+[7]: https://img.shields.io/github/license/GoogleCloudPlatform/datacatalog-connectors-bi.svg
+[8]: https://img.shields.io/github/issues/GoogleCloudPlatform/datacatalog-connectors-bi.svg
+[9]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues
