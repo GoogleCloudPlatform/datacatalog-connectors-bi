@@ -321,17 +321,18 @@ class MetadataSynchronizer:
 
     def __scrape_query(self, query_id):
         query = self.__metadata_scraper.scrape_query(query_id)
-        generated_sql = \
-            self.__metadata_scraper.scrape_query_generated_sql(query_id)
 
         model_explore = None
         connection = None
+        generated_sql = None
 
         try:
             model_explore = self.__metadata_scraper\
                 .scrape_lookml_model_explore(query.model, query.view)
             connection = self.__metadata_scraper.scrape_connection(
                 model_explore.connection_name)
+            generated_sql = \
+                self.__metadata_scraper.scrape_query_generated_sql(query_id)
         except error.SDKError:
             pass
 
