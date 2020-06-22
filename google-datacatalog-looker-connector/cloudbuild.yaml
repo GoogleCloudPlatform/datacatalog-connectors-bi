@@ -50,8 +50,7 @@ steps:
   args:
   - -c
   - 'pip install google-cloud-datacatalog &&
-     /workspace/google-datacatalog-looker-connector/system_tests/cleanup.sh'
- System_tests disabled: b/152768468     
+     /workspace/google-datacatalog-looker-connector/system_tests/cleanup.sh'   
 - name: 'gcr.io/cloud-builders/docker'
   id: 'SYSTEM_TESTS'
   args: ['run',
