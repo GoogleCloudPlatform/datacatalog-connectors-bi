@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+echo 'Execute CLEANUP'
+python google-datacatalog-looker-connector/tools/cleanup_datacatalog.py --datacatalog-project-ids $LOOKER2DC_DATACATALOG_PROJECT_ID
+
 # Sleep 5 seconds to wait for search index
 sleep 5
-echo 'Assert INGESTION'
-python google-datacatalog-tableau-connector/system_tests/execution_results_test.py
+echo 'Assert CLEANUP'
+python google-datacatalog-looker-connector/system_tests/cleanup_results_test.py

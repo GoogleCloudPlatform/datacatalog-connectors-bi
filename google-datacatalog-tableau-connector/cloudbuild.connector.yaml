@@ -20,7 +20,7 @@ steps:
   args: ['build',
          '-t',
          'gcr.io/$PROJECT_ID/tableau2datacatalog:$COMMIT_SHA',
-         '.']
+         '/workspace/google-datacatalog-tableau-connector/.']
   # Create custom image tag and write to file /workspace/_TAG
 - name: 'alpine'
   id: 'SETUP_TAG'
@@ -49,22 +49,22 @@ steps:
   args:
   - -c
   - 'pip install google-cloud-datacatalog &&
-     system_tests/cleanup.sh'
-# System_tests disabled: b/152768468     
-#- name: 'gcr.io/cloud-builders/docker'
-#  id: 'SYSTEM_TESTS'
-#  args: ['run',
-#         '--rm',
-#         '--tty',
-#         '-v',
-#         '/workspace:/data',
-#         'gcr.io/$PROJECT_ID/tableau2datacatalog:$COMMIT_SHA',
-#         '--datacatalog-project-id=${_TABLEAU2DC_DATACATALOG_PROJECT_ID}',
-#         '--tableau-server=${_TABLEAU2DC_TABLEAU_SERVER}',
-#         '--tableau-api-version=${_TABLEAU2DC_TABLEAU_API_VERSION}',
-#         '--tableau-username=${_TABLEAU2DC_TABLEAU_USERNAME}',
-#         '--tableau-password=${_TABLEAU2DC_TABLEAU_PASSWORD}',
-#         '--tableau-site=${_TABLEAU2DC_TABLEAU_SITE}']
+     /workspace/google-datacatalog-tableau-connector/system_tests/cleanup.sh'
+ System_tests disabled: b/152768468     
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'SYSTEM_TESTS'
+  args: ['run',
+         '--rm',
+         '--tty',
+         '-v',
+         '/workspace:/data',
+         'gcr.io/$PROJECT_ID/tableau2datacatalog:$COMMIT_SHA',
+         '--datacatalog-project-id=${_TABLEAU2DC_DATACATALOG_PROJECT_ID}',
+         '--tableau-server=${_TABLEAU2DC_TABLEAU_SERVER}',
+         '--tableau-api-version=${_TABLEAU2DC_TABLEAU_API_VERSION}',
+         '--tableau-username=${_TABLEAU2DC_TABLEAU_USERNAME}',
+         '--tableau-password=${_TABLEAU2DC_TABLEAU_PASSWORD}',
+         '--tableau-site=${_TABLEAU2DC_TABLEAU_SITE}']
 - name: 'docker.io/library/python:3.7'
   id: 'ASSERT_RESULTS'
   entrypoint: 'bash'
@@ -74,7 +74,7 @@ steps:
   args:
   - -c
   - 'pip install google-cloud-datacatalog &&
-     system_tests/assert.sh'
+     /workspace/google-datacatalog-tableau-connector/system_tests/assert.sh'
 - name: 'gcr.io/cloud-builders/docker'
   id: 'TAG_STABLE'
   entrypoint: '/bin/bash'
