@@ -20,7 +20,7 @@ import re
 from google.cloud import datacatalog
 from google.cloud.datacatalog import types
 
-from ciandt.google_cloud.looker2datacatalog.prepare import constant
+from google.datacatalog_connectors.looker.prepare import constant
 
 __DATACATALOG_LOCATION_ID = 'us-central1'
 
