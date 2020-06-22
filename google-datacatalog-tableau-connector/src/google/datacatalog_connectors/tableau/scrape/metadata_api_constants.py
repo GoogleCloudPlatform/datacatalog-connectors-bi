@@ -27,9 +27,9 @@ __DATABASE_FIELDS = """
 
 __DATABASE_TABLE_FIELDS = """
     fullName
-    database {{
+    database {
         luid
-    }}
+    }
 """
 
 __DATASOURCE_FIELDS = f"""
