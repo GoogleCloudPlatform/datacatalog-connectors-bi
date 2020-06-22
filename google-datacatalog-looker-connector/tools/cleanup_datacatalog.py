@@ -20,8 +20,6 @@ import re
 from google.cloud import datacatalog
 from google.cloud.datacatalog import types
 
-from google.datacatalog_connectors.looker.prepare import constant
-
 __DATACATALOG_LOCATION_ID = 'us-central1'
 
 __datacatalog = datacatalog.DataCatalogClient()
@@ -81,15 +79,15 @@ def __delete_tag_template(project_id, location_id, tag_template_id):
 
 def __delete_tag_templates(project_id, location_id):
     __delete_tag_template(
-        project_id, location_id, constant.TAG_TEMPLATE_ID_DASHBOARD)
+        project_id, location_id, 'looker_dashboard_metadata')
     __delete_tag_template(
-        project_id, location_id, constant.TAG_TEMPLATE_ID_DASHBOARD_ELEMENT)
+        project_id, location_id, 'looker_dashboard_element_metadata')
     __delete_tag_template(
-        project_id, location_id, constant.TAG_TEMPLATE_ID_FOLDER)
+        project_id, location_id, 'looker_folder_metadata')
     __delete_tag_template(
-        project_id, location_id, constant.TAG_TEMPLATE_ID_LOOK)
+        project_id, location_id, 'looker_look_metadata')
     __delete_tag_template(
-        project_id, location_id, constant.TAG_TEMPLATE_ID_QUERY)
+        project_id, location_id, 'looker_query_metadata')
 
 
 def __parse_args():
