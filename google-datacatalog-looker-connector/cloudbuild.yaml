@@ -51,9 +51,7 @@ steps:
   - -c
   - 'pip install google-cloud-datacatalog &&
      /workspace/google-datacatalog-looker-connector/system_tests/cleanup.sh'   
-  # Ignore step if it takes more than 10 minutes.
-  # this will have enough metadata to validate the results. 
-  - name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/cloud-builders/docker'
   id: 'SYSTEM_TESTS'
   args: ['run',
          '--rm',
