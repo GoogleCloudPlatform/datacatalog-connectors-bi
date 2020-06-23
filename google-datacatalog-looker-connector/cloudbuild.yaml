@@ -60,8 +60,7 @@ steps:
          '/workspace:/data',
          'gcr.io/$PROJECT_ID/looker2datacatalog:$COMMIT_SHA',
          '--datacatalog-project-id=${_LOOKER2DC_DATACATALOG_PROJECT_ID}',
-         '--looker-credentials-file=/data/looker.ini']
-  timeout: 600s       
+         '--looker-credentials-file=/data/looker.ini']     
 - name: 'docker.io/library/python:3.7'
   id: 'ASSERT_RESULTS'
   entrypoint: 'bash'
