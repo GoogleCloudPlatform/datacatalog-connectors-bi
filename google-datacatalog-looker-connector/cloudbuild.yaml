@@ -78,4 +78,4 @@ steps:
   args: ['-c',
          "docker tag gcr.io/$PROJECT_ID/looker2datacatalog:$COMMIT_SHA gcr.io/$PROJECT_ID/looker2datacatalog:$(cat _TAG)"]
 images: ['gcr.io/$PROJECT_ID/looker2datacatalog']
-timeout: 900s
+timeout: 3600s
