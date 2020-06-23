@@ -51,7 +51,9 @@ steps:
   - -c
   - 'pip install google-cloud-datacatalog &&
      /workspace/google-datacatalog-looker-connector/system_tests/cleanup.sh'   
-- name: 'gcr.io/cloud-builders/docker'
+  # Ignore step if it takes more than 10 minutes.
+  # this will have enough metadata to validate the results 
+  - name: 'gcr.io/cloud-builders/docker'
   id: 'SYSTEM_TESTS'
   args: ['run',
          '--rm',
@@ -60,7 +62,9 @@ steps:
          '/workspace:/data',
          'gcr.io/$PROJECT_ID/looker2datacatalog:$COMMIT_SHA',
          '--datacatalog-project-id=${_LOOKER2DC_DATACATALOG_PROJECT_ID}',
-         '--looker-credentials-file=/data/looker.ini']
+         '--looker-credentials-file=/data/looker.ini',
+         '||', 'true']
+  timeout: 600s       
 - name: 'docker.io/library/python:3.7'
   id: 'ASSERT_RESULTS'
   entrypoint: 'bash'
