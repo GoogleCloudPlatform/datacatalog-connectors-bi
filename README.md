@@ -6,7 +6,7 @@ This repository contains sample code with integration between Data Catalog and B
 
 ![Python package](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/workflows/Python%20package/badge.svg?branch=master)
 
-## **Breaking Changes in v0.5.0.**
+## **Breaking Changes in v0.5.0**
 
 The package names were renamed, if you are still using the older version use the branch: [release-v0.0.0](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/release-v0.0.0)
 
