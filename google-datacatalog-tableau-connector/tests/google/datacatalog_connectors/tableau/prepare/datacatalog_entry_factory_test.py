@@ -174,3 +174,29 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                                              datetime_format)
         self.assertEqual(updated_datetime.timestamp(),
                          entry.source_system_timestamps.update_time.seconds)
+
+    def test_make_entry_long_luid_should_limit_result_id_length(self):
+        metadata = {
+            'luid': '12345678901234567890123456789012'
+                    '34567890123456789012345678901234',
+            'name': 'Test Name',
+            'path': 'test/sheet',
+            'createdAt': '2019-09-12T16:30:00Z',
+            'updatedAt': '2019-09-12T16:30:55Z'
+        }
+
+        workbook_metadata = {'site': {'name': 'test-site'}}
+
+        entry = self.__factory.make_entry_for_sheet(metadata,
+                                                    workbook_metadata)
+
+        self.assertEqual(
+            't__1234567890123456789012345678901234567890123456789012345678901',
+            entry[0])
+
+        entry = entry[1]
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'entryGroups/test-entry-group/entries/'
+            't__1234567890123456789012345678901234567890123456789012345678901',
+            entry.name)

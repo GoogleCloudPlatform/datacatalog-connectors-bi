@@ -20,10 +20,12 @@ import logging
 from google.cloud import datacatalog
 from google.cloud.datacatalog import types
 
+from google.datacatalog_connectors.commons.prepare.base_entry_factory import \
+    BaseEntryFactory
 from . import constant
 
 
-class DataCatalogEntryFactory:
+class DataCatalogEntryFactory(BaseEntryFactory):
     # Datetime format with timezone information
     __DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
@@ -47,7 +49,7 @@ class DataCatalogEntryFactory:
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = constant.USER_SPECIFIED_TYPE_DASHBOARD
 
-        entry.display_name = self.__format_display_name(
+        entry.display_name = self._format_display_name(
             dashboard_metadata.get('name'))
 
         path = dashboard_metadata.get('path')
@@ -90,7 +92,7 @@ class DataCatalogEntryFactory:
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = constant.USER_SPECIFIED_TYPE_SHEET
 
-        entry.display_name = self.__format_display_name(
+        entry.display_name = self._format_display_name(
             sheet_metadata.get('name'))
 
         # A null path that means the sheet was hidden and included on a
@@ -131,7 +133,7 @@ class DataCatalogEntryFactory:
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = constant.USER_SPECIFIED_TYPE_WORKBOOK
 
-        entry.display_name = self.__format_display_name(
+        entry.display_name = self._format_display_name(
             workbook_metadata.get('name'))
         entry.description = workbook_metadata.get('description')
 
@@ -157,14 +159,11 @@ class DataCatalogEntryFactory:
 
     @classmethod
     def __format_id(cls, source_id):
-        return f'{constant.ENTRY_ID_PREFIX}{source_id}'.replace('-', '_')
-
-    @classmethod
-    def __format_display_name(cls, source_name):
-        formatted_name = source_name.replace('&', '_')
-        formatted_name = formatted_name.replace(':', '_')
-        formatted_name = formatted_name.replace('/', '_')
-        return formatted_name
+        no_prefix_fmt_id = cls._format_id(source_id)
+        if len(no_prefix_fmt_id) > constant.NO_PREFIX_ENTRY_ID_LENGTH:
+            no_prefix_fmt_id = \
+                no_prefix_fmt_id[:constant.NO_PREFIX_ENTRY_ID_LENGTH]
+        return f'{constant.ENTRY_ID_PREFIX}{no_prefix_fmt_id}'
 
     @classmethod
     def __format_site_content_url(cls, workbook_metadata):
