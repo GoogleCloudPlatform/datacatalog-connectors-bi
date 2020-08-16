@@ -49,18 +49,16 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tag.template = tag_template.name
 
-        super()._set_string_field(tag, 'id', dashboard_metadata.get('id'))
-        super()._set_string_field(tag, 'luid', dashboard_metadata.get('luid'))
-        super()._set_string_field(
-            tag, 'workbook_luid',
-            dashboard_metadata.get('workbook').get('luid'))
-        super()._set_string_field(
-            tag, 'workbook_name',
-            dashboard_metadata.get('workbook').get('name'))
-        super()._set_string_field(
+        cls._set_string_field(tag, 'id', dashboard_metadata.get('id'))
+        cls._set_string_field(tag, 'luid', dashboard_metadata.get('luid'))
+        cls._set_string_field(tag, 'workbook_luid',
+                              dashboard_metadata.get('workbook').get('luid'))
+        cls._set_string_field(tag, 'workbook_name',
+                              dashboard_metadata.get('workbook').get('name'))
+        cls._set_string_field(
             tag, 'site_name',
             dashboard_metadata.get('workbook').get('site').get('name'))
-        super()._set_bool_field(
+        cls._set_bool_field(
             tag, 'has_external_url', 'path' in dashboard_metadata and
             not dashboard_metadata.get('path') == '')
 
@@ -74,15 +72,15 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tag.template = tag_template.name
 
-        super()._set_string_field(tag, 'id', sheet_metadata.get('id'))
-        super()._set_string_field(tag, 'luid', sheet_metadata.get('luid'))
-        super()._set_string_field(tag, 'workbook_luid',
-                                  workbook_metadata.get('luid'))
-        super()._set_string_field(tag, 'workbook_name',
-                                  workbook_metadata.get('name'))
-        super()._set_string_field(tag, 'site_name',
-                                  workbook_metadata.get('site').get('name'))
-        super()._set_bool_field(
+        cls._set_string_field(tag, 'id', sheet_metadata.get('id'))
+        cls._set_string_field(tag, 'luid', sheet_metadata.get('luid'))
+        cls._set_string_field(tag, 'workbook_luid',
+                              workbook_metadata.get('luid'))
+        cls._set_string_field(tag, 'workbook_name',
+                              workbook_metadata.get('name'))
+        cls._set_string_field(tag, 'site_name',
+                              workbook_metadata.get('site').get('name'))
+        cls._set_bool_field(
             tag, 'has_external_url', 'path' in sheet_metadata and
             not sheet_metadata.get('path') == '')
 
@@ -94,29 +92,28 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tag.template = tag_template.name
 
-        super()._set_string_field(tag, 'luid', workbook_metadata.get('luid'))
+        cls._set_string_field(tag, 'luid', workbook_metadata.get('luid'))
 
         site = workbook_metadata.get('site')
         if site:
-            super()._set_string_field(tag, 'site_name', site.get('name'))
+            cls._set_string_field(tag, 'site_name', site.get('name'))
 
-        super()._set_string_field(tag, 'project_name',
-                                  workbook_metadata.get('projectName'))
+        cls._set_string_field(tag, 'project_name',
+                              workbook_metadata.get('projectName'))
 
         owner = workbook_metadata.get('owner')
         if owner:
-            super()._set_string_field(tag, 'owner_username',
-                                      owner.get('username'))
-            super()._set_string_field(tag, 'owner_name', owner.get('name'))
+            cls._set_string_field(tag, 'owner_username', owner.get('username'))
+            cls._set_string_field(tag, 'owner_name', owner.get('name'))
 
         upstream_tables = cls.make_upstream_tables_field_value(
             workbook_metadata)
         if upstream_tables:
-            super()._set_string_field(
+            cls._set_string_field(
                 tag, 'upstream_table_definition',
                 'DATABASE NAME (CONNECTION TYPE) / TABLE NAME')
-            super()._set_string_field(tag, 'upstream_tables',
-                                      ', '.join(upstream_tables))
+            cls._set_string_field(tag, 'upstream_tables',
+                                  ', '.join(upstream_tables))
 
         return tag
 
