@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ENTRY_ID_LENGTH = 64
 ENTRY_ID_PREFIX = 't__'
+NO_PREFIX_ENTRY_ID_LENGTH = ENTRY_ID_LENGTH - len(ENTRY_ID_PREFIX)
 
 USER_SPECIFIED_TYPE_DASHBOARD = 'dashboard'
 USER_SPECIFIED_TYPE_SHEET = 'sheet'
