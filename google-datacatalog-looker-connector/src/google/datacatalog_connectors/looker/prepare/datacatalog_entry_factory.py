@@ -50,7 +50,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = constant.USER_SPECIFIED_TYPE_DASHBOARD
 
-        entry.display_name = super()._format_display_name(dashboard.title)
+        entry.display_name = self._format_display_name(dashboard.title)
 
         entry.linked_resource = \
             f'{self.__instance_url}/dashboards/{dashboard.id}'
@@ -89,7 +89,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_type = \
             constant.USER_SPECIFIED_TYPE_DASHBOARD_ELEMENT
 
-        entry.display_name = super()._format_display_name(title)
+        entry.display_name = self._format_display_name(title)
 
         return generated_id, entry
 
@@ -104,7 +104,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = constant.USER_SPECIFIED_TYPE_FOLDER
 
-        entry.display_name = super()._format_display_name(folder.name)
+        entry.display_name = self._format_display_name(folder.name)
 
         entry.linked_resource = f'{self.__instance_url}/folders/{folder.id}'
 
@@ -121,7 +121,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = constant.USER_SPECIFIED_TYPE_LOOK
 
-        entry.display_name = super()._format_display_name(look.title)
+        entry.display_name = self._format_display_name(look.title)
 
         entry.linked_resource = f'{self.__instance_url}/looks/{look.id}'
 
@@ -145,7 +145,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = constant.USER_SPECIFIED_TYPE_QUERY
 
-        entry.display_name = super()._format_display_name(
+        entry.display_name = self._format_display_name(
             f'Query {query.id} - model {query.model} - explore {query.view}')
 
         entry.linked_resource = query.share_url
@@ -154,9 +154,9 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
     def __format_id(self, source_type_prefix, source_id):
         prefixed_id = f'{constant.ENTRY_ID_PREFIX}' \
-                       f'{self.__server_id}_' \
-                       f'{source_type_prefix}{source_id}'
-        return super()._format_id(prefixed_id)
+                      f'{self.__server_id}_' \
+                      f'{source_type_prefix}{source_id}'
+        return self._format_id(prefixed_id)
 
     @classmethod
     def __convert_datetime_to_seconds(cls, datetime_object):
