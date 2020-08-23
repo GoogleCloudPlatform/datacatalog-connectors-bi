@@ -16,14 +16,14 @@
 
 import setuptools
 
-release_status='Development Status :: 4 - Beta'
+release_status = 'Development Status :: 4 - Beta'
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
 setuptools.setup(
     name='google-datacatalog-tableau-connector',
-    version='0.5.1',
+    version='0.5.2',
     author='Google LLC',
     description='Package for ingesting Tableau metadata'
     ' into Google Cloud Data Catalog',
