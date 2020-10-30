@@ -41,6 +41,7 @@ currently supporting below asset types:
   * [5.1. Install and run Yapf formatter](#51-install-and-run-yapf-formatter)
   * [6.2. Install and run Flake8 linter](#62-install-and-run-flake8-linter)
   * [6.3. Run Tests](#63-run-tests)
+  * [6.4. Additional resources](#64-additional-resources)
 - [7. Troubleshooting](#7-troubleshooting)
 
 <!-- tocstop -->
@@ -204,6 +205,12 @@ flake8 src tests
 ```bash
 python setup.py test
 ```
+
+### 6.4. Additional resources
+
+Please refer to the [Developer Resources
+documentation](docs/developer-resources).
+
 ## 7. Troubleshooting
 
 In the case a connector execution hits Data Catalog quota limit, an error will
