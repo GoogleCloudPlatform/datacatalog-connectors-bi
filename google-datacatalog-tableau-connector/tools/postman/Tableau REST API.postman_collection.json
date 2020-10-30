@@ -1,0 +1,600 @@
+{
+	"info": {
+		"_postman_id": "d6709b25-df27-4f24-8e4c-5433f55d38da",
+		"name": "Tableau REST API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 Authenticate",
+			"item": [
+				{
+					"name": "0.01.01 Sign in",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "10d745db-cee3-4079-8841-4b5307ddfd41",
+								"exec": [
+									"pm.globals.clear();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "855aa168-0e50-4eae-b20b-658b69c83159",
+								"exec": [
+									"pm.globals.set(\"siteId\", pm.response.json().credentials.site.id);",
+									"pm.globals.set(\"userId\", pm.response.json().credentials.user.id);",
+									"pm.globals.set(\"token\", pm.response.json().credentials.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"credentials\": {\n\t\t\"name\": \"{{USERNAME}}\",\n\t\t\"password\": \"{{PASSWORD}}\",\n\t\t\"site\": {\n\t\t\t\"contentUrl\": \"{{SITE_URL}}\"\t\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/auth/signin",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "1 REST API",
+			"item": [
+				{
+					"name": "1.01.01 Get Databases for site",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e0d2d0e2-e882-46a2-9aed-ccc8bbfdff7e",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const databases = jsonData.databases.database;",
+									"",
+									"pm.globals.unset(\"databaseId\");",
+									"",
+									"if (databases.length > 0) {",
+									"    pm.globals.set(\"databaseId\", databases[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"databases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.01.02 Get Database by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases/{{databaseId}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"databases",
+								"{{databaseId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.01.03 Delete Database",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "text/xml"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases/<DATABASE-ID-TO-DELETE>",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"databases",
+								"<DATABASE-ID-TO-DELETE>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.02.01 Get Data Sources for site",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4fc973b2-e863-46e3-95f0-50325a59bec7",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const datasources = jsonData.datasources.datasource;",
+									"",
+									"pm.globals.unset(\"datasourceId\");",
+									"",
+									"if (datasources.length > 0) {",
+									"    pm.globals.set(\"datasourceId\", datasources[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/datasources",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"datasources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.02.02 Get Data Source",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/datasources/{{datasourceId}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"datasources",
+								"{{datasourceId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.03.01 Get Projects for site",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/projects",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.04.01 Get Views for site",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/views",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"views"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.05.01 Get Workbooks for site",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/workbooks",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"workbooks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.06.01 Get Sites for server",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.07.01 Get Workbooks for user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/users/{{userId}}/workbooks",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}",
+								"users",
+								"{{userId}}",
+								"workbooks"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "663116dc-b8f1-4874-84a0-8c94b476c17a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "3f68e5fd-0598-49ea-88c8-728f8ba2ae2c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

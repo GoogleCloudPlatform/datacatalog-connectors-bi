@@ -1,0 +1,491 @@
+{
+	"info": {
+		"_postman_id": "48f8d106-3886-4f0e-a224-3ff10cf369a7",
+		"name": "Tableau GraphQL API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 Authentication",
+			"item": [
+				{
+					"name": "0.01.01 Sign in",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9d9dd1a1-fb2c-4232-b58b-b7449178b232",
+								"exec": [
+									"pm.globals.clear();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8539e066-8311-4393-ad8b-8bbcbfc4cfbf",
+								"exec": [
+									"pm.globals.set(\"siteId\", pm.response.json().credentials.site.id);",
+									"pm.globals.set(\"userId\", pm.response.json().credentials.user.id);",
+									"pm.globals.set(\"token\", pm.response.json().credentials.token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"credentials\": {\n\t\t\"name\": \"{{USERNAME}}\",\n\t\t\"password\": \"{{PASSWORD}}\",\n\t\t\"site\": {\n\t\t\t\"contentUrl\": \"{{SITE_URL}}\"\t\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/auth/signin",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "1 GraphQL API",
+			"item": [
+				{
+					"name": "1.01.01 Query Databases",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getDatabases {\n    databases {\n        id\n        name\n        connectionType\n        tables {\n            id\n            name\n            fullName\n        }\n    }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.02.01 Query Database Servers",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getDatabaseServers {\n    databaseServers {\n        id\n        luid\n        name\n        connectionType\n    }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.03.01 Query Dashboards",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getDashboards($filter: Dashboard_Filter) {\n    dashboards(filter: $filter) {\n        luid\n        name\n        path\n        createdAt\n        updatedAt\n        workbook {\n            name\n            site {\n                name\n            }\n        }\n    }\n}\n",
+								"variables": "{\n  \"filter\": {\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.04.01 Query Embedded Datasources",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getEmbeddedDatasources {\n    embeddedDatasources {\n        id\n        name\n        workbook {\n            id\n            name\n        }\n    }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.04.02 Query Published Datasources",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getPublishedDatasources {\n    publishedDatasources {\n        luid\n        name\n        site {\n            luid\n            name\n        }\n        projectName\n        owner {\n            username\n            name\n        }\n        upstreamTables {\n            luid\n            name\n            isEmbedded\n            schema\n            fullName\n            description\n            contact {\n                username\n                name\n            }\n            isCertified\n            certificationNote\n            database {\n                luid\n            }\n        }\n        upstreamDatabases {\n            luid\n            name\n            connectionType\n            isEmbedded\n            description\n            contact {\n                username\n                name\n            }\n            isCertified\n            certificationNote\n        }\n        isCertified\n        certifierDisplayName\n        certificationNote\n        description\n        vizportalUrlId\n    }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.05.01 Query Sheets",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getSheets($filter: Sheet_Filter) {\n    sheets(filter: $filter) {\n        id\n        luid\n        name\n        path\n        createdAt\n        updatedAt\n    }\n}\n",
+								"variables": "{\n  \"filter\": {\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.06.01 Query Sites",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getSites {\n    tableauSites {\n        luid\n        uri\n        name\n        publishedDatasources {\n            luid\n            name\n            site {\n                luid\n                name\n            }\n            projectName\n            owner {\n                username\n                name\n            }\n            upstreamTables {\n                name\n                # fullName\n                # database {\n                #     luid\n                # }\n            }\n            upstreamDatabases {\n                # luid\n                name\n                connectionType\n            }\n            isCertified\n            certifierDisplayName\n            certificationNote\n            description\n            vizportalUrlId\n        }\n        workbooks {\n            luid\n            name\n            site {\n                luid\n                name\n            }\n            projectName\n            owner {\n                username\n                name\n            }\n            sheets {\n                id\n                luid\n                name\n                path\n                createdAt\n                updatedAt\n            }\n            description\n            vizportalUrlId\n            createdAt\n            updatedAt\n            upstreamTables {\n                name\n                # fullName\n                # database {\n                #     luid\n                # }\n            }\n            upstreamDatabases {\n                # luid\n                name\n                connectionType\n            }\n        }\n    }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.07.01 Query Views",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getViews {\n    views {\n        id\n        name\n        luid\n        path\n        createdAt\n        updatedAt\n        workbook {\n            id\n            name\n        }\n    }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.08.01 Query Web Data Connectors",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getWebDataConnectors {\n    webDataConnectors {\n        id\n        name\n        connectionType\n        connectorUrl\n        description\n        upstreamDatabases {\n            id\n            name\n            connectionType\n        }\n    }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.09.01 Query Workbooks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c029016f-97ce-4f06-bfa2-7bf03f9f07aa",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const workbooks = jsonData.data.workbooks;",
+									"",
+									"pm.globals.unset(\"workbookLuid\");",
+									"",
+									"if (workbooks.length > 0) {",
+									"    pm.globals.set(\"workbookLuid\", workbooks[0].luid);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getWorkbooks($filter: Workbook_Filter) {\n    workbooks(filter: $filter) {\n        luid\n        name\n        site {\n            luid\n            name\n        }\n        projectName\n        owner {\n            username\n            name\n        }\n        sheets {\n            luid\n            name\n            path\n            createdAt\n            updatedAt\n        }\n        description\n        vizportalUrlId\n        createdAt\n        updatedAt\n        upstreamTables {\n            fullName\n            database {\n                luid\n            }\n        }\n        upstreamDatabases {\n            luid\n            name\n            connectionType\n        }\n    }\n}\n",
+								"variables": "{\n  \"filter\": {\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.09.02 Query Workbooks by Filter",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/relationship-service-war/graphql?query=query+getWorkbook%28%24filter%3A+Workbook_Filter%29+%7B+workbooks%28filter%3A+%24filter%29+%7B+id+%7D+%7D&variables=%7B+%22filter%22%3A+%7B+%22luid%22%3A+%22{{workbookLuid}}%22+%7D+%7D",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"relationship-service-war",
+								"graphql"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "query+getWorkbook%28%24filter%3A+Workbook_Filter%29+%7B+workbooks%28filter%3A+%24filter%29+%7B+id+%7D+%7D"
+								},
+								{
+									"key": "variables",
+									"value": "%7B+%22filter%22%3A+%7B+%22luid%22%3A+%22{{workbookLuid}}%22+%7D+%7D"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "97126011-e183-4788-8635-e2076364aee8",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a1e12fe2-b9fc-44a8-a6d7-778e18478ced",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
