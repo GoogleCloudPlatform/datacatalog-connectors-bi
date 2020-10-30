@@ -6,10 +6,10 @@
 	},
 	"item": [
 		{
-			"name": "Authenticate",
+			"name": "0 Authenticate",
 			"item": [
 				{
-					"name": "Sign in",
+					"name": "0.01.01 Sign in",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -73,10 +73,10 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "REST API",
+			"name": "1 REST API",
 			"item": [
 				{
-					"name": "Get Databases for site",
+					"name": "1.01.01 Get Databases for site",
 					"event": [
 						{
 							"listen": "test",
@@ -142,7 +142,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Database by id",
+					"name": "1.01.02 Get Database by id",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -189,7 +189,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Database",
+					"name": "1.01.03 Delete Database",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -228,7 +228,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Data Sources for site",
+					"name": "1.02.01 Get Data Sources for site",
 					"event": [
 						{
 							"listen": "test",
@@ -294,7 +294,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Data Source",
+					"name": "1.02.02 Get Data Source",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -341,7 +341,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Projects for site",
+					"name": "1.03.01 Get Projects for site",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -387,7 +387,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Views for site",
+					"name": "1.04.01 Get Views for site",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -433,7 +433,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Workbooks for site",
+					"name": "1.05.01 Get Workbooks for site",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -479,7 +479,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Sites for server",
+					"name": "1.06.01 Get Sites for server",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -523,7 +523,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Workbooks for user",
+					"name": "1.07.01 Get Workbooks for user",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
