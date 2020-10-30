@@ -44,6 +44,7 @@ supporting below asset types:
   * [4.1. Install and run Yapf formatter](#41-install-and-run-yapf-formatter)
   * [4.2. Install and run Flake8 linter](#42-install-and-run-flake8-linter)
   * [4.3. Run Tests](#43-run-tests)
+  * [4.4. Additional resources](#44-additional-resources)
 - [5. Troubleshooting](#5-troubleshooting)
 
 <!-- tocstop -->
@@ -193,6 +194,11 @@ flake8 src tests
 ```bash
 python setup.py test
 ```
+
+### 4.4. Additional resources
+
+Please refer to the [Developer Resources
+documentation](docs/developer-resources).
 
 ## 5. Troubleshooting
 
