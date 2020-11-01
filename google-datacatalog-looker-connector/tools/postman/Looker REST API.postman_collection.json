@@ -1,0 +1,855 @@
+{
+	"info": {
+		"_postman_id": "fdc597fb-9466-48c1-836e-8d6ebf8d6870",
+		"name": "Looker REST API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 Authentication",
+			"item": [
+				{
+					"name": "0.01.01 Sign in",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "10d745db-cee3-4079-8841-4b5307ddfd41",
+								"exec": [
+									"pm.globals.clear();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "855aa168-0e50-4eae-b20b-658b69c83159",
+								"exec": [
+									"pm.globals.set(\"token\", pm.response.json().access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{CLIENT_ID}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{CLIENT_SECRET}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/login",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "1 Folders",
+			"item": [
+				{
+					"name": "1.01.01 Get all Folders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2e6c6f2c-8a38-4178-a5d9-02a79d21f6da",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const folders = jsonData;",
+									"",
+									"pm.globals.unset(\"folderId\");",
+									"",
+									"if (folders.length > 0) {",
+									"    pm.globals.set(\"folderId\", folders[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/folders",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"folders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.01.02 Get Folders [search]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/folders/search?fields=id,name,parent_id,child_count,creator_id",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"folders",
+								"search"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,name,parent_id,child_count,creator_id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.01.03 Get Folder by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/folders/{{folderId}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"folders",
+								"{{folderId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "2 Spaces",
+			"item": [
+				{
+					"name": "2.01.01 Get Spaces [search]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/spaces/search?fields=id,name,parent_id",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"spaces",
+								"search"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,name,parent_id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2.01.02 Get Space by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/spaces/home",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"spaces",
+								"home"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "3 Dashboards",
+			"item": [
+				{
+					"name": "3.01.01 Get all Dashboards",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4e4bf6b9-e02b-4aab-a7b3-6c5925ee9ce0",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const dashboards = jsonData;",
+									"",
+									"pm.globals.unset(\"dashboardId\");",
+									"",
+									"if (dashboards.length > 0) {",
+									"    pm.globals.set(\"dashboardId\", dashboards[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.01.02 Get Dashboards [search]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/search?fields=id,title,created_at,space,dashboard_elements",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboards",
+								"search"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,title,created_at,space,dashboard_elements"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.01.03 Get Dashboard by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboards",
+								"{{dashboardId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.02.01 Get all Dashboard Elements",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9c6cbead-ab88-4609-9910-56ee35432300",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const dashboardElements = jsonData;",
+									"",
+									"pm.globals.unset(\"dashboardElementId\");",
+									"",
+									"if (dashboardElements.length > 0) {",
+									"    pm.globals.set(\"dashboardElementId\", dashboardElements[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}/dashboard_elements",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboards",
+								"{{dashboardId}}",
+								"dashboard_elements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.02.02 Get Dashboard Elements [search]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboard_elements/search?title=IS NULL",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboard_elements",
+								"search"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "IS NULL"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.02.03 Get Dashboard Element by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboard_elements/{{dashboardElementId}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboard_elements",
+								"{{dashboardElementId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "4 Looks",
+			"item": [
+				{
+					"name": "4.01.01 Get all Looks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7917563c-ead2-4f11-bf22-f0dbbad103fa",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const looks = jsonData;",
+									"",
+									"pm.globals.unset(\"lookId\");",
+									"",
+									"if (looks.length > 0) {",
+									"    pm.globals.set(\"lookId\", looks[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/looks",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"looks"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "description,id,title",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.01.02 Get Looks [search]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/looks/search?fields=id,title,created_at,updated_at,description,space,public,user_id,last_updater_id,url,short_url,public_url,excel_file_url,google_spreadsheet_formula,view_count,favorite_count,last_accessed_at,last_viewed_at,deleted,deleter_id",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"looks",
+								"search"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,title,created_at,updated_at,description,space,public,user_id,last_updater_id,url,short_url,public_url,excel_file_url,google_spreadsheet_formula,view_count,favorite_count,last_accessed_at,last_viewed_at,deleted,deleter_id"
+								},
+								{
+									"key": "space_id",
+									"value": "lookml",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.01.03 Get Look by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/looks/{{lookId}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"looks",
+								"{{lookId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "5 Queries",
+			"item": [
+				{
+					"name": "5.01.01 Get Query by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/queries/{{QUERY_ID}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"queries",
+								"{{QUERY_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5.02.01 Get generated SQL",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/queries/{{QUERY_ID}}/run/sql",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"queries",
+								"{{QUERY_ID}}",
+								"run",
+								"sql"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "6 LookML Models",
+			"item": [
+				{
+					"name": "6.01.01 Get LookML Model by name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "01b73781-18d1-48b7-8cfc-319bc596af69",
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const modelExplores = jsonData.explores;",
+									"",
+									"pm.globals.unset(\"modelExploreName\");",
+									"",
+									"if (modelExplores.length > 0) {",
+									"    pm.globals.set(\"modelExploreName\", modelExplores[0].name);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/lookml_models/{{LOOKML_MODEL_NAME}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"lookml_models",
+								"{{LOOKML_MODEL_NAME}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6.02.01 Get LookML Model Explore by name",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/lookml_models/{{LOOKML_MODEL_NAME}}/explores/{{modelExploreName}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"lookml_models",
+								"{{LOOKML_MODEL_NAME}}",
+								"explores",
+								"{{modelExploreName}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "7 Connections",
+			"item": [
+				{
+					"name": "7.01.01 Get Connection by name",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/connections/{{CONNECTION_NAME}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"connections",
+								"{{CONNECTION_NAME}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
