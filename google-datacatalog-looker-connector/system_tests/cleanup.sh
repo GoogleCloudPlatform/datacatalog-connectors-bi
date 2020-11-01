@@ -15,9 +15,9 @@
 # limitations under the License.
 
 echo 'Execute CLEANUP'
-python google-datacatalog-looker-connector/tools/cleanup_datacatalog.py --datacatalog-project-ids $LOOKER2DC_DATACATALOG_PROJECT_ID
+python google-datacatalog-looker-connector/tools/scripts/cleanup_datacatalog.py --datacatalog-project-ids $LOOKER2DC_DATACATALOG_PROJECT_ID
 
-# Sleep 5 seconds to wait for search index
+# Wait 5 seconds for the search index update
 sleep 5
 echo 'Assert CLEANUP'
 python google-datacatalog-looker-connector/system_tests/cleanup_results_test.py
