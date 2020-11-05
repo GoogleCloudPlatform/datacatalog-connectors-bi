@@ -18,7 +18,7 @@ from datetime import datetime
 import logging
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import types
+from google.protobuf import timestamp_pb2
 
 from google.datacatalog_connectors.commons.prepare.base_entry_factory import \
     BaseEntryFactory
@@ -39,7 +39,7 @@ class DataCatalogEntryFactory(BaseEntryFactory):
         self.__server_address = server_address
 
     def make_entry_for_dashboard(self, dashboard_metadata):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         generated_id = self.__format_id(dashboard_metadata.get('luid'))
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -61,19 +61,20 @@ class DataCatalogEntryFactory(BaseEntryFactory):
 
         created_datetime = self.__convert_string_to_utc_datetime(
             dashboard_metadata.get('createdAt'))
-        entry.source_system_timestamps.create_time.seconds = \
-            self.__convert_datetime_to_seconds(
-                created_datetime)
+        created_timestamp = timestamp_pb2.Timestamp()
+        created_timestamp.FromDatetime(created_datetime)
+        entry.source_system_timestamps.create_time = created_timestamp
+
         updated_datetime = self.__convert_string_to_utc_datetime(
             dashboard_metadata.get('updatedAt'))
-        entry.source_system_timestamps.update_time.seconds = \
-            self.__convert_datetime_to_seconds(
-                updated_datetime)
+        updated_timestamp = timestamp_pb2.Timestamp()
+        updated_timestamp.FromDatetime(updated_datetime)
+        entry.source_system_timestamps.update_time = updated_timestamp
 
         return generated_id, entry
 
     def make_entry_for_sheet(self, sheet_metadata, workbook_metadata):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         luid = sheet_metadata.get('luid')
         if luid:
@@ -108,22 +109,22 @@ class DataCatalogEntryFactory(BaseEntryFactory):
         if created_at:
             created_datetime = self.__convert_string_to_utc_datetime(
                 created_at)
-            entry.source_system_timestamps.create_time.seconds = \
-                self.__convert_datetime_to_seconds(
-                    created_datetime)
+            created_timestamp = timestamp_pb2.Timestamp()
+            created_timestamp.FromDatetime(created_datetime)
+            entry.source_system_timestamps.create_time = created_timestamp
 
         updated_at = sheet_metadata.get('updatedAt')
         if updated_at:
             updated_datetime = self.__convert_string_to_utc_datetime(
                 updated_at)
-            entry.source_system_timestamps.update_time.seconds = \
-                self.__convert_datetime_to_seconds(
-                    updated_datetime)
+            updated_timestamp = timestamp_pb2.Timestamp()
+            updated_timestamp.FromDatetime(updated_datetime)
+            entry.source_system_timestamps.update_time = updated_timestamp
 
         return generated_id, entry
 
     def make_entry_for_workbook(self, workbook_metadata):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         generated_id = self.__format_id(workbook_metadata.get('luid'))
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -146,14 +147,15 @@ class DataCatalogEntryFactory(BaseEntryFactory):
 
         created_datetime = self.__convert_string_to_utc_datetime(
             workbook_metadata.get('createdAt'))
-        entry.source_system_timestamps.create_time.seconds = \
-            self.__convert_datetime_to_seconds(
-                created_datetime)
+        created_timestamp = timestamp_pb2.Timestamp()
+        created_timestamp.FromDatetime(created_datetime)
+        entry.source_system_timestamps.create_time = created_timestamp
+
         updated_datetime = self.__convert_string_to_utc_datetime(
             workbook_metadata.get('updatedAt'))
-        entry.source_system_timestamps.update_time.seconds = \
-            self.__convert_datetime_to_seconds(
-                updated_datetime)
+        updated_timestamp = timestamp_pb2.Timestamp()
+        updated_timestamp.FromDatetime(updated_datetime)
+        entry.source_system_timestamps.update_time = updated_timestamp
 
         return generated_id, entry
 

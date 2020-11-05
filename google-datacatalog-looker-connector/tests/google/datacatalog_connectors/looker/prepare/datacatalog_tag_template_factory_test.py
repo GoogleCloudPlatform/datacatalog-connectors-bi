@@ -23,10 +23,10 @@ from google.datacatalog_connectors.looker.prepare import \
 
 
 class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
-    __BOOL_TYPE = datacatalog.enums.FieldType.PrimitiveType.BOOL
-    __DOUBLE_TYPE = datacatalog.enums.FieldType.PrimitiveType.DOUBLE
-    __STRING_TYPE = datacatalog.enums.FieldType.PrimitiveType.STRING
-    __TIMESTAMP_TYPE = datacatalog.enums.FieldType.PrimitiveType.TIMESTAMP
+    __BOOL_TYPE = datacatalog.FieldType.PrimitiveType.BOOL
+    __DOUBLE_TYPE = datacatalog.FieldType.PrimitiveType.DOUBLE
+    __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
+    __TIMESTAMP_TYPE = datacatalog.FieldType.PrimitiveType.TIMESTAMP
 
     def setUp(self):
         self.__factory = datacatalog_tag_template_factory.\

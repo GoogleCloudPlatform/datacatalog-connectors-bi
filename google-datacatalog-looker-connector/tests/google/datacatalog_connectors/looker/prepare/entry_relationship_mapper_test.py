@@ -16,7 +16,7 @@
 
 import unittest
 
-from google.cloud.datacatalog import types
+from google.cloud import datacatalog
 
 from google.datacatalog_connectors.commons import \
     prepare as commons_prepare
@@ -92,8 +92,7 @@ class EntryRelationshipMapperTest(unittest.TestCase):
             [look_assembled_entry, element_assembled_entry])
 
         self.assertEqual(
-            f'https://console.cloud.google.com/datacatalog/'
-            f'{look_entry.name}',
+            f'https://console.cloud.google.com/datacatalog/{look_entry.name}',
             element_tag.fields['look_entry'].string_value)
 
     def test_fulfill_tag_fields_should_resolve_element_query_mapping(self):
@@ -191,21 +190,25 @@ class EntryRelationshipMapperTest(unittest.TestCase):
 
     @classmethod
     def __make_fake_entry(cls, entry_id, entry_type):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
         entry.name = f'fake_entries/{entry_id}'
         entry.user_specified_type = entry_type
         return entry
 
     @classmethod
     def __make_fake_tag(cls, string_fields=None, double_fields=None):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
 
         if string_fields:
-            for field in string_fields:
-                tag.fields[field[0]].string_value = field[1]
+            for string_field in string_fields:
+                tag_field = datacatalog.TagField()
+                tag_field.string_value = string_field[1]
+                tag.fields[string_field[0]] = tag_field
 
         if double_fields:
-            for field in double_fields:
-                tag.fields[field[0]].double_value = field[1]
+            for double_field in double_fields:
+                tag_field = datacatalog.TagField()
+                tag_field.double_value = double_field[1]
+                tag.fields[double_field[0]] = tag_field
 
         return tag

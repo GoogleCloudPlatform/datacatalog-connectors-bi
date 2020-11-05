@@ -15,23 +15,24 @@
 # limitations under the License.
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import enums, types
+
+from google.datacatalog_connectors.commons import prepare
 
 from . import constant
 
 
-class DataCatalogTagTemplateFactory:
-    __BOOL_TYPE = enums.FieldType.PrimitiveType.BOOL
-    __DOUBLE_TYPE = enums.FieldType.PrimitiveType.DOUBLE
-    __STRING_TYPE = enums.FieldType.PrimitiveType.STRING
-    __TIMESTAMP_TYPE = enums.FieldType.PrimitiveType.TIMESTAMP
+class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
+    __BOOL_TYPE = datacatalog.FieldType.PrimitiveType.BOOL
+    __DOUBLE_TYPE = datacatalog.FieldType.PrimitiveType.DOUBLE
+    __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
+    __TIMESTAMP_TYPE = datacatalog.FieldType.PrimitiveType.TIMESTAMP
 
     def __init__(self, project_id, location_id):
         self.__project_id = project_id
         self.__location_id = location_id
 
     def make_tag_template_for_dashboard(self):
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
@@ -40,75 +41,63 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Looker Dashboard Metadata'
 
-        tag_template.fields['id'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['id'].display_name = 'Unique Id'
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
 
-        tag_template.fields['description'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['description'].display_name = 'Description'
+        self._add_primitive_type_field(tag_template, 'description',
+                                       self.__STRING_TYPE, 'Description')
 
-        tag_template.fields['folder_id'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['folder_id'].display_name = 'Folder Id'
+        self._add_primitive_type_field(tag_template, 'folder_id',
+                                       self.__STRING_TYPE, 'Folder Id')
 
-        tag_template.fields[
-            'folder_name'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['folder_name'].display_name = 'Folder Name'
+        self._add_primitive_type_field(tag_template, 'folder_name',
+                                       self.__STRING_TYPE, 'Folder Name')
 
-        tag_template.fields[
-            'folder_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['folder_entry'].display_name = \
-            'Data Catalog Entry for the Folder'
+        self._add_primitive_type_field(tag_template, 'folder_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Folder')
 
-        tag_template.fields['is_hidden'].type.primitive_type = self.__BOOL_TYPE
-        tag_template.fields['is_hidden'].display_name = 'Is hidden'
+        self._add_primitive_type_field(tag_template, 'is_hidden',
+                                       self.__BOOL_TYPE, 'Is hidden')
 
-        tag_template.fields['user_id'].type.primitive_type = self.__DOUBLE_TYPE
-        tag_template.fields['user_id'].display_name = 'Id of User'
+        self._add_primitive_type_field(tag_template, 'user_id',
+                                       self.__DOUBLE_TYPE, 'Id of User')
 
-        tag_template.fields['view_count'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['view_count'].display_name = \
-            'Number of views in the web UI'
+        self._add_primitive_type_field(tag_template, 'view_count',
+                                       self.__DOUBLE_TYPE,
+                                       'Number of views in the web UI')
 
-        tag_template.fields['favorite_count'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['favorite_count'].display_name = \
-            'Number of times favorited'
+        self._add_primitive_type_field(tag_template, 'favorite_count',
+                                       self.__DOUBLE_TYPE,
+                                       'Number of times favorited')
 
-        tag_template.fields['last_accessed_at'].type.primitive_type = \
-            self.__TIMESTAMP_TYPE
-        tag_template.fields['last_accessed_at'].display_name = \
-            'Time it was last accessed'
+        self._add_primitive_type_field(tag_template, 'last_accessed_at',
+                                       self.__TIMESTAMP_TYPE,
+                                       'Time it was last accessed')
 
-        tag_template.fields['last_viewed_at'].type.primitive_type = \
-            self.__TIMESTAMP_TYPE
-        tag_template.fields['last_viewed_at'].display_name = \
-            'Time last viewed in the web UI'
+        self._add_primitive_type_field(tag_template, 'last_viewed_at',
+                                       self.__TIMESTAMP_TYPE,
+                                       'Time last viewed in the web UI')
 
-        tag_template.fields['is_deleted'].type.primitive_type = \
-            self.__BOOL_TYPE
-        tag_template.fields['is_deleted'].display_name = 'Is soft deleted'
+        self._add_primitive_type_field(tag_template, 'is_deleted',
+                                       self.__BOOL_TYPE, 'Is soft deleted')
 
-        tag_template.fields['deleted_at'].type.primitive_type = \
-            self.__TIMESTAMP_TYPE
-        tag_template.fields['deleted_at'].display_name = \
-            'Time it was soft deleted'
+        self._add_primitive_type_field(tag_template, 'deleted_at',
+                                       self.__TIMESTAMP_TYPE,
+                                       'Time it was soft deleted')
 
-        tag_template.fields['deleter_id'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['deleter_id'].display_name = \
-            'Id of User that soft deleted it'
+        self._add_primitive_type_field(tag_template, 'deleter_id',
+                                       self.__DOUBLE_TYPE,
+                                       'Id of User that soft deleted it')
 
-        tag_template.fields['instance_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['instance_url'].display_name = \
-            'Looker Instance Url'
+        self._add_primitive_type_field(tag_template, 'instance_url',
+                                       self.__STRING_TYPE,
+                                       'Looker Instance Url')
 
         return tag_template
 
     def make_tag_template_for_dashboard_element(self):
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
@@ -117,60 +106,51 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Looker Dashboard Element Metadata'
 
-        tag_template.fields['id'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['id'].display_name = 'Unique Id'
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
 
-        tag_template.fields['type'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['type'].display_name = 'Type'
+        self._add_primitive_type_field(tag_template, 'type',
+                                       self.__STRING_TYPE, 'Type')
 
-        tag_template.fields['dashboard_id'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['dashboard_id'].display_name = 'Id of Dashboard'
+        self._add_primitive_type_field(tag_template, 'dashboard_id',
+                                       self.__STRING_TYPE, 'Id of Dashboard')
 
-        tag_template.fields['dashboard_title'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['dashboard_title'].display_name = \
-            'Title of Dashboard'
+        self._add_primitive_type_field(tag_template, 'dashboard_title',
+                                       self.__STRING_TYPE,
+                                       'Title of Dashboard')
 
-        tag_template.fields[
-            'dashboard_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['dashboard_entry'].display_name = \
-            'Data Catalog Entry for the Dashboard'
+        self._add_primitive_type_field(tag_template, 'dashboard_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Dashboard')
 
-        tag_template.fields['look_id'].type.primitive_type = self.__DOUBLE_TYPE
-        tag_template.fields['look_id'].display_name = 'Id Of Look'
+        self._add_primitive_type_field(tag_template, 'look_id',
+                                       self.__DOUBLE_TYPE, 'Id Of Look')
 
-        tag_template.fields['look_title'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['look_title'].display_name = 'Title Of Look'
+        self._add_primitive_type_field(tag_template, 'look_title',
+                                       self.__STRING_TYPE, 'Title Of Look')
 
-        tag_template.fields[
-            'look_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['look_entry'].display_name = \
-            'Data Catalog Entry for the Look'
+        self._add_primitive_type_field(tag_template, 'look_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Look')
 
-        tag_template.fields['lookml_link_id'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['lookml_link_id'].display_name = 'LookML link ID'
+        self._add_primitive_type_field(tag_template, 'lookml_link_id',
+                                       self.__STRING_TYPE, 'LookML link ID')
 
-        tag_template.fields['query_id'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['query_id'].display_name = 'Id Of Query'
+        self._add_primitive_type_field(tag_template, 'query_id',
+                                       self.__DOUBLE_TYPE, 'Id Of Query')
 
-        tag_template.fields[
-            'query_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['query_entry'].display_name = \
-            'Data Catalog Entry for the Query'
+        self._add_primitive_type_field(tag_template, 'query_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Query')
 
-        tag_template.fields['instance_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['instance_url'].display_name = \
-            'Looker Instance Url'
+        self._add_primitive_type_field(tag_template, 'instance_url',
+                                       self.__STRING_TYPE,
+                                       'Looker Instance Url')
 
         return tag_template
 
     def make_tag_template_for_folder(self):
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
@@ -179,54 +159,45 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Looker Folder Metadata'
 
-        tag_template.fields['id'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['id'].display_name = 'Unique Id'
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
 
-        tag_template.fields['name'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['name'].display_name = 'Unique Name'
+        self._add_primitive_type_field(tag_template, 'name',
+                                       self.__STRING_TYPE, 'Unique Name')
 
-        tag_template.fields['has_children'].type.primitive_type = \
-            self.__BOOL_TYPE
-        tag_template.fields['has_children'].display_name = 'Has children'
+        self._add_primitive_type_field(tag_template, 'has_children',
+                                       self.__BOOL_TYPE, 'Has children')
 
-        tag_template.fields['children_count'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['children_count'].display_name = 'Children count'
+        self._add_primitive_type_field(tag_template, 'children_count',
+                                       self.__DOUBLE_TYPE, 'Children count')
 
-        tag_template.fields['parent_id'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['parent_id'].display_name = 'Id of Parent'
+        self._add_primitive_type_field(tag_template, 'parent_id',
+                                       self.__STRING_TYPE, 'Id of Parent')
 
-        tag_template.fields[
-            'parent_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['parent_entry'].display_name = \
-            'Data Catalog Entry for the parent Folder'
+        self._add_primitive_type_field(
+            tag_template, 'parent_entry', self.__STRING_TYPE,
+            'Data Catalog Entry for the parent Folder')
 
-        tag_template.fields['has_dashboards'].type.primitive_type = \
-            self.__BOOL_TYPE
-        tag_template.fields['has_dashboards'].display_name = 'Has dashboards'
+        self._add_primitive_type_field(tag_template, 'has_dashboards',
+                                       self.__BOOL_TYPE, 'Has dashboards')
 
-        tag_template.fields['dashboards_count'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['dashboards_count'].display_name = \
-            'Dashboards count'
+        self._add_primitive_type_field(tag_template, 'dashboards_count',
+                                       self.__DOUBLE_TYPE, 'Dashboards count')
 
-        tag_template.fields['has_looks'].type.primitive_type = self.__BOOL_TYPE
-        tag_template.fields['has_looks'].display_name = 'Has looks'
+        self._add_primitive_type_field(tag_template, 'has_looks',
+                                       self.__BOOL_TYPE, 'Has looks')
 
-        tag_template.fields['looks_count'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['looks_count'].display_name = 'Looks count'
+        self._add_primitive_type_field(tag_template, 'looks_count',
+                                       self.__DOUBLE_TYPE, 'Looks count')
 
-        tag_template.fields['instance_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['instance_url'].display_name = \
-            'Looker Instance Url'
+        self._add_primitive_type_field(tag_template, 'instance_url',
+                                       self.__STRING_TYPE,
+                                       'Looker Instance Url')
 
         return tag_template
 
     def make_tag_template_for_look(self):
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
@@ -235,109 +206,91 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Looker Look Metadata'
 
-        tag_template.fields['id'].type.primitive_type = self.__DOUBLE_TYPE
-        tag_template.fields['id'].display_name = 'Unique Id'
+        self._add_primitive_type_field(tag_template, 'id', self.__DOUBLE_TYPE,
+                                       'Unique Id')
 
-        tag_template.fields['description'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['description'].display_name = 'Description'
+        self._add_primitive_type_field(tag_template, 'description',
+                                       self.__STRING_TYPE, 'Description')
 
-        tag_template.fields['folder_id'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['folder_id'].display_name = 'Folder Id'
+        self._add_primitive_type_field(tag_template, 'folder_id',
+                                       self.__STRING_TYPE, 'Folder Id')
 
-        tag_template.fields[
-            'folder_name'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['folder_name'].display_name = 'Folder Name'
+        self._add_primitive_type_field(tag_template, 'folder_name',
+                                       self.__STRING_TYPE, 'Folder Name')
 
-        tag_template.fields[
-            'folder_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['folder_entry'].display_name = \
-            'Data Catalog Entry for the Folder'
+        self._add_primitive_type_field(tag_template, 'folder_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Folder')
 
-        tag_template.fields['is_public'].type.primitive_type = self.__BOOL_TYPE
-        tag_template.fields['is_public'].display_name = 'Is public'
+        self._add_primitive_type_field(tag_template, 'is_public',
+                                       self.__BOOL_TYPE, 'Is public')
 
-        tag_template.fields['user_id'].type.primitive_type = self.__DOUBLE_TYPE
-        tag_template.fields['user_id'].display_name = 'Id of User'
+        self._add_primitive_type_field(tag_template, 'user_id',
+                                       self.__DOUBLE_TYPE, 'Id of User')
 
-        tag_template.fields['last_updater_id'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['last_updater_id'].display_name = \
-            'Id of User that last updated it'
+        self._add_primitive_type_field(tag_template, 'last_updater_id',
+                                       self.__DOUBLE_TYPE,
+                                       'Id of User that last updated it')
 
-        tag_template.fields['query_id'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['query_id'].display_name = 'Query Id'
+        self._add_primitive_type_field(tag_template, 'query_id',
+                                       self.__DOUBLE_TYPE, 'Query Id')
 
-        tag_template.fields[
-            'query_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['query_entry'].display_name = \
-            'Data Catalog Entry for the Query'
+        self._add_primitive_type_field(tag_template, 'query_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Query')
 
-        tag_template.fields['url'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['url'].display_name = 'Url'
+        self._add_primitive_type_field(tag_template, 'url', self.__STRING_TYPE,
+                                       'Url')
 
-        tag_template.fields['short_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['short_url'].display_name = 'Short Url'
+        self._add_primitive_type_field(tag_template, 'short_url',
+                                       self.__STRING_TYPE, 'Short Url')
 
-        tag_template.fields['public_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['public_url'].display_name = 'Public Url'
+        self._add_primitive_type_field(tag_template, 'public_url',
+                                       self.__STRING_TYPE, 'Public Url')
 
-        tag_template.fields['excel_file_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['excel_file_url'].display_name = 'Excel File Url'
+        self._add_primitive_type_field(tag_template, 'excel_file_url',
+                                       self.__STRING_TYPE, 'Excel File Url')
 
-        tag_template.fields['google_spreadsheet_formula']\
-            .type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['google_spreadsheet_formula'].display_name = \
-            'Google Spreadsheet Formula'
+        self._add_primitive_type_field(tag_template,
+                                       'google_spreadsheet_formula',
+                                       self.__STRING_TYPE,
+                                       'Google Spreadsheet Formula')
 
-        tag_template.fields['view_count'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['view_count'].display_name = \
-            'Number of views in the web UI'
+        self._add_primitive_type_field(tag_template, 'view_count',
+                                       self.__DOUBLE_TYPE,
+                                       'Number of views in the web UI')
 
-        tag_template.fields['favorite_count'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['favorite_count'].display_name = \
-            'Number of times favorited'
+        self._add_primitive_type_field(tag_template, 'favorite_count',
+                                       self.__DOUBLE_TYPE,
+                                       'Number of times favorited')
 
-        tag_template.fields['last_accessed_at'].type.primitive_type = \
-            self.__TIMESTAMP_TYPE
-        tag_template.fields['last_accessed_at'].display_name = \
-            'Time it was last accessed'
+        self._add_primitive_type_field(tag_template, 'last_accessed_at',
+                                       self.__TIMESTAMP_TYPE,
+                                       'Time it was last accessed')
 
-        tag_template.fields['last_viewed_at'].type.primitive_type = \
-            self.__TIMESTAMP_TYPE
-        tag_template.fields['last_viewed_at'].display_name = \
-            'Time last viewed in the web UI'
+        self._add_primitive_type_field(tag_template, 'last_viewed_at',
+                                       self.__TIMESTAMP_TYPE,
+                                       'Time last viewed in the web UI')
 
-        tag_template.fields['is_deleted'].type.primitive_type = \
-            self.__BOOL_TYPE
-        tag_template.fields['is_deleted'].display_name = 'Is soft deleted'
+        self._add_primitive_type_field(tag_template, 'is_deleted',
+                                       self.__BOOL_TYPE, 'Is soft deleted')
 
-        tag_template.fields['deleted_at'].type.primitive_type = \
-            self.__TIMESTAMP_TYPE
-        tag_template.fields['deleted_at'].display_name = \
-            'Time it was soft deleted'
+        self._add_primitive_type_field(tag_template, 'deleted_at',
+                                       self.__TIMESTAMP_TYPE,
+                                       'Time it was soft deleted')
 
-        tag_template.fields['deleter_id'].type.primitive_type = \
-            self.__DOUBLE_TYPE
-        tag_template.fields['deleter_id'].display_name = \
-            'Id of User that soft deleted it'
+        self._add_primitive_type_field(tag_template, 'deleter_id',
+                                       self.__DOUBLE_TYPE,
+                                       'Id of User that soft deleted it')
 
-        tag_template.fields['instance_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['instance_url'].display_name = \
-            'Looker Instance Url'
+        self._add_primitive_type_field(tag_template, 'instance_url',
+                                       self.__STRING_TYPE,
+                                       'Looker Instance Url')
 
         return tag_template
 
     def make_tag_template_for_query(self):
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
@@ -346,68 +299,60 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Looker Query Metadata'
 
-        tag_template.fields['id'].type.primitive_type = self.__DOUBLE_TYPE
-        tag_template.fields['id'].display_name = 'Unique Id'
+        self._add_primitive_type_field(tag_template, 'id', self.__DOUBLE_TYPE,
+                                       'Unique Id')
 
-        tag_template.fields['fields'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['fields'].display_name = 'Fields'
+        self._add_primitive_type_field(tag_template, 'fields',
+                                       self.__STRING_TYPE, 'Fields')
 
-        tag_template.fields['pivots'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['pivots'].display_name = 'Pivots'
+        self._add_primitive_type_field(tag_template, 'pivots',
+                                       self.__STRING_TYPE, 'Pivots')
 
-        tag_template.fields['sorts'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['sorts'].display_name = 'Sorting for the results'
+        self._add_primitive_type_field(tag_template, 'sorts',
+                                       self.__STRING_TYPE,
+                                       'Sorting for the results')
 
-        tag_template.fields['runtime'].type.primitive_type = self.__DOUBLE_TYPE
-        tag_template.fields['runtime'].display_name = 'Runtime'
+        self._add_primitive_type_field(tag_template, 'runtime',
+                                       self.__DOUBLE_TYPE, 'Runtime')
 
-        tag_template.fields['client_id'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['client_id'].display_name = 'Id for explore URLs'
+        self._add_primitive_type_field(tag_template, 'client_id',
+                                       self.__STRING_TYPE,
+                                       'Id for explore URLs')
 
-        tag_template.fields['query_timezone'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['query_timezone'].display_name = 'Query Timezone'
+        self._add_primitive_type_field(tag_template, 'query_timezone',
+                                       self.__STRING_TYPE, 'Query Timezone')
 
-        tag_template.fields['lookml_model'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['lookml_model'].display_name = 'LookML Model name'
+        self._add_primitive_type_field(tag_template, 'lookml_model',
+                                       self.__STRING_TYPE, 'LookML Model name')
 
-        tag_template.fields['explore_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['explore_name'].display_name = 'Explore name'
+        self._add_primitive_type_field(tag_template, 'explore_name',
+                                       self.__STRING_TYPE, 'Explore name')
 
-        tag_template.fields['sql'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['sql'].display_name = 'Generated SQL'
+        self._add_primitive_type_field(tag_template, 'sql', self.__STRING_TYPE,
+                                       'Generated SQL')
 
-        tag_template.fields['lookml_project'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['lookml_project'].display_name = 'LookML Project'
+        self._add_primitive_type_field(tag_template, 'lookml_project',
+                                       self.__STRING_TYPE, 'LookML Project')
 
-        tag_template.fields['connection'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['connection'].display_name = 'Connection name'
+        self._add_primitive_type_field(tag_template, 'connection',
+                                       self.__STRING_TYPE, 'Connection name')
 
-        tag_template.fields['host'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['host'].display_name = 'Server hostname or address'
+        self._add_primitive_type_field(tag_template, 'host',
+                                       self.__STRING_TYPE,
+                                       'Server hostname or address')
 
-        tag_template.fields['database'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['database'].display_name = 'Database name'
+        self._add_primitive_type_field(tag_template, 'database',
+                                       self.__STRING_TYPE, 'Database name')
 
-        tag_template.fields['connection_dialect'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['connection_dialect'].display_name = \
-            'SQL Dialect name'
+        self._add_primitive_type_field(tag_template, 'connection_dialect',
+                                       self.__STRING_TYPE, 'SQL Dialect name')
 
-        tag_template.fields['connection_username'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['connection_username'].display_name = \
-            'Username for server authentication'
+        self._add_primitive_type_field(tag_template, 'connection_username',
+                                       self.__STRING_TYPE,
+                                       'Username for server authentication')
 
-        tag_template.fields['instance_url'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['instance_url'].display_name = \
-            'Looker Instance Url'
+        self._add_primitive_type_field(tag_template, 'instance_url',
+                                       self.__STRING_TYPE,
+                                       'Looker Instance Url')
 
         return tag_template

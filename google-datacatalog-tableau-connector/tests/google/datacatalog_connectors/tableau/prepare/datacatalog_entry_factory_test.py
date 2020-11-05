@@ -77,12 +77,14 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         datetime_format = '%Y-%m-%dT%H:%M:%S%z'
         created_datetime = datetime.strptime('2019-09-12T16:30:00+0000',
                                              datetime_format)
-        self.assertEqual(created_datetime.timestamp(),
-                         entry.source_system_timestamps.create_time.seconds)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
         updated_datetime = datetime.strptime('2019-09-12T16:30:55+0000',
                                              datetime_format)
-        self.assertEqual(updated_datetime.timestamp(),
-                         entry.source_system_timestamps.update_time.seconds)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_for_sheet_should_set_all_available_fields(self):
         metadata = {
@@ -113,12 +115,14 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         datetime_format = '%Y-%m-%dT%H:%M:%S%z'
         created_datetime = datetime.strptime('2019-09-12T16:30:00+0000',
                                              datetime_format)
-        self.assertEqual(created_datetime.timestamp(),
-                         entry.source_system_timestamps.create_time.seconds)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
         updated_datetime = datetime.strptime('2019-09-12T16:30:55+0000',
                                              datetime_format)
-        self.assertEqual(updated_datetime.timestamp(),
-                         entry.source_system_timestamps.update_time.seconds)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_for_sheet_missing_luid_should_use_id_fallback(self):
         metadata = {
@@ -168,12 +172,14 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         datetime_format = '%Y-%m-%dT%H:%M:%S%z'
         created_datetime = datetime.strptime('2019-09-12T16:30:00+0000',
                                              datetime_format)
-        self.assertEqual(created_datetime.timestamp(),
-                         entry.source_system_timestamps.create_time.seconds)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
         updated_datetime = datetime.strptime('2019-09-12T16:30:55+0000',
                                              datetime_format)
-        self.assertEqual(updated_datetime.timestamp(),
-                         entry.source_system_timestamps.update_time.seconds)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_long_luid_should_limit_result_id_length(self):
         metadata = {

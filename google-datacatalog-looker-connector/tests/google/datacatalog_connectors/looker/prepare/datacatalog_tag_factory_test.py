@@ -83,18 +83,19 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         last_accessed_at = self.__parse_datetime('2019-09-12T16:30:00+0000')
         self.assertEqual(
-            self.__get_datetime_secs(last_accessed_at),
-            tag.fields['last_accessed_at'].timestamp_value.seconds)
+            last_accessed_at.timestamp(),
+            tag.fields['last_accessed_at'].timestamp_value.timestamp())
 
         last_viewed_at = self.__parse_datetime('2019-09-12T16:35:00+0000')
-        self.assertEqual(self.__get_datetime_secs(last_viewed_at),
-                         tag.fields['last_viewed_at'].timestamp_value.seconds)
+        self.assertEqual(
+            last_viewed_at.timestamp(),
+            tag.fields['last_viewed_at'].timestamp_value.timestamp())
 
         self.assertEqual(True, tag.fields['is_deleted'].bool_value)
 
         deleted_at = self.__parse_datetime('2019-09-12T16:40:00+0000')
-        self.assertEqual(self.__get_datetime_secs(deleted_at),
-                         tag.fields['deleted_at'].timestamp_value.seconds)
+        self.assertEqual(deleted_at.timestamp(),
+                         tag.fields['deleted_at'].timestamp_value.timestamp())
 
         self.assertEqual(12, tag.fields['deleter_id'].double_value)
         self.assertEqual('https://test.server.com',
@@ -270,18 +271,19 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         last_accessed_at = self.__parse_datetime('2019-09-12T16:30:00+0000')
         self.assertEqual(
-            self.__get_datetime_secs(last_accessed_at),
-            tag.fields['last_accessed_at'].timestamp_value.seconds)
+            last_accessed_at.timestamp(),
+            tag.fields['last_accessed_at'].timestamp_value.timestamp())
 
         last_viewed_at = self.__parse_datetime('2019-09-12T16:35:00+0000')
-        self.assertEqual(self.__get_datetime_secs(last_viewed_at),
-                         tag.fields['last_viewed_at'].timestamp_value.seconds)
+        self.assertEqual(
+            last_viewed_at.timestamp(),
+            tag.fields['last_viewed_at'].timestamp_value.timestamp())
 
         self.assertEqual(True, tag.fields['is_deleted'].bool_value)
 
         deleted_at = self.__parse_datetime('2019-09-12T16:40:00+0000')
-        self.assertEqual(self.__get_datetime_secs(deleted_at),
-                         tag.fields['deleted_at'].timestamp_value.seconds)
+        self.assertEqual(deleted_at.timestamp(),
+                         tag.fields['deleted_at'].timestamp_value.timestamp())
 
         self.assertEqual(12, tag.fields['deleter_id'].double_value)
         self.assertEqual('https://test.server.com',
@@ -425,7 +427,3 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
     @classmethod
     def __parse_datetime(cls, string):
         return datetime.strptime(string, cls.__DATETIME_FORMAT)
-
-    @classmethod
-    def __get_datetime_secs(cls, datetime_object):
-        return int(datetime_object.timestamp())

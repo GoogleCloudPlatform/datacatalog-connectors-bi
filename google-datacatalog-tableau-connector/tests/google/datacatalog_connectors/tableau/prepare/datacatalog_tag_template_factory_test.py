@@ -16,14 +16,14 @@
 
 import unittest
 
-from google.cloud.datacatalog import enums
+from google.cloud import datacatalog
 
 from google.datacatalog_connectors.tableau import prepare
 
 
 class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
-    __BOOL_TYPE = enums.FieldType.PrimitiveType.BOOL
-    __STRING_TYPE = enums.FieldType.PrimitiveType.STRING
+    __BOOL_TYPE = datacatalog.FieldType.PrimitiveType.BOOL
+    __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
 
     def test_make_tag_template_for_dashboard(self):
         tag_template_factory = prepare.DataCatalogTagTemplateFactory(

@@ -37,7 +37,8 @@ setuptools.setup(
         ],
     },
     include_package_data=True,
-    install_requires=('requests', 'google-datacatalog-connectors-commons>=0.5.2,<0.6.0'),
+    install_requires=('requests',
+                      'google-datacatalog-connectors-commons >= 0.6.0'),
     setup_requires=('pytest-runner',),
     tests_require=('pytest-cov',),
     classifiers=[

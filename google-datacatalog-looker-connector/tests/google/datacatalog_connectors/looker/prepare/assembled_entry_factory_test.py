@@ -18,7 +18,7 @@ import json
 import unittest
 from unittest import mock
 
-from google.cloud.datacatalog import types
+from google.cloud import datacatalog
 from looker_sdk import models
 from looker_sdk.rtl import serialize
 
@@ -286,19 +286,19 @@ class AssembledEntryFactoryTest(unittest.TestCase):
 
     @classmethod
     def __mock_make_entry(cls, asset):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
         entry_id = asset.id
         entry.name = f'fake_entries/{entry_id}'
         return entry_id, entry
 
     @classmethod
     def __mock_make_tag(cls, tag_template_dict, asset):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
         tag.template = tag_template_dict['name']
         return tag
 
     @classmethod
     def __mock_make_tag_parent_dep(cls, tag_template_dict, asset, parent):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
         tag.template = tag_template_dict['name']
         return tag
