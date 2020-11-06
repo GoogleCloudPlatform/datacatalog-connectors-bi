@@ -23,7 +23,7 @@ with open('README.md') as readme_file:
 
 setuptools.setup(
     name='google-datacatalog-looker-connector',
-    version='0.6.0',
+    version='0.5.2',
     author='Google LLC',
     description='Package for ingesting Looker metadata'
     ' into Google Cloud Data Catalog',

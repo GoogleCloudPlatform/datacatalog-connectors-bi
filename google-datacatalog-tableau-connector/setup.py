@@ -23,7 +23,7 @@ with open('README.md') as readme_file:
 
 setuptools.setup(
     name='google-datacatalog-tableau-connector',
-    version='0.6.0',
+    version='0.5.3',
     author='Google LLC',
     description='Package for ingesting Tableau metadata'
     ' into Google Cloud Data Catalog',
