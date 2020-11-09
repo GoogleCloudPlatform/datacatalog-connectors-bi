@@ -53,18 +53,18 @@ supporting below asset types:
 
 ## 1. Installation
 
-Install this library in a [virtualenv][3] using pip. [virtualenv][3] is a tool to
-create isolated Python environments. The basic problem it addresses is one of
-dependencies and versions, and indirectly permissions.
+Install this library in a [virtualenv][3] using pip. [virtualenv][3] is a tool
+to create isolated Python environments. The basic problem it addresses is one
+of dependencies and versions, and indirectly permissions.
 
-With [virtualenv][3], it's possible to install this library without needing system
-install permissions, and without clashing with the installed system
-dependencies. Make sure you use Python 3.7+.
+With [virtualenv][3], it's possible to install this library without needing
+system install permissions, and without clashing with the installed system
+dependencies. Make sure you use Python `3.7+`.
 
 
 ### 1.1. Mac/Linux
 
-```bash
+```shell script
 pip3 install virtualenv
 virtualenv --python python3.7 <your-env>
 source <your-env>/bin/activate
@@ -73,7 +73,7 @@ source <your-env>/bin/activate
 
 ### 1.2. Windows
 
-```bash
+```shell script
 pip3 install virtualenv
 virtualenv --python python3.7 <your-env>
 <your-env>\Scripts\activate
@@ -84,14 +84,14 @@ virtualenv --python python3.7 <your-env>
 
 #### 1.3.1. Get the code
 
-````bash
+````shell script
 git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/
 cd datacatalog-connectors-bi/google-datacatalog-looker-connector
 ````
 
 #### 1.3.2. Create and activate a *virtualenv*
 
-```bash
+```shell script
 pip3 install virtualenv
 virtualenv --python python3.7 <your-env>
 source <your-env>/bin/activate
@@ -99,7 +99,7 @@ source <your-env>/bin/activate
 
 #### 1.3.3. Install the library
 
-```bash
+```shell script
 pip install .
 ```
 
@@ -114,6 +114,8 @@ pip install .
 #### 2.1.2. Download a JSON key and save it as
 - `<YOUR-CREDENTIALS_FILES_FOLDER>/looker2dc-datacatalog-credentials.json`
 
+> Please notice this folder and file will be required in next steps.
+
 #### 2.1.3. Create Looker API3 credentials
 
 The credentials required for API access must be obtained by creating an
@@ -125,20 +127,20 @@ https://<YOUR-LOOKER-ENDPOINT>/admin/users/api3_key/<YOUR-USER-ID>
 
 #### 2.1.4. Create a Looker configuration file
 
-File content is described in [Looker SDK documentation][1].
-Save the file as
+File content is described in [Looker SDK documentation][1]. Save the file as
 `<YOUR-CREDENTIALS_FILES_FOLDER>/looker2dc-looker-credentials.ini`
 
-> Please notice this folder and files will be required in next steps.
+> Please notice this folder and file will be required in next steps.
 
 ### 2.2. Set environment variables
 
-```bash
+```shell script
 export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 ```
 
 > Replace above values according to your environment. The Data Catalog
-> credentials file was saved in step 1.2.2.
+> credentials file was saved in [step
+> 2.1.2](#212-download-a-json-key-and-save-it-as).
 
 ## 3. Run entry point
 
@@ -146,15 +148,18 @@ export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 
 - Virtualenv
 
-```bash
+```shell script
 google-datacatalog-looker-connector \
   --datacatalog-project-id <YOUR-DATACATALOG-PROJECT-ID> \
   --looker-credentials-file looker_credentials_ini_file
 ```
 
+> Replace above values according to your environment. The Looker credentials
+> file was saved in [step 2.1.4](#214-create-a-looker-configuration-file).
+
 ### 3.2. Run Docker entry point
 
-```bash
+```shell script
 docker build --rm --tag looker2datacatalog .
 docker run --rm --tty -v <YOUR-CREDENTIALS_FILES_FOLDER>:/data \
   looker2datacatalog \ 
@@ -166,7 +171,7 @@ docker run --rm --tty -v <YOUR-CREDENTIALS_FILES_FOLDER>:/data \
 
 ### 4.1. Install and run Yapf formatter
 
-```bash
+```shell script
 pip install --upgrade yapf
 
 # Auto update files
@@ -184,14 +189,14 @@ mv pre-commit.sh .git/hooks/pre-commit
 
 ### 4.2. Install and run Flake8 linter
 
-```bash
+```shell script
 pip install --upgrade flake8
 flake8 src tests
 ```
 
 ### 4.3. Run Tests
 
-```bash
+```shell script
 python setup.py test
 ```
 
@@ -213,7 +218,8 @@ debug_error_string =
 "{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'.","grpc_status":8}"
 ```
 
-For more information on Data Catalog quota, please refer to: [Data Catalog quota docs][2].
+For more information on Data Catalog quota, please refer to: [Data Catalog
+quota docs][2].
 
 [1]: https://github.com/looker-open-source/sdk-codegen/blob/master/looker-sample.ini
 [2]: https://cloud.google.com/data-catalog/docs/resources/quotas
