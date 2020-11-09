@@ -104,6 +104,8 @@ pip install .
 #### 2.1.2. Download a JSON key and save it as
 - `<YOUR-CREDENTIALS_FILES_FOLDER>/qlik2dc-datacatalog-credentials.json`
 
+> Please notice this folder and file will be required in next steps.
+
 ### 2.2. Set environment variables
 
 ```shell script
@@ -111,7 +113,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 ```
 
 > Replace above values according to your environment. The Data Catalog
-> credentials file was saved in the [step
+> credentials file was saved in [step
 > 2.1.2](#212-download-a-json-key-and-save-it-as).
 
 ## 3. Run entry point
@@ -179,7 +181,8 @@ debug_error_string =
 "{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'.","grpc_status":8}"
 ```
 
-For more information on Data Catalog quota, please refer to: [Data Catalog quota docs][2].
+For more information on Data Catalog quota, please refer to: [Data Catalog
+quota docs][2].
 
 [1]: https://virtualenv.pypa.io/en/latest/
 [2]: https://cloud.google.com/data-catalog/docs/resources/quotas
