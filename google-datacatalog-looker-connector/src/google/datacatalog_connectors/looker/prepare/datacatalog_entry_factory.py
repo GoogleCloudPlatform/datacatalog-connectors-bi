@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import types
+from google.protobuf import timestamp_pb2
 
 from google.datacatalog_connectors.commons import prepare
 
@@ -39,7 +40,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         self.__server_id = instance_url[instance_url.find('//') + 2:]
 
     def make_entry_for_dashboard(self, dashboard):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         generated_id = self.__format_id(constant.ENTRY_ID_DASHBOARD,
                                         dashboard.id)
@@ -56,12 +57,16 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             f'{self.__instance_url}/dashboards/{dashboard.id}'
 
         if dashboard.created_at:  # LookML dashboards come with None
-            created_secs = \
-                self.__convert_datetime_to_seconds(dashboard.created_at)
-            entry.source_system_timestamps.create_time.seconds = created_secs
-            # TODO Evaluate/remove "+ 1" after b/144041881 has been closed.
-            entry.source_system_timestamps.update_time.seconds = \
-                created_secs + 10
+            created_timestamp = timestamp_pb2.Timestamp()
+            created_timestamp.FromDatetime(dashboard.created_at)
+            entry.source_system_timestamps.create_time = created_timestamp
+
+            updated_timestamp = timestamp_pb2.Timestamp()
+            # TODO Evaluate/remove "+ 10" after b/144041881 has been closed.
+            updated_timestamp.FromDatetime(dashboard.created_at +
+                                           datetime.timedelta(seconds=10))
+            entry.source_system_timestamps.update_time = updated_timestamp
+
         else:
             logging.info('Dashboard "%s" has no created_at information!',
                          dashboard.id)
@@ -77,7 +82,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
                 ' and will be skipped!', element.id)
             return None, None
 
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         generated_id = self.__format_id(constant.ENTRY_ID_DASHBOARD_ELEMENT,
                                         element.id)
@@ -94,7 +99,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         return generated_id, entry
 
     def make_entry_for_folder(self, folder):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         generated_id = self.__format_id(constant.ENTRY_ID_FOLDER, folder.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -111,7 +116,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         return generated_id, entry
 
     def make_entry_for_look(self, look):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         generated_id = self.__format_id(constant.ENTRY_ID_LOOK, look.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -125,17 +130,22 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         entry.linked_resource = f'{self.__instance_url}/looks/{look.id}'
 
-        created_secs = self.__convert_datetime_to_seconds(look.created_at)
-        entry.source_system_timestamps.create_time.seconds = created_secs
-        updated_secs = self.__convert_datetime_to_seconds(look.updated_at) \
-            if look.updated_at else created_secs
-        # TODO Evaluate/remove "+ 1" after b/144041881 has been closed.
-        entry.source_system_timestamps.update_time.seconds = updated_secs + 10
+        created_timestamp = timestamp_pb2.Timestamp()
+        created_timestamp.FromDatetime(look.created_at)
+        entry.source_system_timestamps.create_time = created_timestamp
+
+        updated_datetime = \
+            look.updated_at if look.updated_at else look.created_at
+        updated_timestamp = timestamp_pb2.Timestamp()
+        # TODO Evaluate/remove "+ 10" after b/144041881 has been closed.
+        updated_timestamp.FromDatetime(updated_datetime +
+                                       datetime.timedelta(seconds=10))
+        entry.source_system_timestamps.update_time = updated_timestamp
 
         return generated_id, entry
 
     def make_entry_for_query(self, query):
-        entry = types.Entry()
+        entry = datacatalog.Entry()
 
         generated_id = self.__format_id(constant.ENTRY_ID_QUERY, query.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -157,7 +167,3 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
                       f'{self.__server_id}_' \
                       f'{source_type_prefix}{source_id}'
         return self._format_id(prefixed_id)
-
-    @classmethod
-    def __convert_datetime_to_seconds(cls, datetime_object):
-        return int(datetime_object.timestamp())

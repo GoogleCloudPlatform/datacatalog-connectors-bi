@@ -18,11 +18,10 @@ import argparse
 import re
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import types
-
-datacatalog = datacatalog.DataCatalogClient()
 
 __DATACATALOG_LOCATION_ID = 'us-central1'
+
+__datacatalog = datacatalog.DataCatalogClient()
 
 
 def __delete_entries_and_groups(project_ids):
@@ -30,20 +29,24 @@ def __delete_entries_and_groups(project_ids):
 
     query = f'system=tableau'
 
-    scope = types.SearchCatalogRequest.Scope()
+    scope = datacatalog.SearchCatalogRequest.Scope()
     scope.include_project_ids.extend(project_ids)
+
+    request = datacatalog.SearchCatalogRequest()
+    request.scope = scope
+    request.query = query
+    request.page_size = 1000
 
     # TODO Replace "search entries" by "list entries by group"
     #  when/if it becomes available.
     search_results = [
-        result for result in datacatalog.search_catalog(
-            scope=scope, query=query, order_by='relevance', page_size=1000)
+        result for result in __datacatalog.search_catalog(request)
     ]
 
     entry_group_names = []
     for result in search_results:
         try:
-            datacatalog.delete_entry(result.relative_resource_name)
+            __datacatalog.delete_entry(result.relative_resource_name)
             print('Entry deleted: {}'.format(result.relative_resource_name))
             entry_group_name = re.match(
                 pattern=entry_name_pattern,
@@ -55,7 +58,7 @@ def __delete_entries_and_groups(project_ids):
     # Delete any pre-existing Entry Groups.
     for entry_group_name in set(entry_group_names):
         try:
-            datacatalog.delete_entry_group(entry_group_name)
+            __datacatalog.delete_entry_group(name=entry_group_name)
             print('--> Entry Group deleted: {}'.format(entry_group_name))
         except:
             print('Exception deleting entry group')
@@ -65,8 +68,8 @@ def __delete_tag_templates(project_id, location_id):
     tag_template_id = 'tableau_sheet_metadata'
 
     try:
-        datacatalog.delete_tag_template(
-            datacatalog.DataCatalogClient.tag_template_path(
+        __datacatalog.delete_tag_template(
+            name=datacatalog.DataCatalogClient.tag_template_path(
                 project=project_id,
                 location=location_id,
                 tag_template=tag_template_id),
@@ -78,7 +81,7 @@ def __delete_tag_templates(project_id, location_id):
     tag_template_id = 'tableau_dashboard_metadata'
 
     try:
-        datacatalog.delete_tag_template(
+        __datacatalog.delete_tag_template(
             name=datacatalog.DataCatalogClient.tag_template_path(
                 project=project_id,
                 location=location_id,
@@ -91,7 +94,7 @@ def __delete_tag_templates(project_id, location_id):
     tag_template_id = 'tableau_workbook_metadata'
 
     try:
-        datacatalog.delete_tag_template(
+        __datacatalog.delete_tag_template(
             name=datacatalog.DataCatalogClient.tag_template_path(
                 project=project_id,
                 location=location_id,

@@ -18,7 +18,6 @@ import argparse
 import re
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import types
 
 __DATACATALOG_LOCATION_ID = 'us-central1'
 
@@ -30,14 +29,19 @@ def __delete_entries_and_groups(project_ids):
 
     query = 'system=looker'
 
-    scope = types.SearchCatalogRequest.Scope()
+    scope = datacatalog.SearchCatalogRequest.Scope()
     scope.include_project_ids.extend(project_ids)
+
+    request = datacatalog.SearchCatalogRequest()
+    request.scope = scope
+    request.query = query
+    request.page_size = 1000
 
     # TODO Replace "search entries" by "list entries by group"
     #  when/if it becomes available.
-    search_results = [result for result in __datacatalog.search_catalog(
-        scope=scope, query=query, order_by='relevance',
-        page_size=1000)]
+    search_results = [
+        result for result in __datacatalog.search_catalog(request)
+    ]
 
     entry_group_names = []
     for result in search_results:
@@ -46,8 +50,7 @@ def __delete_entries_and_groups(project_ids):
             print('Entry deleted: {}'.format(result.relative_resource_name))
             entry_group_name = re.match(
                 pattern=entry_name_pattern,
-                string=result.relative_resource_name
-            ).group('entry_group_name')
+                string=result.relative_resource_name).group('entry_group_name')
             entry_group_names.append(entry_group_name)
         except Exception as e:
             print('Exception deleting Entry')
@@ -56,7 +59,7 @@ def __delete_entries_and_groups(project_ids):
     # Delete any pre-existing Entry Groups.
     for entry_group_name in set(entry_group_names):
         try:
-            __datacatalog.delete_entry_group(entry_group_name)
+            __datacatalog.delete_entry_group(name=entry_group_name)
             print('--> Entry Group deleted: {}'.format(entry_group_name))
         except Exception as e:
             print('Exception deleting Entry Group')
@@ -66,7 +69,7 @@ def __delete_entries_and_groups(project_ids):
 def __delete_tag_template(project_id, location_id, tag_template_id):
     try:
         __datacatalog.delete_tag_template(
-            datacatalog.DataCatalogClient.tag_template_path(
+            name=datacatalog.DataCatalogClient.tag_template_path(
                 project=project_id,
                 location=location_id,
                 tag_template=tag_template_id),
@@ -78,27 +81,23 @@ def __delete_tag_template(project_id, location_id, tag_template_id):
 
 
 def __delete_tag_templates(project_id, location_id):
-    __delete_tag_template(
-        project_id, location_id, 'looker_dashboard_metadata')
-    __delete_tag_template(
-        project_id, location_id, 'looker_dashboard_element_metadata')
-    __delete_tag_template(
-        project_id, location_id, 'looker_folder_metadata')
-    __delete_tag_template(
-        project_id, location_id, 'looker_look_metadata')
-    __delete_tag_template(
-        project_id, location_id, 'looker_query_metadata')
+    __delete_tag_template(project_id, location_id, 'looker_dashboard_metadata')
+    __delete_tag_template(project_id, location_id,
+                          'looker_dashboard_element_metadata')
+    __delete_tag_template(project_id, location_id, 'looker_folder_metadata')
+    __delete_tag_template(project_id, location_id, 'looker_look_metadata')
+    __delete_tag_template(project_id, location_id, 'looker_query_metadata')
 
 
 def __parse_args():
     parser = argparse.ArgumentParser(
         description='Command line utility to remove all Looker-related'
-                    ' metadata from Data Catalog')
+        ' metadata from Data Catalog')
 
-    parser.add_argument(
-        '--datacatalog-project-ids',
-        help='List of Google Cloud project IDs split by comma.'
-             ' At least one must be provided.', required=True)
+    parser.add_argument('--datacatalog-project-ids',
+                        help='List of Google Cloud project IDs split by comma.'
+                        ' At least one must be provided.',
+                        required=True)
     parser.add_argument(
         '--datacatalog-location-id',
         help='Google Cloud region where your Data Catalog metadata resides.',
@@ -116,5 +115,5 @@ if __name__ == "__main__":
 
     __delete_entries_and_groups(datacatalog_project_ids)
     for datacatalog_project_id in datacatalog_project_ids:
-        __delete_tag_templates(
-            datacatalog_project_id, args.datacatalog_location_id)
+        __delete_tag_templates(datacatalog_project_id,
+                               args.datacatalog_location_id)

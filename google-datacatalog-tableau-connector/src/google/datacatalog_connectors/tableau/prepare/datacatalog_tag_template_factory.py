@@ -15,14 +15,15 @@
 # limitations under the License.
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import enums, types
+
+from google.datacatalog_connectors.commons import prepare
 
 from . import constant
 
 
-class DataCatalogTagTemplateFactory:
-    __BOOL_TYPE = enums.FieldType.PrimitiveType.BOOL
-    __STRING_TYPE = enums.FieldType.PrimitiveType.STRING
+class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
+    __BOOL_TYPE = datacatalog.FieldType.PrimitiveType.BOOL
+    __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
 
     def __init__(self, project_id, location_id):
         self.__project_id = project_id
@@ -31,7 +32,7 @@ class DataCatalogTagTemplateFactory:
     def make_tag_template_for_dashboard(self):
         tag_template_id = constant.TAG_TEMPLATE_DASHBOARD_ID
 
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = \
             datacatalog.DataCatalogClient.tag_template_path(
@@ -41,45 +42,37 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Tableau Dashboard Metadata'
 
-        tag_template.fields['id'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['id'].display_name = \
-            'Unique identifier for the Metadata API'
+        self._add_primitive_type_field(
+            tag_template, 'id', self.__STRING_TYPE,
+            'Unique identifier for the Metadata API')
 
-        tag_template.fields['luid'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['luid'].display_name = \
-            'Unique identifier for the REST API'
+        self._add_primitive_type_field(tag_template, 'luid',
+                                       self.__STRING_TYPE,
+                                       'Unique identifier for the REST API')
 
-        tag_template.fields['workbook_luid'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['workbook_luid'].display_name = \
-            'Workbook identifier for the REST API'
+        self._add_primitive_type_field(tag_template, 'workbook_luid',
+                                       self.__STRING_TYPE,
+                                       'Workbook identifier for the REST API')
 
-        tag_template.fields['workbook_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['workbook_name'].display_name = \
-            'Workbook name'
+        self._add_primitive_type_field(tag_template, 'workbook_name',
+                                       self.__STRING_TYPE, 'Workbook name')
 
-        tag_template.fields[
-            'workbook_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['workbook_entry'].display_name = \
-            'Data Catalog Entry for the Workbook'
+        self._add_primitive_type_field(tag_template, 'workbook_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Workbook')
 
-        tag_template.fields['site_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['site_name'].display_name = \
-            'Site name'
+        self._add_primitive_type_field(tag_template, 'site_name',
+                                       self.__STRING_TYPE, 'Site name')
 
-        tag_template.fields['has_external_url'].type.primitive_type = \
-            self.__BOOL_TYPE
-        tag_template.fields['has_external_url'].display_name = \
-            'Has external URL'
+        self._add_primitive_type_field(tag_template, 'has_external_url',
+                                       self.__BOOL_TYPE, 'Has external URL')
 
         return tag_template_id, tag_template
 
     def make_tag_template_for_sheet(self):
         tag_template_id = constant.TAG_TEMPLATE_SHEET_ID
 
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = \
             datacatalog.DataCatalogClient.tag_template_path(
@@ -89,45 +82,37 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Tableau Sheet Metadata'
 
-        tag_template.fields['id'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['id'].display_name = \
-            'Unique identifier for the Metadata API'
+        self._add_primitive_type_field(
+            tag_template, 'id', self.__STRING_TYPE,
+            'Unique identifier for the Metadata API')
 
-        tag_template.fields['luid'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['luid'].display_name = \
-            'Unique identifier for the REST API'
+        self._add_primitive_type_field(tag_template, 'luid',
+                                       self.__STRING_TYPE,
+                                       'Unique identifier for the REST API')
 
-        tag_template.fields['workbook_luid'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['workbook_luid'].display_name = \
-            'Workbook identifier for the REST API'
+        self._add_primitive_type_field(tag_template, 'workbook_luid',
+                                       self.__STRING_TYPE,
+                                       'Workbook identifier for the REST API')
 
-        tag_template.fields['workbook_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['workbook_name'].display_name = \
-            'Workbook name'
+        self._add_primitive_type_field(tag_template, 'workbook_name',
+                                       self.__STRING_TYPE, 'Workbook name')
 
-        tag_template.fields[
-            'workbook_entry'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['workbook_entry'].display_name = \
-            'Data Catalog Entry for the Workbook'
+        self._add_primitive_type_field(tag_template, 'workbook_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Workbook')
 
-        tag_template.fields['site_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['site_name'].display_name = \
-            'Site name'
+        self._add_primitive_type_field(tag_template, 'site_name',
+                                       self.__STRING_TYPE, 'Site name')
 
-        tag_template.fields['has_external_url'].type.primitive_type = \
-            self.__BOOL_TYPE
-        tag_template.fields['has_external_url'].display_name = \
-            'Has external URL'
+        self._add_primitive_type_field(tag_template, 'has_external_url',
+                                       self.__BOOL_TYPE, 'Has external URL')
 
         return tag_template_id, tag_template
 
     def make_tag_template_for_workbook(self):
         tag_template_id = constant.TAG_TEMPLATE_WORKBOOK_ID
 
-        tag_template = types.TagTemplate()
+        tag_template = datacatalog.TagTemplate()
 
         tag_template.name = \
             datacatalog.DataCatalogClient.tag_template_path(
@@ -137,38 +122,29 @@ class DataCatalogTagTemplateFactory:
 
         tag_template.display_name = 'Tableau Workbook Metadata'
 
-        tag_template.fields['luid'].type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['luid'].display_name = \
-            'Unique identifier for the REST API'
+        self._add_primitive_type_field(tag_template, 'luid',
+                                       self.__STRING_TYPE,
+                                       'Unique identifier for the REST API')
 
-        tag_template.fields['site_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['site_name'].display_name = \
-            'Site name'
+        self._add_primitive_type_field(tag_template, 'site_name',
+                                       self.__STRING_TYPE, 'Site name')
 
-        tag_template.fields['project_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['project_name'].display_name = \
-            'Project name'
+        self._add_primitive_type_field(tag_template, 'project_name',
+                                       self.__STRING_TYPE, 'Project name')
 
-        tag_template.fields['owner_username'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['owner_username'].display_name = \
-            'Owner username'
+        self._add_primitive_type_field(tag_template, 'owner_username',
+                                       self.__STRING_TYPE, 'Owner username')
 
-        tag_template.fields['owner_name'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['owner_name'].display_name = \
-            'Owner name'
+        self._add_primitive_type_field(tag_template, 'owner_name',
+                                       self.__STRING_TYPE, 'Owner name')
 
-        tag_template.fields['upstream_table_definition']\
-            .type.primitive_type = self.__STRING_TYPE
-        tag_template.fields['upstream_table_definition'].display_name = \
-            'upstream_tables values meaning'
+        self._add_primitive_type_field(tag_template,
+                                       'upstream_table_definition',
+                                       self.__STRING_TYPE,
+                                       'upstream_tables values meaning')
 
-        tag_template.fields['upstream_tables'].type.primitive_type = \
-            self.__STRING_TYPE
-        tag_template.fields['upstream_tables'].display_name = \
-            'Tables used by the workbook'
+        self._add_primitive_type_field(tag_template, 'upstream_tables',
+                                       self.__STRING_TYPE,
+                                       'Tables used by the workbook')
 
         return tag_template_id, tag_template

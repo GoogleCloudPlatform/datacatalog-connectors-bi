@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import unittest
 
@@ -73,11 +73,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                          entry.linked_resource)
 
         created_datetime = self.__parse_datetime('2019-09-12T16:30:00+0000')
-        self.assertEqual(self.__get_datetime_secs(created_datetime),
-                         entry.source_system_timestamps.create_time.seconds)
         self.assertEqual(
-            self.__get_datetime_secs(created_datetime) + 10,
-            entry.source_system_timestamps.update_time.seconds)
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
+        self.assertEqual(
+            (created_datetime + timedelta(seconds=10)).timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_for_dashboard_no_created_at_should_succeed(self):
         dashboard_data = {
@@ -89,8 +90,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             serialize.deserialize(json.dumps(dashboard_data),
                                   models.Dashboard))
 
-        self.assertEqual(0, entry.source_system_timestamps.create_time.seconds)
-        self.assertEqual(0, entry.source_system_timestamps.update_time.seconds)
+        self.assertIsNone(entry.source_system_timestamps.create_time)
+        self.assertIsNone(entry.source_system_timestamps.update_time)
 
     def test_make_entry_for_dashboard_tile_should_set_fields(self):
         dashboard_element_data = {
@@ -179,11 +180,13 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                          entry.linked_resource)
 
         created_datetime = self.__parse_datetime('2019-09-12T16:30:00+0000')
-        self.assertEqual(self.__get_datetime_secs(created_datetime),
-                         entry.source_system_timestamps.create_time.seconds)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
         updated_datetime = self.__parse_datetime('2019-09-12T17:35:10+0000')
-        self.assertEqual(self.__get_datetime_secs(updated_datetime),
-                         entry.source_system_timestamps.update_time.seconds)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_for_look_no_updated_at_should_succeed(self):
         look_data = {
@@ -196,11 +199,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             serialize.deserialize(json.dumps(look_data), models.Look))
 
         created_datetime = self.__parse_datetime('2019-09-12T16:30:00+0000')
-        self.assertEqual(self.__get_datetime_secs(created_datetime),
-                         entry.source_system_timestamps.create_time.seconds)
         self.assertEqual(
-            int(created_datetime.timestamp()) + 10,
-            entry.source_system_timestamps.update_time.seconds)
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
+        self.assertEqual(
+            (created_datetime + timedelta(seconds=10)).timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_for_query_should_set_all_available_fields(self):
         query_data = {
@@ -227,7 +231,3 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
     @classmethod
     def __parse_datetime(cls, string):
         return datetime.strptime(string, cls.__DATETIME_FORMAT)
-
-    @classmethod
-    def __get_datetime_secs(cls, datetime_object):
-        return int(datetime_object.timestamp())

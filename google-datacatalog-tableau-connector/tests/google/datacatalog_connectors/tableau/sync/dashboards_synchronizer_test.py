@@ -17,7 +17,7 @@
 import unittest
 from unittest import mock
 
-from google.cloud.datacatalog import types
+from google.cloud import datacatalog
 
 from google.datacatalog_connectors.commons import prepare
 from google.datacatalog_connectors.tableau.sync import \
@@ -44,7 +44,8 @@ class DashboardsSynchronizerTest(unittest.TestCase):
 
         assembled_entry_factory = mock_assembled_entry_factory.return_value
         assembled_entry_factory.make_entries_for_dashboards.return_value = [
-            (prepare.AssembledEntryData('test-entry-id-1', types.Entry(), []))
+            (prepare.AssembledEntryData('test-entry-id-1', datacatalog.Entry(),
+                                        []))
         ]
 
         dashboards_synchronizer.DashboardsSynchronizer(

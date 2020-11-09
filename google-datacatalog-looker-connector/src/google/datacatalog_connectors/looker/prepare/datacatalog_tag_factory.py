@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.cloud.datacatalog import types
+from google.cloud import datacatalog
 
 from google.datacatalog_connectors.commons import prepare
 
@@ -29,7 +29,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self.__instance_url = instance_url
 
     def make_tag_for_dashboard(self, tag_template, dashboard):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
 
         tag.template = tag_template.name
 
@@ -54,7 +54,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         return tag
 
     def make_tag_for_dashboard_element(self, tag_template, element, dashboard):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
 
         tag.template = tag_template.name
 
@@ -83,7 +83,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         return tag
 
     def make_tag_for_folder(self, tag_template, folder):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
 
         tag.template = tag_template.name
 
@@ -112,7 +112,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         return tag
 
     def make_tag_for_look(self, tag_template, look):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
 
         tag.template = tag_template.name
 
@@ -149,7 +149,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         return tag
 
     def make_tag_for_query(self, tag_template, assembled_query_metadata):
-        tag = types.Tag()
+        tag = datacatalog.Tag()
 
         tag.template = tag_template.name
 
