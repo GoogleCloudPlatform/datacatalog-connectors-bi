@@ -1,0 +1,225 @@
+{
+	"info": {
+		"_postman_id": "aaec14b2-a88e-48b1-ad44-813c86fb78e5",
+		"name": "Qlik Sense Repository Service API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 Authentication",
+			"item": [
+				{
+					"name": "0.01.01 Get the auth url",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0c67375b-9ef5-4b45-afc2-c566b8e18e79",
+								"exec": [
+									"const jar = pm.cookies.jar();",
+									"",
+									"// Remove all cookies to force a new authentication flow",
+									"jar.clear(pm.environment.get('SERVER'), function (error) {",
+									"    // error handling",
+									"});",
+									"",
+									"pm.globals.unset('windowsAuthenticationUrl');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "1b021c78-014d-44ad-bde4-ca2b69ea86ce",
+								"exec": [
+									"pm.test(\"Status code is 302\", function () {",
+									"    pm.response.to.have.status(302);",
+									"});",
+									"",
+									"pm.globals.set('windowsAuthenticationUrl', pm.response.headers.get('Location'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"followRedirects": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"value": "{{XRFKEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "User-Agent",
+								"value": "Windows",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/qrs/about?Xrfkey={{XRFKEY}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"about"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "0.01.02 Sign in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "966dfbae-2dfa-4277-a7ba-31e319e64a39",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.globals.unset('windowsAuthenticationUrl');",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "ntlm",
+							"ntlm": [
+								{
+									"key": "domain",
+									"value": "{{DOMAIN}}",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{PASSWORD}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{USERNAME}}",
+									"type": "string"
+								},
+								{
+									"key": "disableRetryRequest",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"value": "{{XRFKEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{windowsAuthenticationUrl}}",
+							"host": [
+								"{{windowsAuthenticationUrl}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "1. QRS API endpoints",
+			"item": [
+				{
+					"name": "1.01.01 Get information on the Qlik Sense repository",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c87cd1eb-03de-4575-b3fb-09e45b06263b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{PROTOCOL}}://{{SERVER}}/qrs/about?Xrfkey={{XRFKEY}}",
+							"protocol": "{{PROTOCOL}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"about"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
