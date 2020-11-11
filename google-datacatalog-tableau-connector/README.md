@@ -50,18 +50,18 @@ currently supporting below asset types:
 
 ## 1. Installation
 
-Install this library in a [virtualenv][2] using pip. [virtualenv][2] is a tool to
-create isolated Python environments. The basic problem it addresses is one of
-dependencies and versions, and indirectly permissions.
+Install this library in a [virtualenv][2] using pip. [virtualenv][2] is a tool
+to create isolated Python environments. The basic problem it addresses is one
+of dependencies and versions, and indirectly permissions.
 
-With [virtualenv][2], it's possible to install this library without needing system
-install permissions, and without clashing with the installed system
-dependencies. Make sure you use Python 3.6+.
+With [virtualenv][2], it's possible to install this library without needing
+system install permissions, and without clashing with the installed system
+dependencies. Make sure you use Python `3.6+`.
 
 
 ### 1.1. Mac/Linux
 
-```bash
+```shell script
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 source <your-env>/bin/activate
@@ -70,7 +70,7 @@ source <your-env>/bin/activate
 
 ### 1.2. Windows
 
-```bash
+```shell script
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 <your-env>\Scripts\activate
@@ -81,14 +81,14 @@ virtualenv --python python3.6 <your-env>
 
 #### 1.3.1. Get the code
 
-````bash
+````shell script
 git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/
 cd datacatalog-connectors-bi/google-datacatalog-tableau-connector
 ````
 
 #### 1.3.2. Create and activate a *virtualenv*
 
-```bash
+```shell script
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env> 
 source <your-env>/bin/activate
@@ -96,7 +96,7 @@ source <your-env>/bin/activate
 
 #### 1.3.3. Install the library
 
-```bash
+```shell script
 pip install .
 ```
 
@@ -117,7 +117,7 @@ pip install .
 
 Replace below values according to your environment:
 
-```bash
+```shell script
 export GOOGLE_APPLICATION_CREDENTIALS=data_catalog_credentials_file
 
 export TABLEAU2DC_TABLEAU_SERVER=tableau_server
@@ -128,13 +128,17 @@ export TABLEAU2DC_TABLEAU_SITE=tableau_site (optional)
 export TABLEAU2DC_DATACATALOG_PROJECT_ID=google_cloud_project_id
 ```
 
+> Replace above values according to your environment. The Data Catalog
+> credentials file was saved in [step
+> 2.1.2](#212-download-a-json-key-and-save-it-as).
+
 ## 3. Run entry point
 
 ### 3.1. Run Python entry point
 
 - Virtualenv
 
-```bash
+```shell script
 google-datacatalog-tableau-connector \
   --tableau-server $TABLEAU2DC_TABLEAU_SERVER \
   --tableau-api-version $TABLEAU2DC_TABLEAU_API_VERSION \
@@ -146,7 +150,7 @@ google-datacatalog-tableau-connector \
 
 ### 3.2. Run Docker entry point
 
-```bash
+```shell script
 docker build --rm --tag tableau2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   tableau2datacatalog \
@@ -177,7 +181,7 @@ Then you will be able to use your Tableau Online dev server.
 
 ### 5.1. Install and run Yapf formatter
 
-```bash
+```shell script
 pip install --upgrade yapf
 
 # Auto update files
@@ -195,14 +199,14 @@ mv pre-commit.sh .git/hooks/pre-commit
 
 ### 6.2. Install and run Flake8 linter
 
-```bash
+```shell script
 pip install --upgrade flake8
 flake8 src tests
 ```
 
 ### 6.3. Run Tests
 
-```bash
+```shell script
 python setup.py test
 ```
 
@@ -224,7 +228,8 @@ debug_error_string =
 "{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'.","grpc_status":8}"
 ```
 
-For more information on Data Catalog quota, please refer to: [Data Catalog quota docs][1]
+For more information on Data Catalog quota, please refer to: [Data Catalog
+quota docs][1]
 
 [1]: https://cloud.google.com/data-catalog/docs/resources/quotas
 [2]: https://virtualenv.pypa.io/en/latest/

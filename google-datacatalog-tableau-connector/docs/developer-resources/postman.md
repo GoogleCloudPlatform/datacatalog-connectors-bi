@@ -13,7 +13,7 @@ requests. The available collections cover both Tableau GraphQL and REST APIs.
    | ------------- | ----------------------------------------------------------------------- |
    | `PROTOCOL`    | `http` or `https`                                                       |
    | `SERVER`      | URL of the Tableau server, e.g. `10ax.online.tableau.com`               |
-   | `API_VERSION` | Version of the Tableau REST API (for user authentication*), e.g. `3.6`) |
+   | `API_VERSION` | Version of the Tableau REST API (for user authentication*), e.g. `3.6`  |
    | `USERNAME`    | Username to authenticate* the API calls                                 |
    | `PASSWORD`    | Password to authenticate* the API calls                                 |
    | `SITE_URL`    | Name of the site to authenticate* (a single server can host many sites) |
