@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        build-dir: ['./google-datacatalog-looker-connector', './google-datacatalog-tableau-connector']
+        build-dir: ['./google-datacatalog-looker-connector', './google-datacatalog-qlik-connector', './google-datacatalog-tableau-connector']
         python-version: [3.7]
     defaults:
       run:
@@ -41,3 +41,4 @@ jobs:
     - name: Test with pytest
       run: |
         python setup.py test
+
