@@ -14,12 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import requests
 from requests_ntlm import HttpNtlmAuth
 
+from . import constants
+
 
 class Authenticator:
-    __QPS_SESSION_COOKIE_PREFIX = 'X-Qlik-Session'
 
     @classmethod
     def get_qps_session_cookie_windows_auth(cls, domain, username, password,
@@ -29,16 +31,23 @@ class Authenticator:
         user_auth = HttpNtlmAuth(username=f'{domain}\\{username}',
                                  password=password)
 
-        headers = {'x-Qlik-Xrfkey': 'application/json'}
+        headers = {'x-Qlik-Xrfkey': constants.XRFKEY}
 
         response = requests.get(url=auth_url, auth=user_auth, headers=headers)
 
         if not response.cookies:
+            cls.__log_authentication_failure()
             return
 
         try:
             return next(
                 cookie for cookie in response.cookies
-                if cookie.name.startswith(cls.__QPS_SESSION_COOKIE_PREFIX))
+                if cookie.name.startswith(constants.QPS_SESSION_COOKIE_PREFIX))
         except StopIteration:
-            pass
+            cls.__log_authentication_failure()
+
+    @classmethod
+    def __log_authentication_failure(cls):
+        logging.warning(
+            'Authentication failed! %s cookie not found in the response.',
+            constants.QPS_SESSION_COOKIE_PREFIX)

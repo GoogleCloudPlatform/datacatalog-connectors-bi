@@ -1,6 +1,8 @@
 # google-datacatalog-looker-connector
 
-Package for ingesting Qlik metadata into Google Cloud Data Catalog.
+Package for ingesting Qlik Sense metadata into Google Cloud Data Catalog,
+currently supporting below asset types:
+- Stream
 
 **Disclaimer: This is not an officially supported Google product.**
 
@@ -27,9 +29,9 @@ Package for ingesting Qlik metadata into Google Cloud Data Catalog.
     + [2.1.1. Create a GCP Service Account and grant it below roles](#211-create-a-gcp-service-account-and-grant-it-below-roles)
     + [2.1.2. Download a JSON key and save it as](#212-download-a-json-key-and-save-it-as)
   * [2.2. Set environment variables](#22-set-environment-variables)
-- [3. Run entry point](#3-run-entry-point)
-  * [3.1. Run Python entry point](#31-run-python-entry-point)
-  * [3.2. Run Docker entry point](#32-run-docker-entry-point)
+- [3. Running the connector](#3-running-the-connector)
+  * [3.1. Python entry point](#31-python-entry-point)
+  * [3.2. Docker entry point](#32-docker-entry-point)
 - [4. Developer environment](#4-developer-environment)
   * [4.1. Install and run Yapf formatter](#41-install-and-run-yapf-formatter)
   * [4.2. Install and run Flake8 linter](#42-install-and-run-flake8-linter)
@@ -39,7 +41,7 @@ Package for ingesting Qlik metadata into Google Cloud Data Catalog.
 
 <!-- tocstop -->
 
------
+---
 
 ## 1. Installation
 
@@ -110,24 +112,50 @@ pip install .
 
 ```shell script
 export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
+
+export QLIK2DC_QLIK_SERVER=qlik_server
+export QLIK2DC_QLIK_DOMAIN=qlik_domain
+export QLIK2DC_QLIK_USERNAME=qlik_username
+export QLIK2DC_QLIK_PASSWORD=qlik_password
+export QLIK2DC_DATACATALOG_PROJECT_ID=google_cloud_project_id
+export QLIK2DC_DATACATALOG_LOCATION_ID=google_cloud_location_id
 ```
 
 > Replace above values according to your environment. The Data Catalog
 > credentials file was saved in [step
 > 2.1.2](#212-download-a-json-key-and-save-it-as).
 
-## 3. Run entry point
+## 3. Running the connector
 
-### 3.1. Run Python entry point
+- The `--qlik-domain` argument is optional and defaults to `.`.
+- The `--datacatalog-location-id` argument is optional and defaults to `us`.
+
+### 3.1. Python entry point
 
 - Virtualenv
 
 ```shell script
+google-datacatalog-qlik-connector \
+  --qlik-server $QLIK2DC_QLIK_SERVER \
+  [--qlik-domain $QLIK2DC_QLIK_DOMAIN \]
+  --qlik-username $QLIK2DC_QLIK_USERNAME \
+  --qlik-password $QLIK2DC_QLIK_PASSWORD \
+  --datacatalog-project-id $QLIK2DC_DATACATALOG_PROJECT_ID \
+  [--datacatalog-location-id $QLIK2DC_DATACATALOG_LOCATION_ID]
 ```
 
-### 3.2. Run Docker entry point
+### 3.2. Docker entry point
 
 ```shell script
+docker build --rm --tag qlik2datacatalog .
+docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
+  qlik2datacatalog \
+  --qlik-server $QLIK2DC_QLIK_SERVER \
+  [--qlik-domain $QLIK2DC_QLIK_DOMAIN \]
+  --qlik-username $QLIK2DC_QLIK_USERNAME \
+  --qlik-password $QLIK2DC_QLIK_PASSWORD \
+  --datacatalog-project-id $QLIK2DC_DATACATALOG_PROJECT_ID \
+  [--datacatalog-location-id $QLIK2DC_DATACATALOG_LOCATION_ID]
 ```
 
 ## 4. Developer environment

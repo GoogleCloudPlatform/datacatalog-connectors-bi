@@ -2,8 +2,8 @@ FROM python:3.6 as builder
 
 # Set the GOOGLE_APPLICATION_CREDENTIALS environment variable.
 # At run time, /data must be binded to a volume containing a valid Service
-# Account credentials file named tableau2dc-datacatalog-credentials.json.
-ENV GOOGLE_APPLICATION_CREDENTIALS=/data/tableau2dc-datacatalog-credentials.json
+# Account credentials file named qlik2dc-datacatalog-credentials.json.
+ENV GOOGLE_APPLICATION_CREDENTIALS=/data/qlik2dc-datacatalog-credentials.json
 
 WORKDIR /app
 
@@ -28,4 +28,4 @@ FROM builder as run
 # Install the connector from source files.
 RUN pip install .
 
-ENTRYPOINT ["google-datacatalog-tableau-connector"]
+ENTRYPOINT ["google-datacatalog-qlik-connector"]

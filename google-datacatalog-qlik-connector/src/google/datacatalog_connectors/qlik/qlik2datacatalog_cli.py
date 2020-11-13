@@ -18,6 +18,8 @@ import argparse
 import logging
 import sys
 
+from . import sync
+
 
 class Qlik2DataCatalogCli:
     __DEFAULT_DATACATALOG_LOCATION_ID = 'us'
@@ -40,13 +42,7 @@ class Qlik2DataCatalogCli:
             description=__doc__,
             formatter_class=argparse.RawDescriptionHelpFormatter)
 
-        parser.add_argument('--datacatalog-project-id',
-                            help='Google Cloud Project ID',
-                            required=True)
-        parser.add_argument('--datacatalog-location-id',
-                            help='Location ID to be used Google Data Catalog'
-                            'to store the metadata',
-                            default=cls.__DEFAULT_DATACATALOG_LOCATION_ID)
+        parser.add_argument('--qlik-server', help='Qlik server', required=True)
         parser.add_argument('--qlik-domain',
                             help='Qlik domain',
                             default=cls.__DEFAULT_QLIK_DOMAIN)
@@ -56,6 +52,13 @@ class Qlik2DataCatalogCli:
         parser.add_argument('--qlik-password',
                             help='Qlik password',
                             required=True)
+        parser.add_argument('--datacatalog-project-id',
+                            help='Google Cloud Project ID',
+                            required=True)
+        parser.add_argument('--datacatalog-location-id',
+                            help='Location ID to be used Google Data Catalog'
+                            'to store the metadata',
+                            default=cls.__DEFAULT_DATACATALOG_LOCATION_ID)
 
         parser.set_defaults(func=cls.__run_synchronizer)
 
@@ -63,7 +66,13 @@ class Qlik2DataCatalogCli:
 
     @classmethod
     def __run_synchronizer(cls, args):
-        pass
+        sync.MetadataSynchronizer(
+            qlik_server_address=args.qlik_server,
+            qlik_domain=args.qlik_domain,
+            qlik_username=args.qlik_username,
+            qlik_password=args.qlik_password,
+            datacatalog_project_id=args.datacatalog_project_id,
+            datacatalog_location_id=args.datacatalog_location_id).run()
 
 
 def main():

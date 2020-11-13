@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .qlik2datacatalog_cli import main
+import random
+import string
 
-__all__ = ['main']
+QPS_SESSION_COOKIE_PREFIX = 'X-Qlik-Session'
+XRFKEY = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
