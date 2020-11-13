@@ -12,7 +12,7 @@ API](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/Reposit
 
    | NAME       | DESCRIPTION                                                                               |
    | ---------- | ----------------------------------------------------------------------------------------- |
-   | `PROTOCOL` | `http` or `https`                                                                         |
+   | `SCHEME`   | The URI scheme: `http` or `https`                                                                         |
    | `SERVER`   | URL of the Qlik Sense server                                                              |
    | `DOMAIN`   | AD domain for the user                                                                    |
    | `USERNAME` | Username to authenticate the API calls                                                    |

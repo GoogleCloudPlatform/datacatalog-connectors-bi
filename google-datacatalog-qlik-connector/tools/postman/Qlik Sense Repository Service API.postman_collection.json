@@ -71,8 +71,8 @@
 							}
 						],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/qrs/about?Xrfkey={{XRFKEY}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/about?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -91,7 +91,7 @@
 					"response": []
 				},
 				{
-					"name": "0.01.02 Sign in",
+					"name": "0.01.02 Windows authentication",
 					"event": [
 						{
 							"listen": "test",
@@ -156,12 +156,83 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "0.01.03 Windows authentication for ws",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d94a2d4f-cf4a-4dfa-a777-f873fcda70e2",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "ntlm",
+							"ntlm": [
+								{
+									"key": "domain",
+									"value": "{{DOMAIN}}",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{PASSWORD}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{USERNAME}}",
+									"type": "string"
+								},
+								{
+									"key": "disableRetryRequest",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"value": "{{XRFKEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/internal_windows_authentication/?targetId=72f906ab-99c8-49a7-b609-68b1b2dd81c1",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"internal_windows_authentication",
+								""
+							],
+							"query": [
+								{
+									"key": "targetId",
+									"value": "72f906ab-99c8-49a7-b609-68b1b2dd81c1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "1. QRS API endpoints",
+			"name": "1 Repository info",
 			"item": [
 				{
 					"name": "1.01.01 Get information on the Qlik Sense repository",
@@ -198,14 +269,249 @@
 							}
 						],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/qrs/about?Xrfkey={{XRFKEY}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/about?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
 							"path": [
 								"qrs",
 								"about"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "2 Apps / Hubs",
+			"item": [
+				{
+					"name": "2.01.01 Get App list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cf9c0aad-40ed-492d-b4d4-aa00d6c6178a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/app?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"app"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2.02.01 Get Hub list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "16da1c1b-677b-4703-a3d5-6e7c828bc80f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/app/hublist?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"app",
+								"hublist"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "3 Streams",
+			"item": [
+				{
+					"name": "3.01.01 Get Stream list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "44ad11cf-fc18-4d97-aac2-70adf4c0e9ea",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/stream?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "4 Data connections",
+			"item": [
+				{
+					"name": "4.01.01 Get Data connections",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "97f5f789-08a7-4c2c-9b05-8aa4b4b008f2",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/dataconnection?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"dataconnection"
 							],
 							"query": [
 								{

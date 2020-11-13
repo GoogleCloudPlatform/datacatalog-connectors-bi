@@ -11,7 +11,7 @@ requests. The available collection covers the Looker REST API.
 
    | NAME                | DESCRIPTION                                                                |
    | ------------------- | -------------------------------------------------------------------------- |
-   | `PROTOCOL`          | `http` or `https`                                                          |
+   | `SCHEME`            | The URI scheme: `http` or `https`                                          |
    | `SERVER`            | URL of the Looker server                                                   |
    | `API_VERSION`       | Version of the Looker REST API, e.g. `3.1`                                 |
    | `CLIENT_ID`         | Client ID to authenticate the API calls                                    |
