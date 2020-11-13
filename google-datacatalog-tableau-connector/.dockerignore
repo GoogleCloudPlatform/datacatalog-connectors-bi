@@ -117,6 +117,3 @@ venv.bak/
 
 # Application logs
 log/
-
-# Local setup/run instructions
-instructions.txt
