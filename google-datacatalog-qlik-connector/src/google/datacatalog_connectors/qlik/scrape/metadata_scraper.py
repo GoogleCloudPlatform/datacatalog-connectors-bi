@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import logging
-import requests
+from requests import sessions
 
 from . import authenticator, constants, repository_services_api_helper
 
@@ -27,7 +27,7 @@ class MetadataScraper:
         self.__domain = domain
         self.__username = username
         self.__password = password
-        self.__session = requests.sessions.session()
+        self.__session = sessions.session()
         self.__qrs_api_helper = \
             repository_services_api_helper.RepositoryServicesAPIHelper(
                 server_address)
