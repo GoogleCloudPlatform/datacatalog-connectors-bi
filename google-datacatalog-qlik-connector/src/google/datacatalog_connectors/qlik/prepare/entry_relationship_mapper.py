@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ENTRY_ID_PREFIX = 'qlik_'
-ENTRY_ID_STREAM = 'st_'
+from google.datacatalog_connectors.commons import prepare
 
-TAG_TEMPLATE_ID_STREAM = 'qlik_stream_metadata'
+from . import constants
 
-USER_SPECIFIED_TYPE_STREAM = 'stream'
+
+class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
+    __STREAM = constants.USER_SPECIFIED_TYPE_STREAM

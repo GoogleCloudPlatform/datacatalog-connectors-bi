@@ -16,6 +16,8 @@
 
 import logging
 
+from google.datacatalog_connectors.commons import cleanup, ingest
+
 from .. import prepare, scrape
 from ..prepare import constants
 
@@ -38,6 +40,15 @@ class MetadataSynchronizer:
             project_id=datacatalog_project_id,
             location_id=datacatalog_location_id)
 
+        self.__site_url = qlik_server_address
+
+        self.__assembled_entry_factory = prepare.AssembledEntryFactory(
+            project_id=datacatalog_project_id,
+            location_id=datacatalog_location_id,
+            entry_group_id=self.__ENTRY_GROUP_ID,
+            user_specified_system=self.__SPECIFIED_SYSTEM,
+            site_url=self.__site_url)
+
     def run(self):
         """Coordinates a full scrape > prepare > ingest process."""
 
@@ -57,8 +68,84 @@ class MetadataSynchronizer:
 
         tag_templates_dict = self.__make_tag_templates_dict()
 
+        assembled_entries_dict = self.__make_assembled_entries_dict(
+            streams, tag_templates_dict)
+        logging.info('==== DONE ========================================')
+
+        # Data Catalog entry relationships mapping.
+        logging.info('')
+        logging.info('===> Mapping Data Catalog entry relationships...')
+
+        self.__map_datacatalog_relationships(assembled_entries_dict)
+        logging.info('==== DONE ========================================')
+
+        # Data Catalog clean up: delete obsolete data.
+        logging.info('')
+        logging.info('===> Deleting Data Catalog obsolete metadata...')
+
+        self.__delete_obsolete_entries(assembled_entries_dict)
+        logging.info('==== DONE ========================================')
+
+        # Ingest metadata into Data Catalog.
+        logging.info('')
+        logging.info('===> Synchronizing Qlik :: Data Catalog metadata...')
+
+        self.__ingest_metadata(tag_templates_dict, assembled_entries_dict)
+        logging.info('==== DONE ========================================')
+
     def __make_tag_templates_dict(self):
         return {
             constants.TAG_TEMPLATE_ID_STREAM:
                 self.__tag_template_factory.make_tag_template_for_stream(),
         }
+
+    def __make_assembled_entries_dict(self, streams, tag_templates_dict):
+        """
+        Make Data Catalog entries and tags for assets belonging to a given
+        Qlik Sense site.
+
+        Returns:
+            A ``dict`` in which keys are equals to the streams keys and
+            values are flat lists containing assembled objects with all their
+            related entries and tags.
+        """
+        assembled_entries = {}
+
+        for stream in streams:
+            assembled_entries[stream['id']] = self.__assembled_entry_factory\
+                .make_assembled_entries_list(stream, tag_templates_dict)
+
+        return assembled_entries
+
+    @classmethod
+    def __map_datacatalog_relationships(cls, assembled_entries_dict):
+        all_assembled_entries = []
+        for assembled_entries_data in assembled_entries_dict.values():
+            all_assembled_entries.extend(assembled_entries_data)
+
+        prepare.EntryRelationshipMapper().fulfill_tag_fields(
+            all_assembled_entries)
+
+    def __delete_obsolete_entries(self, new_assembled_entries_dict):
+        all_assembled_entries = []
+        for assembled_entry_data in new_assembled_entries_dict.values():
+            all_assembled_entries.extend(assembled_entry_data)
+
+        cleanup.DataCatalogMetadataCleaner(
+            self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID). \
+            delete_obsolete_metadata(
+            all_assembled_entries,
+            f'system={self.__SPECIFIED_SYSTEM}'
+            f' tag:site_url:{self.__site_url}')
+
+    def __ingest_metadata(self, tag_templates_dict, assembled_entries_dict):
+        metadata_ingestor = ingest.DataCatalogMetadataIngestor(
+            self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID)
+
+        for assembled_entries_data in assembled_entries_dict.values():
+            metadata_ingestor.ingest_metadata(assembled_entries_data,
+                                              tag_templates_dict)
+
+        entries_count = sum(
+            len(entries) for entries in assembled_entries_dict.values())
+        logging.info('==== %s entries synchronized!', entries_count)

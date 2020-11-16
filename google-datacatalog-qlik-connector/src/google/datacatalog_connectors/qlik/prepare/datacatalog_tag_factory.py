@@ -14,9 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ENTRY_ID_PREFIX = 'qlik_'
-ENTRY_ID_STREAM = 'st_'
+from google.cloud import datacatalog
 
-TAG_TEMPLATE_ID_STREAM = 'qlik_stream_metadata'
+from google.datacatalog_connectors.commons import prepare
 
-USER_SPECIFIED_TYPE_STREAM = 'stream'
+
+class DataCatalogTagFactory(prepare.BaseTagFactory):
+
+    def __init__(self, site_url):
+        self.__site_url = site_url

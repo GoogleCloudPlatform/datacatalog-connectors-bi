@@ -14,9 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ENTRY_ID_PREFIX = 'qlik_'
-ENTRY_ID_STREAM = 'st_'
+import datetime
+import logging
 
-TAG_TEMPLATE_ID_STREAM = 'qlik_stream_metadata'
+from google.cloud import datacatalog
+from google.protobuf import timestamp_pb2
 
-USER_SPECIFIED_TYPE_STREAM = 'stream'
+from google.datacatalog_connectors.commons import prepare
+
+from . import constants
+
+
+class DataCatalogEntryFactory(prepare.BaseEntryFactory):
+
+    def __init__(self, project_id, location_id, entry_group_id,
+                 user_specified_system, site_url):
+
+        self.__project_id = project_id
+        self.__location_id = location_id
+        self.__entry_group_id = entry_group_id
+        self.__user_specified_system = user_specified_system
+        self.__site_url = site_url

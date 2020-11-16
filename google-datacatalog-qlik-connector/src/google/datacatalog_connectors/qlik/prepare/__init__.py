@@ -15,9 +15,13 @@
 # limitations under the License.
 
 from . import constants
+from .assembled_entry_factory import AssembledEntryFactory
 from .datacatalog_tag_template_factory import DataCatalogTagTemplateFactory
+from .entry_relationship_mapper import EntryRelationshipMapper
 
 __all__ = (
     'constants',
+    'AssembledEntryFactory',
     'DataCatalogTagTemplateFactory',
+    'EntryRelationshipMapper',
 )
