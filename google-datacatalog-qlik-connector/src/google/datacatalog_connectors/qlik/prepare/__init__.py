@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .metadata_scraper import MetadataScraper
+from . import constants
+from .datacatalog_tag_template_factory import DataCatalogTagTemplateFactory
 
-__all__ = ('MetadataScraper',)
+__all__ = (
+    'constants',
+    'DataCatalogTagTemplateFactory',
+)

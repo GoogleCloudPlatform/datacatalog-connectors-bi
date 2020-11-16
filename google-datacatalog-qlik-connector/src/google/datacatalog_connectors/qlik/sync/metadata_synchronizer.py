@@ -16,7 +16,8 @@
 
 import logging
 
-from .. import scrape
+from .. import prepare, scrape
+from ..prepare import constants
 
 
 class MetadataSynchronizer:
@@ -33,10 +34,14 @@ class MetadataSynchronizer:
         self.__metadata_scraper = scrape.MetadataScraper(
             qlik_server_address, qlik_domain, qlik_username, qlik_password)
 
+        self.__tag_template_factory = prepare.DataCatalogTagTemplateFactory(
+            project_id=datacatalog_project_id,
+            location_id=datacatalog_location_id)
+
     def run(self):
         """Coordinates a full scrape > prepare > ingest process."""
 
-        # Scrape metadata from Looker server.
+        # Scrape metadata from the Qlik server.
         logging.info('')
         logging.info('===> Scraping Qlik Sense metadata...')
 
@@ -45,4 +50,15 @@ class MetadataSynchronizer:
         streams = self.__metadata_scraper.scrape_streams()
         logging.info('==== DONE ========================================')
 
-        print(streams)
+        # Prepare: convert Qlik metadata into Data Catalog entities model.
+        logging.info('')
+        logging.info('===> Converting Qlik metadata'
+                     ' into Data Catalog entities model...')
+
+        tag_templates_dict = self.__make_tag_templates_dict()
+
+    def __make_tag_templates_dict(self):
+        return {
+            constants.TAG_TEMPLATE_ID_STREAM:
+                self.__tag_template_factory.make_tag_template_for_stream(),
+        }
