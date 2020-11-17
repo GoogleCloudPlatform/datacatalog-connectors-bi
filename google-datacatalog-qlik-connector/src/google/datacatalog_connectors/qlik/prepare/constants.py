@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ENTRY_ID_LENGTH = 64
 ENTRY_ID_PREFIX = 'qlik_'
 ENTRY_ID_STREAM = 'st_'
+NO_PREFIX_ENTRY_ID_LENGTH = ENTRY_ID_LENGTH - len(ENTRY_ID_PREFIX)
 
 TAG_TEMPLATE_ID_STREAM = 'qlik_stream_metadata'
 

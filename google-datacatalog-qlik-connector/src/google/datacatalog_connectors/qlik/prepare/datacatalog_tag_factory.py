@@ -23,3 +23,25 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
     def __init__(self, site_url):
         self.__site_url = site_url
+
+    def make_tag_for_stream(self, tag_template, stream_metadata):
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id', stream_metadata.get('id'))
+
+        owner = stream_metadata.get('owner')
+        if owner:
+            owner_user_dir = owner.get('userDirectory')
+            owner_user_id = owner.get('userId')
+            self._set_string_field(tag, 'owner_username',
+                                   f'{owner_user_dir}\\\\{owner_user_id}')
+            self._set_string_field(tag, 'owner_name', owner.get('name'))
+
+        self._set_string_field(tag, 'modified_by_username',
+                               stream_metadata.get('modifiedByUserName'))
+
+        self._set_string_field(tag, 'site_url', self.__site_url)
+
+        return tag

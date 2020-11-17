@@ -21,3 +21,6 @@ from . import constants
 
 class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
     __STREAM = constants.USER_SPECIFIED_TYPE_STREAM
+
+    def fulfill_tag_fields(self, assembled_entries_data):
+        pass

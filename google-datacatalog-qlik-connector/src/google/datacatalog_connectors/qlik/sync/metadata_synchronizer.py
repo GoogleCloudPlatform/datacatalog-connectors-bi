@@ -99,7 +99,8 @@ class MetadataSynchronizer:
                 self.__tag_template_factory.make_tag_template_for_stream(),
         }
 
-    def __make_assembled_entries_dict(self, streams, tag_templates_dict):
+    def __make_assembled_entries_dict(self, streams_metadata,
+                                      tag_templates_dict):
         """
         Make Data Catalog entries and tags for assets belonging to a given
         Qlik Sense site.
@@ -111,9 +112,10 @@ class MetadataSynchronizer:
         """
         assembled_entries = {}
 
-        for stream in streams:
-            assembled_entries[stream['id']] = self.__assembled_entry_factory\
-                .make_assembled_entries_list(stream, tag_templates_dict)
+        for stream_metadata in streams_metadata:
+            assembled_entries[stream_metadata.get('id')] = \
+                self.__assembled_entry_factory.make_assembled_entries_list(
+                    stream_metadata, tag_templates_dict)
 
         return assembled_entries
 

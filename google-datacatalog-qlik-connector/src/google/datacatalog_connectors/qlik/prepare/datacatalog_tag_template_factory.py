@@ -44,23 +44,11 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
                                        'Unique Id')
 
-        self._add_primitive_type_field(tag_template, 'name',
-                                       self.__STRING_TYPE, 'Name')
+        self._add_primitive_type_field(tag_template, 'owner_username',
+                                       self.__STRING_TYPE, 'Owner username')
 
         self._add_primitive_type_field(tag_template, 'owner_name',
-                                       self.__STRING_TYPE, 'Name of its owner')
-
-        self._add_primitive_type_field(tag_template, 'owner_username',
-                                       self.__STRING_TYPE,
-                                       'Username of its owner')
-
-        self._add_primitive_type_field(tag_template, 'created_date',
-                                       self.__TIMESTAMP_TYPE,
-                                       'Time it was created')
-
-        self._add_primitive_type_field(tag_template, 'modified_date',
-                                       self.__TIMESTAMP_TYPE,
-                                       'Time it was last modified')
+                                       self.__STRING_TYPE, 'Owner name')
 
         self._add_primitive_type_field(tag_template, 'modified_by_username',
                                        self.__STRING_TYPE,
@@ -69,3 +57,5 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'site_url',
                                        self.__STRING_TYPE,
                                        'Qlik Sense site url')
+
+        return tag_template
