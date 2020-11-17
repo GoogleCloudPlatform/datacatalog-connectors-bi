@@ -26,8 +26,8 @@ from . import constant
 
 
 class DataCatalogEntryFactory(BaseEntryFactory):
-    # Datetime format with timezone information
-    __DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
+    # The incoming timestamp format is UTC
+    __INCOMING_TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
     def __init__(self, project_id, location_id, entry_group_id,
                  user_specified_system, server_address):
@@ -59,17 +59,19 @@ class DataCatalogEntryFactory(BaseEntryFactory):
             entry.linked_resource = \
                 f'{self.__server_address}/#{site_content_url}/views/{path}'
 
-        created_datetime = self.__convert_string_to_utc_datetime(
-            dashboard_metadata.get('createdAt'))
-        created_timestamp = timestamp_pb2.Timestamp()
-        created_timestamp.FromDatetime(created_datetime)
-        entry.source_system_timestamps.create_time = created_timestamp
+        created_datetime = datetime.strptime(
+            dashboard_metadata.get('createdAt'),
+            self.__INCOMING_TIMESTAMP_FORMAT)
+        create_timestamp = timestamp_pb2.Timestamp()
+        create_timestamp.FromDatetime(created_datetime)
+        entry.source_system_timestamps.create_time = create_timestamp
 
-        updated_datetime = self.__convert_string_to_utc_datetime(
-            dashboard_metadata.get('updatedAt'))
-        updated_timestamp = timestamp_pb2.Timestamp()
-        updated_timestamp.FromDatetime(updated_datetime)
-        entry.source_system_timestamps.update_time = updated_timestamp
+        updated_datetime = datetime.strptime(
+            dashboard_metadata.get('updatedAt'),
+            self.__INCOMING_TIMESTAMP_FORMAT)
+        update_timestamp = timestamp_pb2.Timestamp()
+        update_timestamp.FromDatetime(updated_datetime)
+        entry.source_system_timestamps.update_time = update_timestamp
 
         return generated_id, entry
 
@@ -107,19 +109,19 @@ class DataCatalogEntryFactory(BaseEntryFactory):
 
         created_at = sheet_metadata.get('createdAt')
         if created_at:
-            created_datetime = self.__convert_string_to_utc_datetime(
-                created_at)
-            created_timestamp = timestamp_pb2.Timestamp()
-            created_timestamp.FromDatetime(created_datetime)
-            entry.source_system_timestamps.create_time = created_timestamp
+            created_datetime = datetime.strptime(
+                created_at, self.__INCOMING_TIMESTAMP_FORMAT)
+            create_timestamp = timestamp_pb2.Timestamp()
+            create_timestamp.FromDatetime(created_datetime)
+            entry.source_system_timestamps.create_time = create_timestamp
 
         updated_at = sheet_metadata.get('updatedAt')
         if updated_at:
-            updated_datetime = self.__convert_string_to_utc_datetime(
-                updated_at)
-            updated_timestamp = timestamp_pb2.Timestamp()
-            updated_timestamp.FromDatetime(updated_datetime)
-            entry.source_system_timestamps.update_time = updated_timestamp
+            updated_datetime = datetime.strptime(
+                updated_at, self.__INCOMING_TIMESTAMP_FORMAT)
+            update_timestamp = timestamp_pb2.Timestamp()
+            update_timestamp.FromDatetime(updated_datetime)
+            entry.source_system_timestamps.update_time = update_timestamp
 
         return generated_id, entry
 
@@ -145,17 +147,19 @@ class DataCatalogEntryFactory(BaseEntryFactory):
             entry.linked_resource = f'{self.__server_address}/' \
                 f'#{site_content_url}/workbooks/{vizportal_url_id}'
 
-        created_datetime = self.__convert_string_to_utc_datetime(
-            workbook_metadata.get('createdAt'))
-        created_timestamp = timestamp_pb2.Timestamp()
-        created_timestamp.FromDatetime(created_datetime)
-        entry.source_system_timestamps.create_time = created_timestamp
+        created_datetime = datetime.strptime(
+            workbook_metadata.get('createdAt'),
+            self.__INCOMING_TIMESTAMP_FORMAT)
+        create_timestamp = timestamp_pb2.Timestamp()
+        create_timestamp.FromDatetime(created_datetime)
+        entry.source_system_timestamps.create_time = create_timestamp
 
-        updated_datetime = self.__convert_string_to_utc_datetime(
-            workbook_metadata.get('updatedAt'))
-        updated_timestamp = timestamp_pb2.Timestamp()
-        updated_timestamp.FromDatetime(updated_datetime)
-        entry.source_system_timestamps.update_time = updated_timestamp
+        updated_datetime = datetime.strptime(
+            workbook_metadata.get('updatedAt'),
+            self.__INCOMING_TIMESTAMP_FORMAT)
+        update_timestamp = timestamp_pb2.Timestamp()
+        update_timestamp.FromDatetime(updated_datetime)
+        entry.source_system_timestamps.update_time = update_timestamp
 
         return generated_id, entry
 
@@ -171,22 +175,3 @@ class DataCatalogEntryFactory(BaseEntryFactory):
     def __format_site_content_url(cls, workbook_metadata):
         site_name = workbook_metadata.get('site').get('name')
         return '' if site_name.lower() == 'default' else f'/site/{site_name}'
-
-    @classmethod
-    def __convert_string_to_utc_datetime(cls, datetime_string):
-        """Converts a Tableau timestamp string into a UTC datetime object.
-
-        Tableau timestamp strings are in format of '%Y-%m-%dT%H:%M:%SZ'.
-        This method replaces the trailing 'Z' by '+0000' before parsing
-        the string. By doing this, it makes possible adding UTC timezone
-        information to the returned object.
-
-        :param datetime_string: Tableau formatted timestamp string
-        :return: UTC datetime object
-        """
-        utc_formatted_str = f'{datetime_string[:-1]}+0000'
-        return datetime.strptime(utc_formatted_str, cls.__DATETIME_FORMAT)
-
-    @classmethod
-    def __convert_datetime_to_seconds(cls, datetime_object):
-        return int(datetime_object.timestamp())
