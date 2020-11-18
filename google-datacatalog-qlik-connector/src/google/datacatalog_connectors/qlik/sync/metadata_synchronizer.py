@@ -144,10 +144,21 @@ class MetadataSynchronizer:
         metadata_ingestor = ingest.DataCatalogMetadataIngestor(
             self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID)
 
-        for assembled_entries_data in assembled_entries_dict.values():
-            metadata_ingestor.ingest_metadata(assembled_entries_data,
-                                              tag_templates_dict)
-
         entries_count = sum(
             len(entries) for entries in assembled_entries_dict.values())
-        logging.info('==== %s entries synchronized!', entries_count)
+        logging.info('==== %d entries to be synchronized!', entries_count)
+
+        synced_entries_count = 0
+        for stream_id, assembled_entries in assembled_entries_dict.items():
+            stream_entries_count = len(assembled_entries)
+
+            logging.info('')
+            logging.info('==== The Stream identified by %s has %d entries.',
+                         stream_id, stream_entries_count)
+            metadata_ingestor.ingest_metadata(assembled_entries,
+                                              tag_templates_dict)
+            synced_entries_count = synced_entries_count + stream_entries_count
+
+        logging.info('')
+        logging.info('==== %d of %d entries successfully synchronized!',
+                     synced_entries_count, entries_count)
