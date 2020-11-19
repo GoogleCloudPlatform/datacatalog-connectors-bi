@@ -49,7 +49,7 @@ class RepositoryServicesAPIHelper:
 
         return response.headers.get('Location')
 
-    def scrape_streams(self, session):
+    def get_streams(self, session):
         """Read streams metadata from a given server.
 
         Returns:
@@ -58,6 +58,4 @@ class RepositoryServicesAPIHelper:
         url = f'{self.__base_api_endpoint}' \
               f'/stream/full?Xrfkey={constants.XRFKEY}'
 
-        return session.get(url=url,
-                           headers=self.__headers,
-                           cookies=requests.session().cookies).json()
+        return session.get(url=url, headers=self.__headers).json()

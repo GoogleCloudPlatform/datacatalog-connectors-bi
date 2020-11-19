@@ -19,14 +19,18 @@ from unittest import mock
 
 from google.datacatalog_connectors.qlik.scrape import authenticator
 
+from . import scrape_ops_mocks
 
+__SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
+
+
+@mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.requests')
 class AuthenticatorTest(unittest.TestCase):
-    __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.requests')
     def test_get_qps_cookie_win_auth_should_return_cookie_on_success(
             self, mock_requests):
-        mock_requests.get.return_value = FakeResponseWithCookies()
+        mock_requests.get.return_value = \
+            scrape_ops_mocks.FakeResponseWithCookies()
 
         cookie = authenticator.Authenticator\
             .get_qps_session_cookie_windows_auth(
@@ -35,10 +39,10 @@ class AuthenticatorTest(unittest.TestCase):
         self.assertIsNotNone(cookie)
         mock_requests.get.assert_called_once()
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.requests')
     def test_get_qps_cookie_win_auth_should_return_none_on_no_cookies(
             self, mock_requests):
-        mock_requests.get.return_value = FakeResponseWithNoCookies()
+        mock_requests.get.return_value = \
+            scrape_ops_mocks.FakeResponseWithNoCookies()
 
         cookie = authenticator.Authenticator \
             .get_qps_session_cookie_windows_auth(
@@ -47,10 +51,10 @@ class AuthenticatorTest(unittest.TestCase):
         self.assertIsNone(cookie)
         mock_requests.get.assert_called_once()
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.requests')
     def test_get_qps_cookie_win_auth_should_return_none_on_cookie_not_found(
             self, mock_requests):
-        mock_requests.get.return_value = FakeResponseWithIgnoredCookies()
+        mock_requests.get.return_value = \
+            scrape_ops_mocks.FakeResponseWithIgnoredCookies()
 
         cookie = authenticator.Authenticator \
             .get_qps_session_cookie_windows_auth(
@@ -58,36 +62,3 @@ class AuthenticatorTest(unittest.TestCase):
 
         self.assertIsNone(cookie)
         mock_requests.get.assert_called_once()
-
-
-class FakeIgnoredCookie:
-
-    def __init__(self):
-        self.name = 'X-Ignored-Cookie'
-
-
-class FakeQPSSessionCookie:
-
-    def __init__(self):
-        self.name = 'X-Qlik-Session'
-        self.value = 'Test cookie'
-        self.domain = 'test-domain'
-        self.path = '/'
-
-
-class FakeResponseWithCookies:
-
-    def __init__(self):
-        self.cookies = [FakeQPSSessionCookie()]
-
-
-class FakeResponseWithIgnoredCookies:
-
-    def __init__(self):
-        self.cookies = [FakeIgnoredCookie()]
-
-
-class FakeResponseWithNoCookies:
-
-    def __init__(self):
-        self.cookies = []

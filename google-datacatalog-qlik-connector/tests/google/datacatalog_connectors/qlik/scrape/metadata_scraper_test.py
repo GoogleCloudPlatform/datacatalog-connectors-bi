@@ -19,6 +19,8 @@ from unittest import mock
 
 from google.datacatalog_connectors.qlik import scrape
 
+from . import scrape_ops_mocks
+
 
 class MetadataScraperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
@@ -54,8 +56,8 @@ class MetadataScraperTest(unittest.TestCase):
 
         qrs_api_helper.get_windows_authentication_url.return_value = 'test-url'
         mock_authenticator.get_qps_session_cookie_windows_auth.return_value =\
-            FakeQPSSessionCookie()
-        qrs_api_helper.scrape_streams.return_value = streams_metadata
+            scrape_ops_mocks.FakeQPSSessionCookie()
+        qrs_api_helper.get_streams.return_value = streams_metadata
 
         streams = self.__scraper.scrape_streams()
 
@@ -67,7 +69,7 @@ class MetadataScraperTest(unittest.TestCase):
                 username='test-username',
                 password='test-password',
                 auth_url='test-url')
-        qrs_api_helper.scrape_streams.assert_called_once()
+        qrs_api_helper.get_streams.assert_called_once()
 
     def test_scrape_streams_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
@@ -77,26 +79,12 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'stream-id',
         }]
 
-        attrs['_MetadataScraper__session'] = FakeSessionWithCookies()
-        qrs_api_helper.scrape_streams.return_value = streams_metadata
+        attrs['_MetadataScraper__session'] = \
+            scrape_ops_mocks.FakeSessionWithCookies()
+        qrs_api_helper.get_streams.return_value = streams_metadata
 
         streams = self.__scraper.scrape_streams()
 
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
-        qrs_api_helper.scrape_streams.assert_called_once()
-
-
-class FakeQPSSessionCookie:
-
-    def __init__(self):
-        self.name = 'X-Qlik-Session'
-        self.value = 'test cookie'
-        self.domain = 'test-domain'
-        self.path = '/'
-
-
-class FakeSessionWithCookies:
-
-    def __init__(self):
-        self.cookies = [FakeQPSSessionCookie()]
+        qrs_api_helper.get_streams.assert_called_once()

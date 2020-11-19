@@ -34,7 +34,7 @@ class MetadataScraper:
 
     def scrape_streams(self):
         self.__set_qps_session_cookie()
-        return self.__qrs_api_helper.scrape_streams(self.__session)
+        return self.__qrs_api_helper.get_streams(self.__session)
 
     def __set_qps_session_cookie(self):
         cookie = None
