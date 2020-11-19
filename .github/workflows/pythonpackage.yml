@@ -5,9 +5,9 @@ name: Python package
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
             "./google-datacatalog-qlik-connector",
             "./google-datacatalog-tableau-connector",
           ]
-        python-version: [ 3.7, 3.8 ]
+        python-version: [3.7]
     defaults:
       run:
         working-directory: ${{ matrix.build-dir }}
