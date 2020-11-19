@@ -1,4 +1,4 @@
-# google-datacatalog-looker-connector
+# google-datacatalog-qlik-connector
 
 Package for ingesting Qlik Sense metadata into Google Cloud Data Catalog,
 currently supporting below asset types:
