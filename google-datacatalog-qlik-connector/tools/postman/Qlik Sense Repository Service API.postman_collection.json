@@ -55,7 +55,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "x-Qlik-Xrfkey",
+								"key": "X-Qlik-Xrfkey",
 								"value": "{{XRFKEY}}",
 								"type": "text"
 							},
@@ -138,13 +138,8 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "x-Qlik-Xrfkey",
+								"key": "X-Qlik-Xrfkey",
 								"value": "{{XRFKEY}}",
-								"type": "text"
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
 								"type": "text"
 							}
 						],
@@ -158,7 +153,7 @@
 					"response": []
 				},
 				{
-					"name": "0.01.03 Windows authentication for ws",
+					"name": "0.01.03 Windows authentication (template request)",
 					"event": [
 						{
 							"listen": "test",
@@ -203,13 +198,13 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "x-Qlik-Xrfkey",
-								"value": "{{XRFKEY}}",
-								"type": "text"
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
 							}
 						],
 						"url": {
-							"raw": "{{SCHEME}}://{{SERVER}}/internal_windows_authentication/?targetId=72f906ab-99c8-49a7-b609-68b1b2dd81c1",
+							"raw": "{{SCHEME}}://{{SERVER}}/internal_windows_authentication/?targetId=<PUT-A-ONE-TIME-TARGET-ID-HERE>",
 							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
@@ -221,7 +216,7 @@
 							"query": [
 								{
 									"key": "targetId",
-									"value": "72f906ab-99c8-49a7-b609-68b1b2dd81c1"
+									"value": "<PUT-A-ONE-TIME-TARGET-ID-HERE>"
 								}
 							]
 						}
@@ -258,7 +253,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "x-Qlik-Xrfkey",
+								"key": "X-Qlik-Xrfkey",
 								"type": "text",
 								"value": "{{XRFKEY}}"
 							},
@@ -292,10 +287,125 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "2 Apps / Hubs",
+			"name": "2 Streams",
 			"item": [
 				{
-					"name": "2.01.01 Get App list",
+					"name": "2.01.01 Get Streams",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "44ad11cf-fc18-4d97-aac2-70adf4c0e9ea",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/stream?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2.01.02 Get Streams (full)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4e2c452d-cd31-457b-8f2a-be34cac52dae",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/stream/full?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"stream",
+								"full"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "X Apps / Hubs",
+			"item": [
+				{
+					"name": "X.01.01 Get App list",
 					"event": [
 						{
 							"listen": "test",
@@ -318,7 +428,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "x-Qlik-Xrfkey",
+								"key": "X-Qlik-Xrfkey",
 								"type": "text",
 								"value": "{{XRFKEY}}"
 							},
@@ -349,7 +459,7 @@
 					"response": []
 				},
 				{
-					"name": "2.02.01 Get Hub list",
+					"name": "X.02.01 Get Hub list",
 					"event": [
 						{
 							"listen": "test",
@@ -372,7 +482,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "x-Qlik-Xrfkey",
+								"key": "X-Qlik-Xrfkey",
 								"type": "text",
 								"value": "{{XRFKEY}}"
 							},
@@ -407,70 +517,10 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "3 Streams",
+			"name": "X Data connections",
 			"item": [
 				{
-					"name": "3.01.01 Get Stream list",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "44ad11cf-fc18-4d97-aac2-70adf4c0e9ea",
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "x-Qlik-Xrfkey",
-								"type": "text",
-								"value": "{{XRFKEY}}"
-							},
-							{
-								"key": "Accept",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{SCHEME}}://{{SERVER}}/qrs/stream?Xrfkey={{XRFKEY}}",
-							"protocol": "{{SCHEME}}",
-							"host": [
-								"{{SERVER}}"
-							],
-							"path": [
-								"qrs",
-								"stream"
-							],
-							"query": [
-								{
-									"key": "Xrfkey",
-									"value": "{{XRFKEY}}"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
-			"name": "4 Data connections",
-			"item": [
-				{
-					"name": "4.01.01 Get Data connections",
+					"name": "X.01.01 Get Data connections",
 					"event": [
 						{
 							"listen": "test",
@@ -493,7 +543,127 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "x-Qlik-Xrfkey",
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/dataconnection?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"dataconnection"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "X Proxy services",
+			"item": [
+				{
+					"name": "X.01.01 Get Proxy services",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f5470ec8-07b6-490f-84d1-3655336c6aee",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/virtualproxyconfig?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"virtualproxyconfig"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "X Virtual Proxy config",
+			"item": [
+				{
+					"name": "X.01.01 Get Virtual Proxy configs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "09ed9da1-24a4-4ff8-9645-d7a981ee3d34",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
 								"type": "text",
 								"value": "{{XRFKEY}}"
 							},
