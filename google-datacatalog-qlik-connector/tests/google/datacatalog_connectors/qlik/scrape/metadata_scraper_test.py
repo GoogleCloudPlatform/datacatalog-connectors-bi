@@ -61,6 +61,12 @@ class MetadataScraperTest(unittest.TestCase):
 
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
+        mock_authenticator.get_qps_session_cookie_windows_auth\
+            .assert_called_with(
+                domain='test-domain',
+                username='test-username',
+                password='test-password',
+                auth_url='test-url')
         qrs_api_helper.scrape_streams.assert_called_once()
 
     def test_scrape_streams_should_return_list_on_success(self):
