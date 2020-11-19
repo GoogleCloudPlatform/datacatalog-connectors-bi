@@ -19,18 +19,17 @@ from unittest import mock
 
 from google.datacatalog_connectors.qlik import sync
 
-_PREPARE_PACKAGE = 'google.datacatalog_connectors.qlik.prepare'
 __SYNC_PACKAGE = 'google.datacatalog_connectors.qlik.sync'
-_SYNC_MODULE = '{}.metadata_synchronizer'.format(__SYNC_PACKAGE)
+_SYNCR_MODULE = f'{__SYNC_PACKAGE}.metadata_synchronizer'
 
 
-@mock.patch(f'{_SYNC_MODULE}.ingest.DataCatalogMetadataIngestor')
-@mock.patch(f'{_SYNC_MODULE}.cleanup.DataCatalogMetadataCleaner')
-@mock.patch(f'{_PREPARE_PACKAGE}.EntryRelationshipMapper')
+@mock.patch(f'{_SYNCR_MODULE}.ingest.DataCatalogMetadataIngestor')
+@mock.patch(f'{_SYNCR_MODULE}.cleanup.DataCatalogMetadataCleaner')
+@mock.patch(f'{_SYNCR_MODULE}.prepare.EntryRelationshipMapper')
 class MetadataSynchronizerTest(unittest.TestCase):
 
-    @mock.patch(f'{_SYNC_MODULE}.prepare.AssembledEntryFactory')
-    @mock.patch(f'{_SYNC_MODULE}.scrape.MetadataScraper')
+    @mock.patch(f'{_SYNCR_MODULE}.prepare.AssembledEntryFactory')
+    @mock.patch(f'{_SYNCR_MODULE}.scrape.MetadataScraper')
     def setUp(self, mock_scraper, mock_assembled_entry_factory):
         self.__synchronizer = sync.MetadataSynchronizer(
             qlik_server_address='test-server',
@@ -59,6 +58,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
     def test_run_no_metadata_should_succeed(self, mock_mapper, mock_cleaner,
                                             mock_ingestor):
+
         scraper = self.__synchronizer.__dict__[
             '_MetadataSynchronizer__metadata_scraper']
 
@@ -95,6 +95,5 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def __make_fake_stream(cls):
         metadata = {
             'id': 'test_stream',
-            'name': 'Test Name',
         }
         return metadata

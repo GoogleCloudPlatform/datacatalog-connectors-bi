@@ -27,7 +27,7 @@ class MetadataScraper:
         self.__domain = domain
         self.__username = username
         self.__password = password
-        self.__session = sessions.session()
+        self.__session = sessions.Session()
         self.__qrs_api_helper = \
             repository_services_api_helper.RepositoryServicesAPIHelper(
                 server_address)

@@ -51,8 +51,7 @@ class Qlik2DataCatalogCliTest(unittest.TestCase):
                 'test-username', '--qlik-password', 'test-password'
             ])
 
-    @mock.patch('google.datacatalog_connectors.qlik.sync'
-                '.MetadataSynchronizer')
+    @mock.patch('google.datacatalog_connectors.qlik.sync.MetadataSynchronizer')
     def test_run_should_call_synchronizer(self, mock_metadata_synchonizer):
         qlik2datacatalog_cli.Qlik2DataCatalogCli.run([
             '--qlik-server', 'test-server', '--qlik-username', 'test-username',
@@ -71,8 +70,8 @@ class Qlik2DataCatalogCliTest(unittest.TestCase):
         synchonizer = mock_metadata_synchonizer.return_value
         synchonizer.run.assert_called_once()
 
-    @mock.patch('google.datacatalog_connectors.qlik'
-                '.qlik2datacatalog_cli.Qlik2DataCatalogCli')
+    @mock.patch('google.datacatalog_connectors.qlik.qlik2datacatalog_cli'
+                '.Qlik2DataCatalogCli')
     def test_main_should_call_cli_run(self, mock_cli):
         qlik.main()
         mock_cli.run.assert_called_once()
