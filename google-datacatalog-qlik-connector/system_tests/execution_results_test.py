@@ -19,17 +19,16 @@ import unittest
 
 from google.cloud import datacatalog
 
-datacatalog_client = datacatalog.DataCatalogClient()
-
 
 class ExecutionResultsTest(unittest.TestCase):
+    __datacatalog = datacatalog.DataCatalogClient()
 
     def test_looker_entries_should_exist_after_connector_execution(self):
-        query = 'system=looker'
+        query = 'system=qlik'
 
         scope = datacatalog.SearchCatalogRequest.Scope()
         scope.include_project_ids.append(
-            os.environ['LOOKER2DC_DATACATALOG_PROJECT_ID'])
+            os.environ['QLIK2DC_DATACATALOG_PROJECT_ID'])
 
         request = datacatalog.SearchCatalogRequest()
         request.scope = scope
@@ -37,6 +36,7 @@ class ExecutionResultsTest(unittest.TestCase):
         request.page_size = 1000
 
         search_results = [
-            result for result in datacatalog_client.search_catalog(request)
+            result for result in self.__datacatalog.search_catalog(request)
         ]
+
         self.assertGreater(len(search_results), 0)
