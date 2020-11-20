@@ -21,8 +21,6 @@ from unittest import mock
 from google.datacatalog_connectors.qlik.scrape import \
     constants, repository_services_api_helper
 
-from . import scrape_ops_mocks
-
 
 class RepositoryServicesAPIHelperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
