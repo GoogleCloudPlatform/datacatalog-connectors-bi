@@ -46,7 +46,8 @@ class MetadataScraper:
 
         if not cookie:
             windows_auth_url = \
-                self.__qrs_api_helper.get_windows_authentication_url()
+                self.__qrs_api_helper.get_windows_authentication_url(
+                    self.__session)
             qps_session_cookie = authenticator.Authenticator\
                 .get_qps_session_cookie_windows_auth(
                     domain=self.__domain,

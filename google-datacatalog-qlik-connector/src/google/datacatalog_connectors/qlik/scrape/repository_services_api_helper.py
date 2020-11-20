@@ -30,7 +30,7 @@ class RepositoryServicesAPIHelper:
             'User-Agent': 'Windows'
         }
 
-    def get_windows_authentication_url(self):
+    def get_windows_authentication_url(self, session):
         """Get a Windows Authentication url.
 
         This method sends an unauthenticated request to a well known endpoint
@@ -47,7 +47,7 @@ class RepositoryServicesAPIHelper:
                                 headers=self.__headers,
                                 allow_redirects=False)
 
-        return response.headers.get('Location')
+        return session.get_redirect_target(response)
 
     def get_streams(self, session):
         """Read streams metadata from a given server.

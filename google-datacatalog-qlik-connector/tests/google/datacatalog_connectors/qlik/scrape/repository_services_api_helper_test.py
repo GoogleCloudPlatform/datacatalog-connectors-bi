@@ -43,11 +43,10 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
     @mock.patch(f'{__SCRAPE_PACKAGE}.repository_services_api_helper.requests')
     def test_get_windows_authentication_url_should_return_url_from_header(
             self, mock_requests):
+        mock_session = mock.Mock(sessions.Session())
+        mock_session.get_redirect_target.return_value = 'redirect-url'
 
-        mock_requests.get.return_value = \
-            scrape_ops_mocks.FakeResponseWithLocationHeader('redirect-url')
-
-        url = self.__helper.get_windows_authentication_url()
+        url = self.__helper.get_windows_authentication_url(mock_session)
 
         self.assertEqual('redirect-url', url)
         mock_requests.get.assert_called_once()
