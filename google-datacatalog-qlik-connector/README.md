@@ -60,7 +60,7 @@ dependencies. Make sure you use Python 3.6+.
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 source <your-env>/bin/activate
-<your-env>/bin/pip install google-datacatalog-looker-connector
+<your-env>/bin/pip install google-datacatalog-qlik-connector
 ```
 
 ### 1.2. Windows
@@ -69,7 +69,7 @@ source <your-env>/bin/activate
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 <your-env>\Scripts\activate
-<your-env>\Scripts\pip.exe install google-datacatalog-looker-connector
+<your-env>\Scripts\pip.exe install google-datacatalog-qlik-connector
 ```
 
 ### 1.3. Install from source
