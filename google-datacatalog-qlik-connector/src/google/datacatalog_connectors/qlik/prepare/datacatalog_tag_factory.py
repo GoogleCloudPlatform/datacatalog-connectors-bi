@@ -35,8 +35,11 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         if owner:
             owner_user_dir = owner.get('userDirectory')
             owner_user_id = owner.get('userId')
-            self._set_string_field(tag, 'owner_username',
-                                   f'{owner_user_dir}\\\\{owner_user_id}')
+
+            if owner_user_dir and owner_user_id:
+                self._set_string_field(tag, 'owner_username',
+                                       f'{owner_user_dir}\\\\{owner_user_id}')
+
             self._set_string_field(tag, 'owner_name', owner.get('name'))
 
         self._set_string_field(tag, 'modified_by_username',
