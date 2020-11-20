@@ -74,7 +74,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.create_time.timestamp())
         self.assertEqual(
-            (created_datetime + timedelta(seconds=10)).timestamp(),
+            created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_long_luid_should_limit_result_id_length(self):

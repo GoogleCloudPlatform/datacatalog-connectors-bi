@@ -68,9 +68,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         modified_datetime = datetime.strptime(resolved_modified_date,
                                               self.__INCOMING_TIMESTAMP_FORMAT)
         update_timestamp = timestamp_pb2.Timestamp()
-        # TODO Evaluate/remove "+ 10" after b/144041881 has been closed.
-        update_timestamp.FromDatetime(modified_datetime +
-                                      timedelta(seconds=10))
+        update_timestamp.FromDatetime(modified_datetime)
         entry.source_system_timestamps.update_time = update_timestamp
 
         return generated_id, entry

@@ -68,7 +68,7 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
             self.__STRING_TYPE,
             tag_template.fields['modified_by_username'].type.primitive_type)
         self.assertEqual(
-            'Username of who modified it',
+            'Username who modified it',
             tag_template.fields['modified_by_username'].display_name)
 
         self.assertEqual(self.__STRING_TYPE,
