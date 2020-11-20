@@ -20,6 +20,13 @@ from google.datacatalog_connectors.qlik.scrape import constants
 
 
 class RepositoryServicesAPIHelper:
+    """Wraps requests to the Qlik Sense Repository Service (QRS).
+
+    The Qlik Sense Repository Service (QRS) manages persistence and
+    synchronization of Qlik Sense apps, licensing, security, and service
+    configuration data.
+
+    """
 
     def __init__(self, server_address):
         self.__base_api_endpoint = f'{server_address}/qrs'

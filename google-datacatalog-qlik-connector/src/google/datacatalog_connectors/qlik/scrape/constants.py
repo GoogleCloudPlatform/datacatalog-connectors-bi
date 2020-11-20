@@ -19,6 +19,9 @@ import string
 
 JSON_CONTENT_TYPE = 'application/json'
 
+# The Qlik Sense Proxy Service (QPS) manages the Qlik Sense authentication,
+# session handling, and load balancing. This constant is used to store the name
+# of the cookie issue to a user after authenticating in QPS.
 QPS_SESSION_COOKIE_PREFIX = 'X-Qlik-Session'
 
 WINDOWS_USER_AGENT = 'Windows'
