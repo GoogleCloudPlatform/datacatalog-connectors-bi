@@ -16,7 +16,8 @@
 
 from google.datacatalog_connectors.commons import prepare
 
-from . import constants, datacatalog_entry_factory, datacatalog_tag_factory
+from google.datacatalog_connectors.qlik.prepare import \
+    constants, datacatalog_entry_factory, datacatalog_tag_factory
 
 
 class AssembledEntryFactory:

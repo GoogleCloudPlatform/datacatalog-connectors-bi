@@ -18,7 +18,7 @@ import logging
 import requests
 from requests_ntlm import HttpNtlmAuth
 
-from . import constants
+from google.datacatalog_connectors.qlik.scrape import constants
 
 
 class Authenticator:

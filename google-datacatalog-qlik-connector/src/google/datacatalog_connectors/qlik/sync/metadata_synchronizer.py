@@ -18,8 +18,8 @@ import logging
 
 from google.datacatalog_connectors.commons import cleanup, ingest
 
-from .. import prepare, scrape
-from ..prepare import constants
+from google.datacatalog_connectors.qlik import prepare, scrape
+from google.datacatalog_connectors.qlik.prepare import constants
 
 
 class MetadataSynchronizer:

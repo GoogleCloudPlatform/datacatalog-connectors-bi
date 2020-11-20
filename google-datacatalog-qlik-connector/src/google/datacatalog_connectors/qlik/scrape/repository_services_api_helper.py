@@ -16,7 +16,7 @@
 
 import requests
 
-from . import constants
+from google.datacatalog_connectors.qlik.scrape import constants
 
 
 class RepositoryServicesAPIHelper:

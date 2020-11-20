@@ -21,7 +21,7 @@ from google.protobuf import timestamp_pb2
 
 from google.datacatalog_connectors.commons import prepare
 
-from . import constants
+from google.datacatalog_connectors.qlik.prepare import constants
 
 
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):

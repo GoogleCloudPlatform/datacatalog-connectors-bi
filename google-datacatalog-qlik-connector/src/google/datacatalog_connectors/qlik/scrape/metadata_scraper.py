@@ -17,7 +17,8 @@
 import logging
 from requests import sessions
 
-from . import authenticator, constants, repository_services_api_helper
+from google.datacatalog_connectors.qlik.scrape import \
+    authenticator, constants, repository_services_api_helper
 
 
 class MetadataScraper:

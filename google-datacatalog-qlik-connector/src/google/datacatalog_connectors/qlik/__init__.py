@@ -14,6 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .qlik2datacatalog_cli import main
+from google.datacatalog_connectors.qlik.qlik2datacatalog_cli import main
 
 __all__ = ['main']

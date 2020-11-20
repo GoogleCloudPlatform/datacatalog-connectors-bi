@@ -18,7 +18,7 @@ import argparse
 import logging
 import sys
 
-from . import sync
+from google.datacatalog_connectors.qlik import sync
 
 
 class Qlik2DataCatalogCli:
