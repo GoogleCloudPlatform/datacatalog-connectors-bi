@@ -52,7 +52,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         self._add_primitive_type_field(tag_template, 'modified_by_username',
                                        self.__STRING_TYPE,
-                                       'Username of who modified it')
+                                       'Username who modified it')
 
         self._add_primitive_type_field(tag_template, 'site_url',
                                        self.__STRING_TYPE,

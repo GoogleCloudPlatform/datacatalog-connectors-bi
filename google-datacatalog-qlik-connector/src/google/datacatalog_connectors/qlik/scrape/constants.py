@@ -18,4 +18,8 @@ import random
 import string
 
 QPS_SESSION_COOKIE_PREFIX = 'X-Qlik-Session'
+
+# XRFKEY is an arbitrary 16-char-length string composed of letters and digits.
+# The below code generates a unique string per connector execution just avoid
+# hardcoded values.
 XRFKEY = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
