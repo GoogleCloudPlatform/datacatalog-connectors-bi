@@ -24,10 +24,9 @@ class RepositoryServicesAPIHelper:
     def __init__(self, server_address):
         self.__base_api_endpoint = f'{server_address}/qrs'
         self.__headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-Qlik-Xrfkey': constants.XRFKEY,
-            'User-Agent': 'Windows'
+            'Content-Type': constants.JSON_CONTENT_TYPE,
+            'Accept': constants.JSON_CONTENT_TYPE,
+            constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
 
     def get_windows_authentication_url(self, session):
@@ -42,6 +41,10 @@ class RepositoryServicesAPIHelper:
             A string.
         """
         url = f'{self.__base_api_endpoint}/about?Xrfkey={constants.XRFKEY}'
+
+        # Sets the User-Agent to Windows to get a Windows Authentication URL
+        # that is required by the NTLM authentication flow.
+        self.__headers['User-Agent'] = constants.WINDOWS_USER_AGENT
 
         response = requests.get(url=url,
                                 headers=self.__headers,

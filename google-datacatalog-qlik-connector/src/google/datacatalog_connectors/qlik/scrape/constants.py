@@ -17,9 +17,14 @@
 import random
 import string
 
+JSON_CONTENT_TYPE = 'application/json'
+
 QPS_SESSION_COOKIE_PREFIX = 'X-Qlik-Session'
+
+WINDOWS_USER_AGENT = 'Windows'
 
 # XRFKEY is an arbitrary 16-char-length string composed of letters and digits.
 # The below code generates a unique string per connector execution just avoid
 # hardcoded values.
 XRFKEY = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+XRFKEY_HEADER_NAME = 'x-Qlik-Xrfkey'

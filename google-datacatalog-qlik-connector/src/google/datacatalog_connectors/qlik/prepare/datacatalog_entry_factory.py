@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from google.cloud import datacatalog
 from google.protobuf import timestamp_pb2

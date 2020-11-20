@@ -31,7 +31,7 @@ class Authenticator:
         user_auth = HttpNtlmAuth(username=f'{ad_domain}\\{username}',
                                  password=password)
 
-        headers = {'x-Qlik-Xrfkey': constants.XRFKEY}
+        headers = {constants.XRFKEY_HEADER_NAME: constants.XRFKEY}
 
         response = requests.get(url=auth_url, auth=user_auth, headers=headers)
 
