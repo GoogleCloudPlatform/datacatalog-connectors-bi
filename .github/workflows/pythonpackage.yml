@@ -5,39 +5,116 @@ name: Python package
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
-  build:
+  build-python-36:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        build-dir: ['./google-datacatalog-looker-connector', './google-datacatalog-tableau-connector']
+        build-dir:
+          [
+            "./google-datacatalog-qlik-connector",
+            "./google-datacatalog-tableau-connector",
+          ]
+        python-version: [3.6]
+    defaults:
+      run:
+        working-directory: ${{ matrix.build-dir }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 yapf
+          pip install .
+      - name: Formatting rules with yapf
+        run: |
+          # stop the build if formatting is different from yapf
+          yapf --diff --recursive src tests
+      - name: Lint with flake8
+        run: |
+          flake8 src tests
+      - name: Test with pytest
+        run: |
+          python setup.py test
+
+  build-python-37:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build-dir:
+          [
+            "./google-datacatalog-looker-connector",
+            "./google-datacatalog-qlik-connector",
+            "./google-datacatalog-tableau-connector",
+          ]
         python-version: [3.7]
     defaults:
       run:
         working-directory: ${{ matrix.build-dir }}
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 yapf
-        pip install .
-    - name: Formatting rules with yapf
-      run: |
-        # stop the build if formatting is different from yapf
-        yapf --diff --recursive src tests  
-    - name: Lint with flake8
-      run: |
-        flake8 src tests
-    - name: Test with pytest
-      run: |
-        python setup.py test
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 yapf
+          pip install .
+      - name: Formatting rules with yapf
+        run: |
+          # stop the build if formatting is different from yapf
+          yapf --diff --recursive src tests
+      - name: Lint with flake8
+        run: |
+          flake8 src tests
+      - name: Test with pytest
+        run: |
+          python setup.py test
+
+  build-python-38:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build-dir:
+          [
+            "./google-datacatalog-qlik-connector",
+            "./google-datacatalog-tableau-connector",
+          ]
+        python-version: [3.8]
+    defaults:
+      run:
+        working-directory: ${{ matrix.build-dir }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 yapf
+          pip install .
+      - name: Formatting rules with yapf
+        run: |
+          # stop the build if formatting is different from yapf
+          yapf --diff --recursive src tests
+      - name: Lint with flake8
+        run: |
+          flake8 src tests
+      - name: Test with pytest
+        run: |
+          python setup.py test

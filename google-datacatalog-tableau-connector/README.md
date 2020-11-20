@@ -33,9 +33,9 @@ currently supporting below asset types:
     + [2.1.1. Create a service account and grant it below roles](#211-create-a-service-account-and-grant-it-below-roles)
     + [2.1.2. Download a JSON key and save it as](#212-download-a-json-key-and-save-it-as)
   * [2.2. Set environment variables](#22-set-environment-variables)
-- [3. Run entry point](#3-run-entry-point)
-  * [3.1. Run Python entry point](#31-run-python-entry-point)
-  * [3.2. Run Docker entry point](#32-run-docker-entry-point)
+- [3. Running the connector](#3-running-the-connector)
+  * [3.1. Python entry point](#31-python-entry-point)
+  * [3.2. Docker entry point](#32-docker-entry-point)
 - [4. Set up a Tableau demo server](#4-set-up-a-tableau-demo-server)
 - [5. Developer environment](#5-developer-environment)
   * [5.1. Install and run Yapf formatter](#51-install-and-run-yapf-formatter)
@@ -132,9 +132,9 @@ export TABLEAU2DC_DATACATALOG_PROJECT_ID=google_cloud_project_id
 > credentials file was saved in [step
 > 2.1.2](#212-download-a-json-key-and-save-it-as).
 
-## 3. Run entry point
+## 3. Running the connector
 
-### 3.1. Run Python entry point
+### 3.1. Python entry point
 
 - Virtualenv
 
@@ -148,7 +148,7 @@ google-datacatalog-tableau-connector \
   --datacatalog-project-id $TABLEAU2DC_DATACATALOG_PROJECT_ID
 ```
 
-### 3.2. Run Docker entry point
+### 3.2. Docker entry point
 
 ```shell script
 docker build --rm --tag tableau2datacatalog .

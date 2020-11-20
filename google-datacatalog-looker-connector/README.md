@@ -37,9 +37,9 @@ supporting below asset types:
     + [2.1.3. Create Looker API3 credentials](#213-create-looker-api3-credentials)
     + [2.1.4. Create a Looker configuration file](#214-create-a-looker-configuration-file)
   * [2.2. Set environment variables](#22-set-environment-variables)
-- [3. Run entry point](#3-run-entry-point)
-  * [3.1. Run Python entry point](#31-run-python-entry-point)
-  * [3.2. Run Docker entry point](#32-run-docker-entry-point)
+- [3. Running the connector](#3-running-the-connector)
+  * [3.1. Python entry point](#31-python-entry-point)
+  * [3.2. Docker entry point](#32-docker-entry-point)
 - [4. Developer environment](#4-developer-environment)
   * [4.1. Install and run Yapf formatter](#41-install-and-run-yapf-formatter)
   * [4.2. Install and run Flake8 linter](#42-install-and-run-flake8-linter)
@@ -59,7 +59,7 @@ of dependencies and versions, and indirectly permissions.
 
 With [virtualenv][3], it's possible to install this library without needing
 system install permissions, and without clashing with the installed system
-dependencies. Make sure you use Python `3.7+`.
+dependencies. Make sure you use Python `3.7`.
 
 
 ### 1.1. Mac/Linux
@@ -142,9 +142,9 @@ export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 > credentials file was saved in [step
 > 2.1.2](#212-download-a-json-key-and-save-it-as).
 
-## 3. Run entry point
+## 3. Running the connector
 
-### 3.1. Run Python entry point
+### 3.1. Python entry point
 
 - Virtualenv
 
@@ -157,7 +157,7 @@ google-datacatalog-looker-connector \
 > Replace above values according to your environment. The Looker credentials
 > file was saved in [step 2.1.4](#214-create-a-looker-configuration-file).
 
-### 3.2. Run Docker entry point
+### 3.2. Docker entry point
 
 ```shell script
 docker build --rm --tag looker2datacatalog .

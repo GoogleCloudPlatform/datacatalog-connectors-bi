@@ -54,8 +54,8 @@
 							"raw": "{\n\t\"credentials\": {\n\t\t\"name\": \"{{USERNAME}}\",\n\t\t\"password\": \"{{PASSWORD}}\",\n\t\t\"site\": {\n\t\t\t\"contentUrl\": \"{{SITE_URL}}\"\t\n\t\t}\n\t}\n}"
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/auth/signin",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/auth/signin",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -125,8 +125,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -171,8 +171,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases/{{databaseId}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases/{{databaseId}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -210,8 +210,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases/<DATABASE-ID-TO-DELETE>",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/databases/<DATABASE-ID-TO-DELETE>",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -277,8 +277,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/datasources",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/datasources",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -323,8 +323,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/datasources/{{datasourceId}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/datasources/{{datasourceId}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -370,8 +370,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/projects",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/projects",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -416,8 +416,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/views",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/views",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -462,8 +462,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/workbooks",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/workbooks",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -508,8 +508,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -552,8 +552,8 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/users/{{userId}}/workbooks",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}/users/{{userId}}/workbooks",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],

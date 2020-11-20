@@ -58,8 +58,8 @@
 							]
 						},
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/login",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/login",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -114,8 +114,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/folders",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/folders",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -144,8 +144,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/folders/search?fields=id,name,parent_id,child_count,creator_id",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/folders/search?fields=id,name,parent_id,child_count,creator_id",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -181,8 +181,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/folders/{{folderId}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/folders/{{folderId}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -218,8 +218,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/spaces/search?fields=id,name,parent_id",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/spaces/search?fields=id,name,parent_id",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -255,8 +255,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/spaces/home",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/spaces/home",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -312,8 +312,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -342,8 +342,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/search?fields=id,title,created_at,space,dashboard_elements",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/search?fields=id,title,created_at,space,dashboard_elements",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -379,8 +379,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -430,8 +430,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}/dashboard_elements",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}/dashboard_elements",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -462,8 +462,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboard_elements/search?title=IS NULL",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboard_elements/search?title=IS NULL",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -499,8 +499,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/dashboard_elements/{{dashboardElementId}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboard_elements/{{dashboardElementId}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -556,8 +556,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/looks",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/looks",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -593,8 +593,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/looks/search?fields=id,title,created_at,updated_at,description,space,public,user_id,last_updater_id,url,short_url,public_url,excel_file_url,google_spreadsheet_formula,view_count,favorite_count,last_accessed_at,last_viewed_at,deleted,deleter_id",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/looks/search?fields=id,title,created_at,updated_at,description,space,public,user_id,last_updater_id,url,short_url,public_url,excel_file_url,google_spreadsheet_formula,view_count,favorite_count,last_accessed_at,last_viewed_at,deleted,deleter_id",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -635,8 +635,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/looks/{{lookId}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/looks/{{lookId}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -672,8 +672,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/queries/{{QUERY_ID}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/queries/{{QUERY_ID}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -703,8 +703,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/queries/{{QUERY_ID}}/run/sql",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/queries/{{QUERY_ID}}/run/sql",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -762,8 +762,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/lookml_models/{{LOOKML_MODEL_NAME}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/lookml_models/{{LOOKML_MODEL_NAME}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -793,8 +793,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/lookml_models/{{LOOKML_MODEL_NAME}}/explores/{{modelExploreName}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/lookml_models/{{LOOKML_MODEL_NAME}}/explores/{{modelExploreName}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],
@@ -832,8 +832,8 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{PROTOCOL}}://{{SERVER}}/api/{{API_VERSION}}/connections/{{CONNECTION_NAME}}",
-							"protocol": "{{PROTOCOL}}",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/connections/{{CONNECTION_NAME}}",
+							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
 							],

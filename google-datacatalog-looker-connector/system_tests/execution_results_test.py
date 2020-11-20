@@ -25,7 +25,7 @@ datacatalog_client = datacatalog.DataCatalogClient()
 class ExecutionResultsTest(unittest.TestCase):
 
     def test_looker_entries_should_exist_after_connector_execution(self):
-        query = 'system=tableau'
+        query = 'system=looker'
 
         scope = datacatalog.SearchCatalogRequest.Scope()
         scope.include_project_ids.append(
