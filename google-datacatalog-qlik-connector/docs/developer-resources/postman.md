@@ -18,3 +18,5 @@ API](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/Reposit
    | `USERNAME` | Username to authenticate the API calls                                                    |
    | `PASSWORD` | Password to authenticate the API calls                                                    |
    | `XRFKEY`   | 16 arbitrary characters to fulfill the `Xrfkey` parameter and `x-Qlik-Xrfkey` HTTP header |
+
+1. Sample environment file: [tools/postman/qliksense-sample-environment.postman_environment.json](../../tools/postman/qliksense-sample-environment.postman_environment.json)
