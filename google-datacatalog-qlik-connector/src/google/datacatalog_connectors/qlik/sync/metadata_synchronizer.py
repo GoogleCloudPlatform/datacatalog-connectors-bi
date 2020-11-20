@@ -26,7 +26,7 @@ class MetadataSynchronizer:
     __ENTRY_GROUP_ID = 'qlik'
     __SPECIFIED_SYSTEM = 'qlik'
 
-    def __init__(self, qlik_server_address, qlik_domain, qlik_username,
+    def __init__(self, qlik_server_address, qlik_ad_domain, qlik_username,
                  qlik_password, datacatalog_project_id,
                  datacatalog_location_id):
 
@@ -34,7 +34,7 @@ class MetadataSynchronizer:
         self.__location_id = datacatalog_location_id
 
         self.__metadata_scraper = scrape.MetadataScraper(
-            qlik_server_address, qlik_domain, qlik_username, qlik_password)
+            qlik_server_address, qlik_ad_domain, qlik_username, qlik_password)
 
         self.__tag_template_factory = prepare.DataCatalogTagTemplateFactory(
             project_id=datacatalog_project_id,

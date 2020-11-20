@@ -33,7 +33,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def setUp(self, mock_scraper, mock_assembled_entry_factory):
         self.__synchronizer = sync.MetadataSynchronizer(
             qlik_server_address='test-server',
-            qlik_domain='test-domain',
+            qlik_ad_domain='test-domain',
             qlik_username='test-username',
             qlik_password='test-password',
             datacatalog_project_id='test-project-id',

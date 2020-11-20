@@ -43,8 +43,8 @@ class Qlik2DataCatalogCli:
             formatter_class=argparse.RawDescriptionHelpFormatter)
 
         parser.add_argument('--qlik-server', help='Qlik server', required=True)
-        parser.add_argument('--qlik-domain',
-                            help='Qlik domain',
+        parser.add_argument('--qlik-ad-domain',
+                            help='Qlik Active Directory domain',
                             default=cls.__DEFAULT_QLIK_DOMAIN)
         parser.add_argument('--qlik-username',
                             help='Qlik username',
@@ -68,7 +68,7 @@ class Qlik2DataCatalogCli:
     def __run_synchronizer(cls, args):
         sync.MetadataSynchronizer(
             qlik_server_address=args.qlik_server,
-            qlik_domain=args.qlik_domain,
+            qlik_ad_domain=args.qlik_ad_domain,
             qlik_username=args.qlik_username,
             qlik_password=args.qlik_password,
             datacatalog_project_id=args.datacatalog_project_id,

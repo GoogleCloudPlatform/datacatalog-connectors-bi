@@ -110,11 +110,17 @@ pip install .
 
 ### 2.2. Set environment variables
 
+The connector uses Windows-based NTLM authentication, which requires the
+username to be provided in the format of `<ẃindows-ad-domain>\<username>`. When
+fulfilling the below environment variables, set `QLIK2DC_QLIK_AD_DOMAIN` with
+the Windows Active Directory domain your user belongs to and
+`QLIK2DC_QLIK_USERNAME` with the username (no backslash in both).
+
 ```shell script
 export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 
 export QLIK2DC_QLIK_SERVER=qlik_server
-export QLIK2DC_QLIK_DOMAIN=qlik_domain
+export QLIK2DC_QLIK_AD_DOMAIN=qlik_ad_domain
 export QLIK2DC_QLIK_USERNAME=qlik_username
 export QLIK2DC_QLIK_PASSWORD=qlik_password
 export QLIK2DC_DATACATALOG_PROJECT_ID=google_cloud_project_id
@@ -127,7 +133,7 @@ export QLIK2DC_DATACATALOG_LOCATION_ID=google_cloud_location_id
 
 ## 3. Running the connector
 
-- The `--qlik-domain` argument is optional and defaults to `.`.
+- The `--qlik-ad-domain` argument is optional and defaults to `.`.
 - The `--datacatalog-location-id` argument is optional and defaults to `us`.
 
 ### 3.1. Python entry point
@@ -137,7 +143,7 @@ export QLIK2DC_DATACATALOG_LOCATION_ID=google_cloud_location_id
 ```shell script
 google-datacatalog-qlik-connector \
   --qlik-server $QLIK2DC_QLIK_SERVER \
-  [--qlik-domain $QLIK2DC_QLIK_DOMAIN \]
+  [--qlik-ad-domain $QLIK2DC_QLIK_AD_DOMAIN \]
   --qlik-username $QLIK2DC_QLIK_USERNAME \
   --qlik-password $QLIK2DC_QLIK_PASSWORD \
   --datacatalog-project-id $QLIK2DC_DATACATALOG_PROJECT_ID \
@@ -151,7 +157,7 @@ docker build --rm --tag qlik2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   qlik2datacatalog \
   --qlik-server $QLIK2DC_QLIK_SERVER \
-  [--qlik-domain $QLIK2DC_QLIK_DOMAIN \]
+  [--qlik-ad-domain $QLIK2DC_QLIK_AD_DOMAIN \]
   --qlik-username $QLIK2DC_QLIK_USERNAME \
   --qlik-password $QLIK2DC_QLIK_PASSWORD \
   --datacatalog-project-id $QLIK2DC_DATACATALOG_PROJECT_ID \

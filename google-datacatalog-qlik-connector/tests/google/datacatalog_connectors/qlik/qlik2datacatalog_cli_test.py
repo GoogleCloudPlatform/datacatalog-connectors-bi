@@ -61,7 +61,7 @@ class Qlik2DataCatalogCliTest(unittest.TestCase):
 
         mock_metadata_synchonizer.assert_called_once_with(
             qlik_server_address='test-server',
-            qlik_domain='.',
+            qlik_ad_domain='.',
             qlik_username='test-username',
             qlik_password='test-password',
             datacatalog_project_id='dc-project-id',

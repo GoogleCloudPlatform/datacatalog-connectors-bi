@@ -30,7 +30,7 @@ class MetadataScraperTest(unittest.TestCase):
                 f'.RepositoryServicesAPIHelper')
     def setUp(self, mock_qrs_api_helper):
         self.__scraper = scrape.MetadataScraper(server_address='test-server',
-                                                domain='test-domain',
+                                                ad_domain='test-domain',
                                                 username='test-username',
                                                 password='test-password')
 
@@ -39,7 +39,7 @@ class MetadataScraperTest(unittest.TestCase):
 
         self.assertEqual('test-server',
                          attrs['_MetadataScraper__server_address'])
-        self.assertEqual('test-domain', attrs['_MetadataScraper__domain'])
+        self.assertEqual('test-domain', attrs['_MetadataScraper__ad_domain'])
         self.assertEqual('test-username', attrs['_MetadataScraper__username'])
         self.assertEqual('test-password', attrs['_MetadataScraper__password'])
         self.assertIsNotNone(attrs['_MetadataScraper__session'])
@@ -65,7 +65,7 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual('stream-id', streams[0].get('id'))
         mock_authenticator.get_qps_session_cookie_windows_auth\
             .assert_called_with(
-                domain='test-domain',
+                ad_domain='test-domain',
                 username='test-username',
                 password='test-password',
                 auth_url='test-url')

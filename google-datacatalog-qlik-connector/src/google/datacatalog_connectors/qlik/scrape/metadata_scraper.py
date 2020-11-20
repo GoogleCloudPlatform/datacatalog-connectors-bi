@@ -22,9 +22,9 @@ from . import authenticator, constants, repository_services_api_helper
 
 class MetadataScraper:
 
-    def __init__(self, server_address, domain, username, password):
+    def __init__(self, server_address, ad_domain, username, password):
         self.__server_address = server_address
-        self.__domain = domain
+        self.__ad_domain = ad_domain
         self.__username = username
         self.__password = password
         self.__session = sessions.Session()
@@ -50,7 +50,7 @@ class MetadataScraper:
                     self.__session)
             qps_session_cookie = authenticator.Authenticator\
                 .get_qps_session_cookie_windows_auth(
-                    domain=self.__domain,
+                    ad_domain=self.__ad_domain,
                     username=self.__username,
                     password=self.__password,
                     auth_url=windows_auth_url)

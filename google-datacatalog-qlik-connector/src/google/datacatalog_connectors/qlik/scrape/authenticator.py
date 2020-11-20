@@ -24,11 +24,11 @@ from . import constants
 class Authenticator:
 
     @classmethod
-    def get_qps_session_cookie_windows_auth(cls, domain, username, password,
+    def get_qps_session_cookie_windows_auth(cls, ad_domain, username, password,
                                             auth_url):
 
         # Set up user credentials
-        user_auth = HttpNtlmAuth(username=f'{domain}\\{username}',
+        user_auth = HttpNtlmAuth(username=f'{ad_domain}\\{username}',
                                  password=password)
 
         headers = {'x-Qlik-Xrfkey': constants.XRFKEY}
