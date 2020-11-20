@@ -23,7 +23,7 @@ from google.cloud import datacatalog
 class CleanupResultsTest(unittest.TestCase):
     __datacatalog = datacatalog.DataCatalogClient()
 
-    def test_looker_entries_should_not_exist_after_cleanup(self):
+    def test_entries_should_not_exist_after_cleanup(self):
         query = 'system=qlik'
 
         scope = datacatalog.SearchCatalogRequest.Scope()
