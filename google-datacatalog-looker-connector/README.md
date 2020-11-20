@@ -59,7 +59,7 @@ of dependencies and versions, and indirectly permissions.
 
 With [virtualenv][3], it's possible to install this library without needing
 system install permissions, and without clashing with the installed system
-dependencies. Make sure you use Python `3.7+`.
+dependencies. Make sure you use Python `3.7`.
 
 
 ### 1.1. Mac/Linux
