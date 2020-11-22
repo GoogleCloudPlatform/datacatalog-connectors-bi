@@ -57,8 +57,8 @@ class MetadataSynchronizer:
         logging.info('===> Scraping Qlik Sense metadata...')
 
         logging.info('')
-        logging.info('Streams...')
-        streams = self.__metadata_scraper.scrape_streams()
+        logging.info('Streams and nested assets...')
+        streams = self.__scrape_streams()
         logging.info('==== DONE ========================================')
 
         # Prepare: convert Qlik metadata into Data Catalog entities model.
@@ -93,6 +93,44 @@ class MetadataSynchronizer:
         self.__ingest_metadata(tag_templates_dict, assembled_entries_dict)
         logging.info('==== DONE ========================================')
 
+    def __scrape_streams(self):
+        """Scrape metadata from all streams the current user has access to.
+        Streams metadata include nested objects such as apps.
+
+        :return: A ``list`` of stream metadata.
+        """
+        all_streams = self.__metadata_scraper.scrape_all_streams()
+        all_apps = self.__metadata_scraper.scrape_all_apps()
+
+        self.__assemble_stream_metadata_from_flat_lists(all_streams, all_apps)
+
+        return all_streams
+
+    @classmethod
+    def __assemble_stream_metadata_from_flat_lists(cls, all_streams, all_apps):
+        """Assemble the stream's metadata from the given flat asset lists.
+
+        """
+        streams_dict = {}
+        # Build an id-based dict to promote faster lookup in the next steps.
+        for stream in all_streams:
+            streams_dict[stream.get('id')] = stream
+
+        for app in all_apps:
+            # Not having a stream means the app is a work in progress and has
+            # not been published, so it can be skipped.
+            if not app.get('stream'):
+                continue
+
+            stream_id = app.get('stream').get('id')
+
+            if not streams_dict[stream_id].get('apps'):
+                streams_dict[stream_id]['apps'] = []
+
+            streams_dict[stream_id]['apps'].append(app)
+
+        return all_streams
+
     def __make_tag_templates_dict(self):
         return {
             constants.TAG_TEMPLATE_ID_STREAM:
@@ -101,8 +139,7 @@ class MetadataSynchronizer:
 
     def __make_assembled_entries_dict(self, streams_metadata,
                                       tag_templates_dict):
-        """
-        Make Data Catalog entries and tags for assets belonging to a given
+        """Make Data Catalog entries and tags for assets belonging to a given
         Qlik Sense site.
 
         Returns:

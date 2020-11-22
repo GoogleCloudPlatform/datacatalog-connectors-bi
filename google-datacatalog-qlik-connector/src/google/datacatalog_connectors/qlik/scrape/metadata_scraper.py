@@ -33,7 +33,11 @@ class MetadataScraper:
             repository_services_api_helper.RepositoryServicesAPIHelper(
                 server_address)
 
-    def scrape_streams(self):
+    def scrape_all_apps(self):
+        self.__set_qps_session_cookie()
+        return self.__qrs_api_helper.get_full_app_list(self.__session)
+
+    def scrape_all_streams(self):
         self.__set_qps_session_cookie()
         return self.__qrs_api_helper.get_full_stream_list(self.__session)
 

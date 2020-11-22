@@ -59,7 +59,7 @@ class MetadataScraperTest(unittest.TestCase):
             scrape_ops_mocks.FakeQPSSessionCookie()
         qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
-        streams = self.__scraper.scrape_streams()
+        streams = self.__scraper.scrape_all_streams()
 
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
@@ -71,7 +71,7 @@ class MetadataScraperTest(unittest.TestCase):
                 auth_url='test-url')
         qrs_api_helper.get_full_stream_list.assert_called_once()
 
-    def test_scrape_streams_should_return_list_on_success(self):
+    def test_scrape_all_streams_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
         qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
 
@@ -83,7 +83,7 @@ class MetadataScraperTest(unittest.TestCase):
             scrape_ops_mocks.FakeSessionWithCookies()
         qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
-        streams = self.__scraper.scrape_streams()
+        streams = self.__scraper.scrape_all_streams()
 
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))

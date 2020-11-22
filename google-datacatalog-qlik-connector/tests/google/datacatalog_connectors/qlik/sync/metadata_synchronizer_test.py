@@ -64,7 +64,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         self.__synchronizer.run()
 
-        scraper.scrape_streams.assert_called_once()
+        scraper.scrape_all_streams.assert_called_once()
 
         cleaner = mock_cleaner.return_value
         cleaner.delete_obsolete_metadata.assert_called_once()
@@ -78,7 +78,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper = self.__synchronizer.__dict__[
             '_MetadataSynchronizer__metadata_scraper']
 
-        scraper.scrape_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
 
         self.__synchronizer.run()
 
