@@ -57,7 +57,7 @@ class MetadataScraperTest(unittest.TestCase):
         qrs_api_helper.get_windows_authentication_url.return_value = 'test-url'
         mock_authenticator.get_qps_session_cookie_windows_auth.return_value =\
             scrape_ops_mocks.FakeQPSSessionCookie()
-        qrs_api_helper.get_streams.return_value = streams_metadata
+        qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
         streams = self.__scraper.scrape_streams()
 
@@ -69,7 +69,7 @@ class MetadataScraperTest(unittest.TestCase):
                 username='test-username',
                 password='test-password',
                 auth_url='test-url')
-        qrs_api_helper.get_streams.assert_called_once()
+        qrs_api_helper.get_full_stream_list.assert_called_once()
 
     def test_scrape_streams_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
@@ -81,10 +81,10 @@ class MetadataScraperTest(unittest.TestCase):
 
         attrs['_MetadataScraper__session'] = \
             scrape_ops_mocks.FakeSessionWithCookies()
-        qrs_api_helper.get_streams.return_value = streams_metadata
+        qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
         streams = self.__scraper.scrape_streams()
 
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
-        qrs_api_helper.get_streams.assert_called_once()
+        qrs_api_helper.get_full_stream_list.assert_called_once()

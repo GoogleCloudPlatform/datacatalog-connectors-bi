@@ -26,6 +26,10 @@ class RepositoryServicesAPIHelper:
     synchronization of Qlik Sense apps, licensing, security, and service
     configuration data.
 
+    QRS returns full objects when /full is included in the request path;
+    otherwise, it returns condensed objects. Full objects are preferred
+    because they allow the connector to read a richer metadata set.
+
     """
 
     def __init__(self, server_address):
@@ -59,11 +63,11 @@ class RepositoryServicesAPIHelper:
 
         return session.get_redirect_target(response)
 
-    def get_streams(self, session):
-        """Read streams metadata from a given server.
+    def get_full_stream_list(self, session):
+        """Read a list  of streams with full metadata from a given server.
 
         Returns:
-            A list of stream metadata objects.
+            A list of full stream metadata objects.
         """
         url = f'{self.__base_api_endpoint}' \
               f'/stream/full?Xrfkey={constants.XRFKEY}'

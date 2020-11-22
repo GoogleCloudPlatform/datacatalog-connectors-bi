@@ -49,10 +49,10 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
         self.assertEqual('redirect-url', url)
         mock_requests.get.assert_called_once()
 
-    def test_get_streams_should_use_session_to_call_api(self):
+    def test_get_full_stream_list_should_use_session_to_call_api(self):
         mock_session = mock.Mock(sessions.Session())
 
-        streams = self.__helper.get_streams(mock_session)
+        streams = self.__helper.get_full_stream_list(mock_session)
 
         self.assertIsNotNone(streams)
         mock_session.get.assert_called_once()
