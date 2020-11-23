@@ -33,6 +33,20 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         self._set_string_field(tag, 'id', app_metadata.get('id'))
 
+        owner = app_metadata.get('owner')
+        if owner:
+            owner_user_dir = owner.get('userDirectory')
+            owner_user_id = owner.get('userId')
+
+            if owner_user_dir and owner_user_id:
+                self._set_string_field(tag, 'owner_username',
+                                       f'{owner_user_dir}\\\\{owner_user_id}')
+
+            self._set_string_field(tag, 'owner_name', owner.get('name'))
+
+        self._set_string_field(tag, 'modified_by_username',
+                               app_metadata.get('modifiedByUserName'))
+
         self._set_timestamp_field(
             tag, 'publish_time',
             datetime.strptime(app_metadata.get('publishTime'),
@@ -40,11 +54,23 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         self._set_bool_field(tag, 'published', app_metadata.get('published'))
 
+        self._set_timestamp_field(
+            tag, 'last_reload_time',
+            datetime.strptime(app_metadata.get('lastReloadTime'),
+                              self.__INCOMING_TIMESTAMP_UTC_FORMAT))
+
         stream_metadata = app_metadata.get('stream')
         if stream_metadata:
             self._set_string_field(tag, 'stream_id', stream_metadata.get('id'))
             self._set_string_field(tag, 'stream_name',
                                    stream_metadata.get('name'))
+
+        self._set_double_field(tag, 'file_size', app_metadata.get('fileSize'))
+
+        if app_metadata.get('thumbnail'):
+            self._set_string_field(
+                tag, 'thumbnail',
+                f'{self.__site_url}{app_metadata.get("thumbnail")}')
 
         self._set_string_field(tag, 'saved_in_product_version',
                                app_metadata.get('savedInProductVersion'))
@@ -54,6 +80,9 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         self._set_double_field(tag, 'availability_status',
                                app_metadata.get('availabilityStatus'))
+
+        self._set_string_field(tag, 'schema_path',
+                               app_metadata.get('schemaPath'))
 
         return tag
 

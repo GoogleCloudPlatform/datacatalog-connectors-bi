@@ -43,20 +43,35 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         metadata = {
             'id': 'c987-d654',
+            'owner': {
+                'userDirectory': 'test-directory',
+                'userId': 'test.userid',
+                'name': 'Test user',
+            },
+            'modifiedByUserName': 'test-directory\\\\test.userid',
             'publishTime': '2020-11-04T14:49:14.504Z',
             'published': True,
+            'lastReloadTime': '2020-11-03T18:13:37.156Z',
             'stream': {
                 'id': 'a123-b456',
                 'name': 'Test stream',
             },
+            'fileSize': 43394841,
+            'thumbnail': '/appcontent/c987-d654/test-thumbnail.jpg',
             'savedInProductVersion': '12.763.4',
             'migrationHash': '504d4e39a7133ee172fbe29aa58348b1e4054149',
             'availabilityStatus': 1,
+            'schemaPath': 'App',
         }
 
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
 
         self.assertEqual('c987-d654', tag.fields['id'].string_value)
+        self.assertEqual('test-directory\\\\test.userid',
+                         tag.fields['owner_username'].string_value)
+        self.assertEqual('Test user', tag.fields['owner_name'].string_value)
+        self.assertEqual('test-directory\\\\test.userid',
+                         tag.fields['modified_by_username'].string_value)
 
         publish_datetime = datetime.strptime('2020-11-04T14:49:14.504+0000',
                                              self.__DATETIME_FORMAT)
@@ -65,13 +80,26 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             tag.fields['publish_time'].timestamp_value.timestamp())
 
         self.assertEqual(True, tag.fields['published'].bool_value)
+
+        last_reload_datetime = datetime.strptime(
+            '2020-11-03T18:13:37.156+0000', self.__DATETIME_FORMAT)
+        self.assertEqual(
+            last_reload_datetime.timestamp(),
+            tag.fields['last_reload_time'].timestamp_value.timestamp())
+
         self.assertEqual('a123-b456', tag.fields['stream_id'].string_value)
         self.assertEqual('Test stream', tag.fields['stream_name'].string_value)
+        self.assertEqual(43394841, tag.fields['file_size'].double_value)
+        self.assertEqual(
+            'https://test.server.com'
+            '/appcontent/c987-d654/test-thumbnail.jpg',
+            tag.fields['thumbnail'].string_value)
         self.assertEqual('12.763.4',
                          tag.fields['saved_in_product_version'].string_value)
         self.assertEqual('504d4e39a7133ee172fbe29aa58348b1e4054149',
                          tag.fields['migration_hash'].string_value)
         self.assertEqual(1, tag.fields['availability_status'].double_value)
+        self.assertEqual('App', tag.fields['schema_path'].string_value)
 
     def test_make_tag_for_stream_should_set_all_available_fields(self):
         tag_template = \
