@@ -124,6 +124,9 @@ class MetadataSynchronizer:
 
             stream_id = app.get('stream').get('id')
 
+            # The 'apps' field is not available in the API response but is
+            # injected into the returned metadata object to make further
+            # processing more efficient.
             if not streams_dict[stream_id].get('apps'):
                 streams_dict[stream_id]['apps'] = []
 

@@ -37,6 +37,26 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         self.__user_specified_system = user_specified_system
         self.__site_url = site_url
 
+    def make_entry_for_app(self, app_metadata):
+        entry = datacatalog.Entry()
+
+        generated_id = self.__format_id(constants.ENTRY_ID_APP,
+                                        app_metadata.get('id'))
+        entry.name = datacatalog.DataCatalogClient.entry_path(
+            self.__project_id, self.__location_id, self.__entry_group_id,
+            generated_id)
+
+        entry.user_specified_system = self.__user_specified_system
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_APP
+
+        entry.display_name = self._format_display_name(
+            app_metadata.get("name"))
+
+        entry.linked_resource = f'{self.__site_url}' \
+                                f'/sense/app/{app_metadata.get("id")}'
+
+        return generated_id, entry
+
     def make_entry_for_stream(self, stream_metadata):
         entry = datacatalog.Entry()
 

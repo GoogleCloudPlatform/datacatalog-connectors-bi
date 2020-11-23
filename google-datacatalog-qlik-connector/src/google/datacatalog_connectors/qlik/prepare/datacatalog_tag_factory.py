@@ -14,15 +14,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
+
 from google.cloud import datacatalog
 
 from google.datacatalog_connectors.commons import prepare
 
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
+    # The incoming timestamp format is UTC
+    __INCOMING_TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     def __init__(self, site_url):
         self.__site_url = site_url
+
+    def make_tag_for_app(self, tag_template, app_metadata):
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id', app_metadata.get('id'))
+
+        self._set_timestamp_field(
+            tag, 'publish_time',
+            datetime.strptime(app_metadata.get('publishTime'),
+                              self.__INCOMING_TIMESTAMP_FORMAT))
+
+        self._set_bool_field(tag, 'published', app_metadata.get('published'))
+
+        stream_metadata = app_metadata.get('stream')
+        if stream_metadata:
+            self._set_string_field(tag, 'stream_id', stream_metadata.get('id'))
+            self._set_string_field(tag, 'stream_name',
+                                   stream_metadata.get('name'))
+
+        self._set_string_field(tag, 'saved_in_product_version',
+                               app_metadata.get('savedInProductVersion'))
+
+        self._set_string_field(tag, 'migration_hash',
+                               app_metadata.get('migrationHash'))
+
+        self._set_double_field(tag, 'availability_status',
+                               app_metadata.get('availabilityStatus'))
+
+        return tag
 
     def make_tag_for_stream(self, tag_template, stream_metadata):
         tag = datacatalog.Tag()
