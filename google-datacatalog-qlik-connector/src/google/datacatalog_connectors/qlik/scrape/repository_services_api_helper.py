@@ -42,29 +42,6 @@ class RepositoryServicesAPIHelper:
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
 
-    def get_windows_authentication_url(self, session):
-        """Get a Windows Authentication url.
-
-        This method sends an unauthenticated request to a well known endpoint
-        of the Qlik Sense Repository Service API. The expected response has a
-        302 status code and a `Location` header, which is the Windows
-        Authentication url.
-
-        Returns:
-            A string.
-        """
-        url = f'{self.__base_api_endpoint}/about?Xrfkey={constants.XRFKEY}'
-
-        # Sets the User-Agent to Windows to get a Windows Authentication URL
-        # that is required by the NTLM authentication flow.
-        self.__headers['User-Agent'] = constants.WINDOWS_USER_AGENT
-
-        response = requests.get(url=url,
-                                headers=self.__headers,
-                                allow_redirects=False)
-
-        return session.get_redirect_target(response)
-
     def get_full_app_list(self, session):
         """Get the list of all apps that can be opened by the current user,
         via the current proxy.
@@ -87,3 +64,26 @@ class RepositoryServicesAPIHelper:
               f'/stream/full?Xrfkey={constants.XRFKEY}'
 
         return session.get(url=url, headers=self.__headers).json()
+
+    def get_windows_authentication_url(self, session):
+        """Get a Windows Authentication url.
+
+        This method sends an unauthenticated request to a well known endpoint
+        of the Qlik Sense Repository Service API. The expected response has a
+        302 status code and a `Location` header, which is the Windows
+        Authentication url.
+
+        Returns:
+            A string.
+        """
+        url = f'{self.__base_api_endpoint}/about?Xrfkey={constants.XRFKEY}'
+
+        # Sets the User-Agent to Windows to get a Windows Authentication URL
+        # that is required by the NTLM authentication flow.
+        self.__headers['User-Agent'] = constants.WINDOWS_USER_AGENT
+
+        response = requests.get(url=url,
+                                headers=self.__headers,
+                                allow_redirects=False)
+
+        return session.get_redirect_target(response)
