@@ -53,7 +53,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        self.__STRING_TYPE, 'Stream Id')
 
         self._add_primitive_type_field(tag_template, 'stream_name',
-                                       self.__STRING_TYPE, 'Stream Name')
+                                       self.__STRING_TYPE, 'Stream name')
 
         self._add_primitive_type_field(tag_template, 'stream_entry',
                                        self.__STRING_TYPE,
