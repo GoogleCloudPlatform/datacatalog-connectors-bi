@@ -290,7 +290,7 @@
 			"name": "2 Streams",
 			"item": [
 				{
-					"name": "2.01.01 Get Streams",
+					"name": "2.01.01 Get Stream list",
 					"event": [
 						{
 							"listen": "test",
@@ -300,6 +300,15 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"const streams = jsonData;",
+									"",
+									"pm.globals.unset(\"streamId\");",
+									"",
+									"if (streams.length > 0) {",
+									"    pm.globals.set(\"streamId\", streams[0].id);",
+									"}",
 									""
 								],
 								"type": "text/javascript"
@@ -344,7 +353,7 @@
 					"response": []
 				},
 				{
-					"name": "2.01.02 Get Streams (full)",
+					"name": "2.01.02 Get Stream list (full)",
 					"event": [
 						{
 							"listen": "test",
@@ -354,6 +363,15 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"const streams = jsonData;",
+									"",
+									"pm.globals.unset(\"streamId\");",
+									"",
+									"if (streams.length > 0) {",
+									"    pm.globals.set(\"streamId\", streams[0].id);",
+									"}",
 									""
 								],
 								"type": "text/javascript"
@@ -397,6 +415,61 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "2.02.01 Get Stream",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "10f70186-9025-4a7f-bda1-b11123f439fe",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/stream/{{streamId}}?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"stream",
+								"{{streamId}}"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -410,7 +483,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "cf9c0aad-40ed-492d-b4d4-aa00d6c6178a",
+								"id": "72df1475-2d12-4b68-baa2-8e943fef03c2",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -459,12 +532,67 @@
 					"response": []
 				},
 				{
+					"name": "X.01.02 Get App list (full)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cf9c0aad-40ed-492d-b4d4-aa00d6c6178a",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/app/full?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"app",
+								"full"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "X.02.01 Get Hub list",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "16da1c1b-677b-4703-a3d5-6e7c828bc80f",
+								"id": "732c7935-865a-4b1f-ad73-9e99405051a5",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -502,6 +630,62 @@
 								"qrs",
 								"app",
 								"hublist"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "X.02.02 Get Hub list  (full)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "16da1c1b-677b-4703-a3d5-6e7c828bc80f",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/app/hublist/full?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"app",
+								"hublist",
+								"full"
 							],
 							"query": [
 								{
