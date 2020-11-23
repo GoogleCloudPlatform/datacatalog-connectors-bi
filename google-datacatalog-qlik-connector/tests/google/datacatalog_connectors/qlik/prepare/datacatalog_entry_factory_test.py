@@ -47,24 +47,43 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.server.com',
                          attrs['_DataCatalogEntryFactory__site_url'])
 
+    def test_make_entry_for_app_should_set_all_available_fields(self):
+        metadata = {
+            'id': 'a123-b456',
+            'name': 'Test app',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_app(metadata)
+        self.assertEqual('qlik_app_a123_b456', entry_id)
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'entryGroups/test-entry-group/entries/'
+            'qlik_app_a123_b456', entry.name)
+        self.assertEqual('test-system', entry.user_specified_system)
+        self.assertEqual('app', entry.user_specified_type)
+        self.assertEqual('Test app', entry.display_name)
+        self.assertEqual('https://test.server.com/sense/app/a123-b456',
+                         entry.linked_resource)
+
     def test_make_entry_for_stream_should_set_all_available_fields(self):
         metadata = {
             'id': 'a123-b456',
-            'name': 'Test Name',
+            'name': 'Test stream',
             'createdDate': '2019-09-12T16:30:00.005Z',
             'modifiedDate': '2019-09-12T16:30:00.005Z',
         }
 
         entry_id, entry = self.__factory.make_entry_for_stream(metadata)
-        self.assertEqual('qlik_st_a123_b456', entry_id)
+        self.assertEqual('qlik_str_a123_b456', entry_id)
 
         self.assertEqual(
             'projects/test-project/locations/test-location/'
             'entryGroups/test-entry-group/entries/'
-            'qlik_st_a123_b456', entry.name)
+            'qlik_str_a123_b456', entry.name)
         self.assertEqual('test-system', entry.user_specified_system)
         self.assertEqual('stream', entry.user_specified_type)
-        self.assertEqual('Test Name', entry.display_name)
+        self.assertEqual('Test stream', entry.display_name)
         self.assertEqual('https://test.server.com/hub/stream/a123-b456',
                          entry.linked_resource)
 
@@ -77,11 +96,11 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
-    def test_make_entry_long_luid_should_limit_result_id_length(self):
+    def test_make_entry_long_id_should_limit_result_id_length(self):
         metadata = {
             'id': '12345678901234567890123456789012'
                   '34567890123456789012345678901234',
-            'name': 'Test Name',
+            'name': 'Test stream',
             'createdDate': '2019-09-12T16:30:00.005Z',
             'modifiedDate': '2019-09-12T16:30:00.005Z',
         }
@@ -89,10 +108,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         entry_id, entry = self.__factory.make_entry_for_stream(metadata)
 
         self.assertEqual(
-            'qlik_st_12345678901234567890123456789012345678901234567890123456',
+            'qlik_str_1234567890123456789012345678901234567890123456789012345',
             entry_id)
         self.assertEqual(
             'projects/test-project/locations/test-location/'
             'entryGroups/test-entry-group/entries/'
-            'qlik_st_12345678901234567890123456789012345678901234567890123456',
+            'qlik_str_1234567890123456789012345678901234567890123456789012345',
             entry.name)

@@ -38,21 +38,23 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
             attrs['_RepositoryServicesAPIHelper__base_api_endpoint'])
         self.assertIsNotNone(attrs['_RepositoryServicesAPIHelper__headers'])
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.repository_services_api_helper.requests')
-    def test_get_windows_authentication_url_should_return_url_from_header(
-            self, mock_requests):
-        mock_session = mock.Mock(sessions.Session())
-        mock_session.get_redirect_target.return_value = 'redirect-url'
-
-        url = self.__helper.get_windows_authentication_url(mock_session)
-
-        self.assertEqual('redirect-url', url)
-        mock_requests.get.assert_called_once()
-
-    def test_get_streams_should_use_session_to_call_api(self):
+    def test_get_full_app_list_should_use_session_to_call_api(self):
         mock_session = mock.Mock(sessions.Session())
 
-        streams = self.__helper.get_streams(mock_session)
+        apps = self.__helper.get_full_app_list(mock_session)
+
+        self.assertIsNotNone(apps)
+        mock_session.get.assert_called_once()
+        mock_session.get.assert_called_with(
+            url=f'test-server/qrs/app/hublist/full?Xrfkey={constants.XRFKEY}',
+            headers=self.__helper.
+            __dict__['_RepositoryServicesAPIHelper__headers'],
+        )
+
+    def test_get_full_stream_list_should_use_session_to_call_api(self):
+        mock_session = mock.Mock(sessions.Session())
+
+        streams = self.__helper.get_full_stream_list(mock_session)
 
         self.assertIsNotNone(streams)
         mock_session.get.assert_called_once()
@@ -61,3 +63,15 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
             headers=self.__helper.
             __dict__['_RepositoryServicesAPIHelper__headers'],
         )
+
+    @mock.patch(f'{__SCRAPE_PACKAGE}.repository_services_api_helper.requests')
+    def test_get_windows_authentication_url_should_return_url_from_header(
+            self, mock_requests):
+
+        mock_session = mock.Mock(sessions.Session())
+        mock_session.get_redirect_target.return_value = 'redirect-url'
+
+        url = self.__helper.get_windows_authentication_url(mock_session)
+
+        self.assertEqual('redirect-url', url)
+        mock_requests.get.assert_called_once()

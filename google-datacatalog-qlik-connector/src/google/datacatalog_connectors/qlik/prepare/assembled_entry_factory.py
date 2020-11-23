@@ -43,6 +43,13 @@ class AssembledEntryFactory:
                                                    stream_tag_template)
         ]
 
+        app_tag_template = self.__get_tag_template(
+            constants.TAG_TEMPLATE_ID_APP, tag_templates_dict)
+
+        assembled_entries.extend(
+            self.__make_assembled_entries_for_apps(stream_metadata,
+                                                   app_tag_template))
+
         return assembled_entries
 
     @classmethod
@@ -60,5 +67,28 @@ class AssembledEntryFactory:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_stream(
                     tag_template, stream_metadata))
+
+        return prepare.AssembledEntryData(entry_id, entry, tags)
+
+    def __make_assembled_entries_for_apps(self, stream_metadata, tag_template):
+        apps_metadata = stream_metadata.get('apps')
+
+        if not apps_metadata:
+            return []
+
+        return [
+            self.__make_assembled_entry_for_app(app_metadata, tag_template)
+            for app_metadata in apps_metadata
+        ]
+
+    def __make_assembled_entry_for_app(self, app_metadata, tag_template):
+        entry_id, entry = \
+            self.__datacatalog_entry_factory.make_entry_for_app(app_metadata)
+
+        tags = []
+        if tag_template:
+            tags.append(
+                self.__datacatalog_tag_factory.make_tag_for_app(
+                    tag_template, app_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)

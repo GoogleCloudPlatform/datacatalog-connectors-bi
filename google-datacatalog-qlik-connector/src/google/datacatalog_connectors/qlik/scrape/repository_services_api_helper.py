@@ -26,6 +26,12 @@ class RepositoryServicesAPIHelper:
     synchronization of Qlik Sense apps, licensing, security, and service
     configuration data.
 
+    QRS returns full objects when /full is included in the request path;
+    otherwise, it returns condensed objects. Full objects are preferred
+    because they allow the connector to read a richer metadata set (see [Full
+    versus condensed objects](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Connect-API-Full-vs-Condensed-Objects.htm) # noqa E501
+    for more information).
+
     """
 
     def __init__(self, server_address):
@@ -35,6 +41,29 @@ class RepositoryServicesAPIHelper:
             'Accept': constants.JSON_CONTENT_TYPE,
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
+
+    def get_full_app_list(self, session):
+        """Get the list of all apps that can be opened by the current user,
+        via the current proxy.
+
+        Returns:
+            A list of full app metadata objects.
+        """
+        url = f'{self.__base_api_endpoint}' \
+              f'/app/hublist/full?Xrfkey={constants.XRFKEY}'
+
+        return session.get(url=url, headers=self.__headers).json()
+
+    def get_full_stream_list(self, session):
+        """Get the list of streams with full metadata from a given server.
+
+        Returns:
+            A list of full stream metadata objects.
+        """
+        url = f'{self.__base_api_endpoint}' \
+              f'/stream/full?Xrfkey={constants.XRFKEY}'
+
+        return session.get(url=url, headers=self.__headers).json()
 
     def get_windows_authentication_url(self, session):
         """Get a Windows Authentication url.
@@ -58,14 +87,3 @@ class RepositoryServicesAPIHelper:
                                 allow_redirects=False)
 
         return session.get_redirect_target(response)
-
-    def get_streams(self, session):
-        """Read streams metadata from a given server.
-
-        Returns:
-            A list of stream metadata objects.
-        """
-        url = f'{self.__base_api_endpoint}' \
-              f'/stream/full?Xrfkey={constants.XRFKEY}'
-
-        return session.get(url=url, headers=self.__headers).json()

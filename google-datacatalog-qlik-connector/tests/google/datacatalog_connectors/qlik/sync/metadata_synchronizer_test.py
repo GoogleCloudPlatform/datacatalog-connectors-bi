@@ -64,7 +64,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         self.__synchronizer.run()
 
-        scraper.scrape_streams.assert_called_once()
+        scraper.scrape_all_streams.assert_called_once()
 
         cleaner = mock_cleaner.return_value
         cleaner.delete_obsolete_metadata.assert_called_once()
@@ -77,10 +77,87 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         scraper = self.__synchronizer.__dict__[
             '_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = self.__synchronizer.__dict__[
+            '_MetadataSynchronizer__assembled_entry_factory']
 
-        scraper.scrape_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
 
         self.__synchronizer.run()
+
+        expected_make_assembled_entries_call_arg = {'id': 'test_stream'}
+
+        make_assembled_entries_args = \
+            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        self.assertEqual(expected_make_assembled_entries_call_arg,
+                         make_assembled_entries_args[0])
+
+        mapper = mock_mapper.return_value
+        mapper.fulfill_tag_fields.assert_called_once()
+
+        cleaner = mock_cleaner.return_value
+        cleaner.delete_obsolete_metadata.assert_called_once()
+
+        ingestor = mock_ingestor.return_value
+        ingestor.ingest_metadata.assert_called_once()
+
+    def test_run_published_app_metadata_should_succeed(self, mock_mapper,
+                                                       mock_cleaner,
+                                                       mock_ingestor):
+
+        scraper = self.__synchronizer.__dict__[
+            '_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = self.__synchronizer.__dict__[
+            '_MetadataSynchronizer__assembled_entry_factory']
+
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_apps.return_value = \
+            [self.__make_fake_published_app()]
+
+        self.__synchronizer.run()
+
+        expected_make_assembled_entries_call_arg = {
+            'id': 'test_stream',
+            'apps': [{
+                'id': 'test_app',
+                'stream': {
+                    'id': 'test_stream'
+                }
+            }]
+        }
+
+        make_assembled_entries_args = \
+            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        self.assertEqual(expected_make_assembled_entries_call_arg,
+                         make_assembled_entries_args[0])
+
+        mapper = mock_mapper.return_value
+        mapper.fulfill_tag_fields.assert_called_once()
+
+        cleaner = mock_cleaner.return_value
+        cleaner.delete_obsolete_metadata.assert_called_once()
+
+        ingestor = mock_ingestor.return_value
+        ingestor.ingest_metadata.assert_called_once()
+
+    def test_run_wip_app_metadata_should_succeed(self, mock_mapper,
+                                                 mock_cleaner, mock_ingestor):
+
+        scraper = self.__synchronizer.__dict__[
+            '_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = self.__synchronizer.__dict__[
+            '_MetadataSynchronizer__assembled_entry_factory']
+
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_apps.return_value = [self.__make_fake_wip_app()]
+
+        self.__synchronizer.run()
+
+        expected_make_assembled_entries_call_arg = {'id': 'test_stream'}
+
+        make_assembled_entries_args = \
+            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        self.assertEqual(expected_make_assembled_entries_call_arg,
+                         make_assembled_entries_args[0])
 
         mapper = mock_mapper.return_value
         mapper.fulfill_tag_fields.assert_called_once()
@@ -93,7 +170,14 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
     @classmethod
     def __make_fake_stream(cls):
-        metadata = {
+        return {
             'id': 'test_stream',
         }
-        return metadata
+
+    @classmethod
+    def __make_fake_published_app(cls):
+        return {'id': 'test_app', 'stream': cls.__make_fake_stream()}
+
+    @classmethod
+    def __make_fake_wip_app(cls):
+        return {'id': 'test_app', 'stream': None}

@@ -40,6 +40,67 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual('test-location',
                          attrs['_DataCatalogTagTemplateFactory__location_id'])
 
+    def test_make_tag_template_for_app(self):
+        tag_template = self.__factory.make_tag_template_for_app()
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'tagTemplates/qlik_app_metadata', tag_template.name)
+
+        self.assertEqual('Qlik App Metadata', tag_template.display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['id'].type.primitive_type)
+        self.assertEqual('Unique Id', tag_template.fields['id'].display_name)
+
+        self.assertEqual(
+            self.__TIMESTAMP_TYPE,
+            tag_template.fields['publish_time'].type.primitive_type)
+        self.assertEqual('Publish time',
+                         tag_template.fields['publish_time'].display_name)
+
+        self.assertEqual(self.__BOOL_TYPE,
+                         tag_template.fields['published'].type.primitive_type)
+        self.assertEqual('Published',
+                         tag_template.fields['published'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['stream_id'].type.primitive_type)
+        self.assertEqual('Stream Id',
+                         tag_template.fields['stream_id'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['stream_name'].type.primitive_type)
+        self.assertEqual('Stream name',
+                         tag_template.fields['stream_name'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['stream_entry'].type.primitive_type)
+        self.assertEqual('Data Catalog Entry for the Stream',
+                         tag_template.fields['stream_entry'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE, tag_template.
+            fields['saved_in_product_version'].type.primitive_type)
+        self.assertEqual(
+            'Saved in product version',
+            tag_template.fields['saved_in_product_version'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['migration_hash'].type.primitive_type)
+        self.assertEqual('Migration hash',
+                         tag_template.fields['migration_hash'].display_name)
+
+        self.assertEqual(
+            self.__DOUBLE_TYPE,
+            tag_template.fields['availability_status'].type.primitive_type)
+        self.assertEqual(
+            'Availability status',
+            tag_template.fields['availability_status'].display_name)
+
     def test_make_tag_template_for_stream(self):
         tag_template = self.__factory.make_tag_template_for_stream()
 
