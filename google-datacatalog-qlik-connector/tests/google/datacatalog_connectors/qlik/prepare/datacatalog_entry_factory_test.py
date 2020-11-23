@@ -51,6 +51,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         metadata = {
             'id': 'a123-b456',
             'name': 'Test app',
+            'createdDate': '2019-09-12T16:30:00.005Z',
+            'modifiedDate': '2019-09-12T16:30:00.005Z',
         }
 
         entry_id, entry = self.__factory.make_entry_for_app(metadata)
@@ -65,6 +67,15 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('Test app', entry.display_name)
         self.assertEqual('https://test.server.com/sense/app/a123-b456',
                          entry.linked_resource)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
 
     def test_make_entry_for_stream_should_set_all_available_fields(self):
         metadata = {
