@@ -54,6 +54,24 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual('Unique Id', tag_template.fields['id'].display_name)
 
         self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['owner_username'].type.primitive_type)
+        self.assertEqual('Owner username',
+                         tag_template.fields['owner_username'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['owner_name'].type.primitive_type)
+        self.assertEqual('Owner name',
+                         tag_template.fields['owner_name'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['modified_by_username'].type.primitive_type)
+        self.assertEqual(
+            'Username who modified it',
+            tag_template.fields['modified_by_username'].display_name)
+
+        self.assertEqual(
             self.__TIMESTAMP_TYPE,
             tag_template.fields['publish_time'].type.primitive_type)
         self.assertEqual('Publish time',
@@ -63,6 +81,12 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
                          tag_template.fields['published'].type.primitive_type)
         self.assertEqual('Published',
                          tag_template.fields['published'].display_name)
+
+        self.assertEqual(
+            self.__TIMESTAMP_TYPE,
+            tag_template.fields['last_reload_time'].type.primitive_type)
+        self.assertEqual('Last reload time',
+                         tag_template.fields['last_reload_time'].display_name)
 
         self.assertEqual(self.__STRING_TYPE,
                          tag_template.fields['stream_id'].type.primitive_type)
@@ -80,6 +104,16 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
             tag_template.fields['stream_entry'].type.primitive_type)
         self.assertEqual('Data Catalog Entry for the Stream',
                          tag_template.fields['stream_entry'].display_name)
+
+        self.assertEqual(self.__DOUBLE_TYPE,
+                         tag_template.fields['file_size'].type.primitive_type)
+        self.assertEqual('File size',
+                         tag_template.fields['file_size'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['thumbnail'].type.primitive_type)
+        self.assertEqual('Thumbnail',
+                         tag_template.fields['thumbnail'].display_name)
 
         self.assertEqual(
             self.__STRING_TYPE, tag_template.
@@ -100,6 +134,12 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual(
             'Availability status',
             tag_template.fields['availability_status'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['schema_path'].type.primitive_type)
+        self.assertEqual('Schema path',
+                         tag_template.fields['schema_path'].display_name)
 
     def test_make_tag_template_for_stream(self):
         tag_template = self.__factory.make_tag_template_for_stream()

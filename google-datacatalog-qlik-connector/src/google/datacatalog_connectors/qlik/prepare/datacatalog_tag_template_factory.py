@@ -43,11 +43,25 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
                                        'Unique Id')
 
+        self._add_primitive_type_field(tag_template, 'owner_username',
+                                       self.__STRING_TYPE, 'Owner username')
+
+        self._add_primitive_type_field(tag_template, 'owner_name',
+                                       self.__STRING_TYPE, 'Owner name')
+
+        self._add_primitive_type_field(tag_template, 'modified_by_username',
+                                       self.__STRING_TYPE,
+                                       'Username who modified it')
+
         self._add_primitive_type_field(tag_template, 'publish_time',
                                        self.__TIMESTAMP_TYPE, 'Publish time')
 
         self._add_primitive_type_field(tag_template, 'published',
                                        self.__BOOL_TYPE, 'Published')
+
+        self._add_primitive_type_field(tag_template, 'last_reload_time',
+                                       self.__TIMESTAMP_TYPE,
+                                       'Last reload time')
 
         self._add_primitive_type_field(tag_template, 'stream_id',
                                        self.__STRING_TYPE, 'Stream Id')
@@ -58,6 +72,12 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'stream_entry',
                                        self.__STRING_TYPE,
                                        'Data Catalog Entry for the Stream')
+
+        self._add_primitive_type_field(tag_template, 'file_size',
+                                       self.__DOUBLE_TYPE, 'File size')
+
+        self._add_primitive_type_field(tag_template, 'thumbnail',
+                                       self.__STRING_TYPE, 'Thumbnail')
 
         self._add_primitive_type_field(tag_template,
                                        'saved_in_product_version',
@@ -70,6 +90,9 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'availability_status',
                                        self.__DOUBLE_TYPE,
                                        'Availability status')
+
+        self._add_primitive_type_field(tag_template, 'schema_path',
+                                       self.__STRING_TYPE, 'Schema path')
 
         return tag_template
 
