@@ -133,19 +133,21 @@ class MetadataSynchronizer:
 
     def __make_tag_templates_dict(self):
         return {
+            constants.TAG_TEMPLATE_ID_APP:
+                self.__tag_template_factory.make_tag_template_for_app(),
             constants.TAG_TEMPLATE_ID_STREAM:
                 self.__tag_template_factory.make_tag_template_for_stream(),
         }
 
     def __make_assembled_entries_dict(self, streams_metadata,
                                       tag_templates_dict):
-        """Make Data Catalog entries and tags for assets belonging to a given
-        Qlik Sense site.
+        """Make Data Catalog entries and tags for the Qlik assets the current
+        user has access to.
 
         Returns:
-            A ``dict`` in which keys are equals to the streams keys and
-            values are flat lists containing assembled objects with all their
-            related entries and tags.
+            A ``dict`` in which keys are equals to the stream keys and values
+            are flat lists containing assembled objects with all their related
+            entries and tags.
         """
         assembled_entries = {}
 

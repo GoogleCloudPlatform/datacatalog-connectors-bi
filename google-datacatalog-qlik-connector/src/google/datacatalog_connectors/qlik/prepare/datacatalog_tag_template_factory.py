@@ -31,6 +31,49 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self.__project_id = project_id
         self.__location_id = location_id
 
+    def make_tag_template_for_app(self):
+        tag_template = datacatalog.TagTemplate()
+
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=constants.TAG_TEMPLATE_ID_APP)
+
+        tag_template.display_name = 'Qlik App Metadata'
+
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
+
+        self._add_primitive_type_field(tag_template, 'publish_time',
+                                       self.__TIMESTAMP_TYPE, 'Publish time')
+
+        self._add_primitive_type_field(tag_template, 'published',
+                                       self.__BOOL_TYPE, 'Published')
+
+        self._add_primitive_type_field(tag_template, 'stream_id',
+                                       self.__STRING_TYPE, 'Stream Id')
+
+        self._add_primitive_type_field(tag_template, 'stream_name',
+                                       self.__STRING_TYPE, 'Stream Name')
+
+        self._add_primitive_type_field(tag_template, 'stream_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the Stream')
+
+        self._add_primitive_type_field(tag_template,
+                                       'saved_in_product_version',
+                                       self.__STRING_TYPE,
+                                       'Saved in product version')
+
+        self._add_primitive_type_field(tag_template, 'migration_hash',
+                                       self.__STRING_TYPE, 'Migration hash')
+
+        self._add_primitive_type_field(tag_template, 'availability_status',
+                                       self.__DOUBLE_TYPE,
+                                       'Availability status')
+
+        return tag_template
+
     def make_tag_template_for_stream(self):
         tag_template = datacatalog.TagTemplate()
 
