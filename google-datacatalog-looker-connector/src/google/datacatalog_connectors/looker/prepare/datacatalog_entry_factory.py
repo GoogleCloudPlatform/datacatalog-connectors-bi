@@ -22,7 +22,7 @@ from google.protobuf import timestamp_pb2
 
 from google.datacatalog_connectors.commons import prepare
 
-from . import constant
+from . import constants
 
 
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):
@@ -42,14 +42,14 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def make_entry_for_dashboard(self, dashboard):
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constant.ENTRY_ID_DASHBOARD,
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_DASHBOARD,
                                         dashboard.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constant.USER_SPECIFIED_TYPE_DASHBOARD
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_DASHBOARD
 
         entry.display_name = self._format_display_name(dashboard.title)
 
@@ -84,15 +84,15 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constant.ENTRY_ID_DASHBOARD_ELEMENT,
-                                        element.id)
+        generated_id = self.__format_id(
+            constants.ENTRY_ID_PART_DASHBOARD_ELEMENT, element.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
         entry.user_specified_type = \
-            constant.USER_SPECIFIED_TYPE_DASHBOARD_ELEMENT
+            constants.USER_SPECIFIED_TYPE_DASHBOARD_ELEMENT
 
         entry.display_name = self._format_display_name(title)
 
@@ -101,13 +101,14 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def make_entry_for_folder(self, folder):
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constant.ENTRY_ID_FOLDER, folder.id)
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_FOLDER,
+                                        folder.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constant.USER_SPECIFIED_TYPE_FOLDER
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_FOLDER
 
         entry.display_name = self._format_display_name(folder.name)
 
@@ -118,13 +119,13 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def make_entry_for_look(self, look):
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constant.ENTRY_ID_LOOK, look.id)
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_LOOK, look.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constant.USER_SPECIFIED_TYPE_LOOK
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_LOOK
 
         entry.display_name = self._format_display_name(look.title)
 
@@ -147,13 +148,14 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def make_entry_for_query(self, query):
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constant.ENTRY_ID_QUERY, query.id)
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_QUERY,
+                                        query.id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constant.USER_SPECIFIED_TYPE_QUERY
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_QUERY
 
         entry.display_name = self._format_display_name(
             f'Query {query.id} - model {query.model} - explore {query.view}')
@@ -162,8 +164,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         return generated_id, entry
 
-    def __format_id(self, source_type_prefix, source_id):
-        prefixed_id = f'{constant.ENTRY_ID_PREFIX}' \
+    def __format_id(self, source_type_identifier, source_id):
+        prefixed_id = f'{constants.ENTRY_ID_PREFIX}' \
                       f'{self.__server_id}_' \
-                      f'{source_type_prefix}{source_id}'
+                      f'{source_type_identifier}{source_id}'
         return self._format_id(prefixed_id)
