@@ -71,6 +71,24 @@ class MetadataScraperTest(unittest.TestCase):
                 auth_url='test-url')
         qrs_api_helper.get_full_stream_list.assert_called_once()
 
+    def test_scrape_all_apps_should_return_list_on_success(self):
+        attrs = self.__scraper.__dict__
+        qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
+
+        apps_metadata = [{
+            'id': 'app-id',
+        }]
+
+        attrs['_MetadataScraper__session'] = \
+            scrape_ops_mocks.FakeSessionWithCookies()
+        qrs_api_helper.get_full_app_list.return_value = apps_metadata
+
+        apps = self.__scraper.scrape_all_apps()
+
+        self.assertEqual(1, len(apps))
+        self.assertEqual('app-id', apps[0].get('id'))
+        qrs_api_helper.get_full_app_list.assert_called_once()
+
     def test_scrape_all_streams_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
         qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
