@@ -67,6 +67,7 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
     @mock.patch(f'{__SCRAPE_PACKAGE}.repository_services_api_helper.requests')
     def test_get_windows_authentication_url_should_return_url_from_header(
             self, mock_requests):
+
         mock_session = mock.Mock(sessions.Session())
         mock_session.get_redirect_target.return_value = 'redirect-url'
 

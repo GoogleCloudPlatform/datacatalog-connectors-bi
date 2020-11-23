@@ -110,15 +110,14 @@ class AssembledEntryFactoryTest(unittest.TestCase):
 
     @classmethod
     def __make_fake_stream(cls):
-        metadata = {
+        return {
             'id': 'test_stream',
             'name': 'Test stream',
         }
-        return metadata
 
     @classmethod
     def __make_fake_stream_with_apps(cls):
-        metadata = {
+        return {
             'id': 'test_stream',
             'name': 'Test stream',
             'apps': [{
@@ -126,7 +125,6 @@ class AssembledEntryFactoryTest(unittest.TestCase):
                 'name': 'Test app',
             }]
         }
-        return metadata
 
     @classmethod
     def __mock_make_entry(cls, asset):
