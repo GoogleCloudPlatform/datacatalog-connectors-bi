@@ -92,8 +92,9 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         return generated_id, entry
 
     @classmethod
-    def __format_id(cls, source_type_prefix, source_id):
-        no_prefix_fmt_id = cls._format_id(f'{source_type_prefix}{source_id}')
+    def __format_id(cls, source_type_identifier, source_id):
+        no_prefix_fmt_id = cls._format_id(
+            f'{source_type_identifier}{source_id}')
         if len(no_prefix_fmt_id) > constants.NO_PREFIX_ENTRY_ID_MAX_LENGTH:
             no_prefix_fmt_id = \
                 no_prefix_fmt_id[:constants.NO_PREFIX_ENTRY_ID_MAX_LENGTH]
