@@ -21,8 +21,7 @@ from google.datacatalog_connectors.commons import prepare
 
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
-    # The incoming timestamp format is UTC
-    __INCOMING_TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+    __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     def __init__(self, site_url):
         self.__site_url = site_url
@@ -37,7 +36,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_timestamp_field(
             tag, 'publish_time',
             datetime.strptime(app_metadata.get('publishTime'),
-                              self.__INCOMING_TIMESTAMP_FORMAT))
+                              self.__INCOMING_TIMESTAMP_UTC_FORMAT))
 
         self._set_bool_field(tag, 'published', app_metadata.get('published'))
 

@@ -24,8 +24,7 @@ from google.datacatalog_connectors.qlik.prepare import constants
 
 
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):
-    # The incoming timestamp format is UTC
-    __INCOMING_TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+    __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     def __init__(self, project_id, location_id, entry_group_id,
                  user_specified_system, site_url):
@@ -39,7 +38,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def make_entry_for_app(self, app_metadata):
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constants.ENTRY_ID_APP,
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_APP,
                                         app_metadata.get('id'))
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
@@ -59,7 +58,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def make_entry_for_stream(self, stream_metadata):
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constants.ENTRY_ID_STREAM,
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_STREAM,
                                         stream_metadata.get('id'))
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
@@ -76,7 +75,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         created_datetime = datetime.strptime(
             stream_metadata.get('createdDate'),
-            self.__INCOMING_TIMESTAMP_FORMAT)
+            self.__INCOMING_TIMESTAMP_UTC_FORMAT)
         create_timestamp = timestamp_pb2.Timestamp()
         create_timestamp.FromDatetime(created_datetime)
         entry.source_system_timestamps.create_time = create_timestamp
@@ -84,8 +83,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         modified_date = stream_metadata.get('modifiedDate')
         resolved_modified_date = modified_date \
             if modified_date else stream_metadata.get('createdDate')
-        modified_datetime = datetime.strptime(resolved_modified_date,
-                                              self.__INCOMING_TIMESTAMP_FORMAT)
+        modified_datetime = datetime.strptime(
+            resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
         update_timestamp = timestamp_pb2.Timestamp()
         update_timestamp.FromDatetime(modified_datetime)
         entry.source_system_timestamps.update_time = update_timestamp
@@ -95,7 +94,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     @classmethod
     def __format_id(cls, source_type_prefix, source_id):
         no_prefix_fmt_id = cls._format_id(f'{source_type_prefix}{source_id}')
-        if len(no_prefix_fmt_id) > constants.NO_PREFIX_ENTRY_ID_LENGTH:
+        if len(no_prefix_fmt_id) > constants.NO_PREFIX_ENTRY_ID_MAX_LENGTH:
             no_prefix_fmt_id = \
-                no_prefix_fmt_id[:constants.NO_PREFIX_ENTRY_ID_LENGTH]
+                no_prefix_fmt_id[:constants.NO_PREFIX_ENTRY_ID_MAX_LENGTH]
         return f'{constants.ENTRY_ID_PREFIX}{no_prefix_fmt_id}'
