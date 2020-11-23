@@ -51,6 +51,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         metadata = {
             'id': 'a123-b456',
             'name': 'Test app',
+            'description': 'Description of the Test app',
             'createdDate': '2019-09-12T16:30:00.005Z',
             'modifiedDate': '2019-09-12T16:30:00.005Z',
         }
@@ -65,6 +66,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('test-system', entry.user_specified_system)
         self.assertEqual('app', entry.user_specified_type)
         self.assertEqual('Test app', entry.display_name)
+        self.assertEqual('Description of the Test app', entry.description)
         self.assertEqual('https://test.server.com/sense/app/a123-b456',
                          entry.linked_resource)
 

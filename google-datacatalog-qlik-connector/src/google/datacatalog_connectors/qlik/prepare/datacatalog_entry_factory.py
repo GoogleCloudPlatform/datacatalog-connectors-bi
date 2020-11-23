@@ -49,6 +49,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         entry.display_name = self._format_display_name(
             app_metadata.get("name"))
+        entry.description = self._format_display_name(
+            app_metadata.get("description"))
 
         entry.linked_resource = f'{self.__site_url}' \
                                 f'/sense/app/{app_metadata.get("id")}'
