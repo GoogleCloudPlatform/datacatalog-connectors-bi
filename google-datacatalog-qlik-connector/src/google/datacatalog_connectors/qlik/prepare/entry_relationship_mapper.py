@@ -20,7 +20,20 @@ from google.datacatalog_connectors.qlik.prepare import constants
 
 
 class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
+    __APP = constants.USER_SPECIFIED_TYPE_APP
     __STREAM = constants.USER_SPECIFIED_TYPE_STREAM
 
     def fulfill_tag_fields(self, assembled_entries_data):
-        pass
+        resolvers = (self.__resolve_app_mappings,)
+
+        self._fulfill_tag_fields(assembled_entries_data, resolvers)
+
+    @classmethod
+    def __resolve_app_mappings(cls, assembled_entries_data, id_name_pairs):
+        for assembled_entry_data in assembled_entries_data:
+            entry = assembled_entry_data.entry
+            if not entry.user_specified_type == cls.__APP:
+                continue
+
+            cls._map_related_entry(assembled_entry_data, cls.__STREAM,
+                                   'stream_id', 'stream_entry', id_name_pairs)

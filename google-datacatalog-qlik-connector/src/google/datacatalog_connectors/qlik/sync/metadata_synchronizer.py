@@ -57,7 +57,7 @@ class MetadataSynchronizer:
         logging.info('===> Scraping Qlik Sense metadata...')
 
         logging.info('')
-        logging.info('Streams and nested assets...')
+        logging.info('Streams and apps...')
         streams = self.__scrape_streams()
         logging.info('==== DONE ========================================')
 
