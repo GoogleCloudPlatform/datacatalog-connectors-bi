@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import logging
+
 import requests
 from requests_ntlm import HttpNtlmAuth
 

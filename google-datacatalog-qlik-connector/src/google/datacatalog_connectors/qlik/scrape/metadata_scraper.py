@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import logging
+
 from requests import sessions
 
 from google.datacatalog_connectors.qlik.scrape import \

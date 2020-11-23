@@ -18,7 +18,6 @@ from datetime import datetime
 
 from google.cloud import datacatalog
 from google.protobuf import timestamp_pb2
-
 from google.datacatalog_connectors.commons import prepare
 
 from google.datacatalog_connectors.qlik.prepare import constants

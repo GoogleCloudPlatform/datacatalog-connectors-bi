@@ -17,7 +17,6 @@
 from datetime import datetime
 
 from google.cloud import datacatalog
-
 from google.datacatalog_connectors.commons import prepare
 
 

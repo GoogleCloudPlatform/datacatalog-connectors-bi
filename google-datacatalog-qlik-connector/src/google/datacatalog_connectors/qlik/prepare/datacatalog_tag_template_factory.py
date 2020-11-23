@@ -15,7 +15,6 @@
 # limitations under the License.
 
 from google.cloud import datacatalog
-
 from google.datacatalog_connectors.commons import prepare
 
 from google.datacatalog_connectors.qlik.prepare import constants
