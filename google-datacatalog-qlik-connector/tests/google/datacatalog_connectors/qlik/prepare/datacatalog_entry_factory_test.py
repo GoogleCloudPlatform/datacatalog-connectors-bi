@@ -56,12 +56,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_stream(metadata)
-        self.assertEqual('qlik_st_a123_b456', entry_id)
+        self.assertEqual('qlik_str_a123_b456', entry_id)
 
         self.assertEqual(
             'projects/test-project/locations/test-location/'
             'entryGroups/test-entry-group/entries/'
-            'qlik_st_a123_b456', entry.name)
+            'qlik_str_a123_b456', entry.name)
         self.assertEqual('test-system', entry.user_specified_system)
         self.assertEqual('stream', entry.user_specified_type)
         self.assertEqual('Test Name', entry.display_name)
@@ -89,10 +89,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         entry_id, entry = self.__factory.make_entry_for_stream(metadata)
 
         self.assertEqual(
-            'qlik_st_12345678901234567890123456789012345678901234567890123456',
+            'qlik_str_1234567890123456789012345678901234567890123456789012345',
             entry_id)
         self.assertEqual(
             'projects/test-project/locations/test-location/'
             'entryGroups/test-entry-group/entries/'
-            'qlik_st_12345678901234567890123456789012345678901234567890123456',
+            'qlik_str_1234567890123456789012345678901234567890123456789012345',
             entry.name)
