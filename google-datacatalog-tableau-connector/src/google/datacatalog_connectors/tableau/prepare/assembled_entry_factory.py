@@ -16,7 +16,7 @@
 
 from google.datacatalog_connectors.commons import prepare
 
-from . import constant, datacatalog_entry_factory, datacatalog_tag_factory
+from . import constants, datacatalog_entry_factory, datacatalog_tag_factory
 
 
 class AssembledEntryFactory:
@@ -33,10 +33,10 @@ class AssembledEntryFactory:
                                     tag_templates_dict):
 
         tag_template_workbook = tag_templates_dict.get(
-            constant.TAG_TEMPLATE_WORKBOOK_ID)
+            constants.TAG_TEMPLATE_ID_WORKBOOK)
 
         tag_template_dashboard = tag_templates_dict.get(
-            constant.TAG_TEMPLATE_DASHBOARD_ID)
+            constants.TAG_TEMPLATE_ID_DASHBOARD)
 
         assembled_entries = []
         for dashboard_metadata in dashboards_metadata:
@@ -70,10 +70,10 @@ class AssembledEntryFactory:
                                    tag_templates_dict):
 
         tag_template_workbook = tag_templates_dict.get(
-            constant.TAG_TEMPLATE_WORKBOOK_ID)
+            constants.TAG_TEMPLATE_ID_WORKBOOK)
 
         tag_template_sheet = tag_templates_dict.get(
-            constant.TAG_TEMPLATE_SHEET_ID)
+            constants.TAG_TEMPLATE_ID_SHEET)
 
         assembled_entries = []
         for workbook_metadata in workbooks_metadata:
