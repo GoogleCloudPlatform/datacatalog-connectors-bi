@@ -54,10 +54,12 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         self._set_bool_field(tag, 'published', app_metadata.get('published'))
 
-        self._set_timestamp_field(
-            tag, 'last_reload_time',
-            datetime.strptime(app_metadata.get('lastReloadTime'),
-                              self.__INCOMING_TIMESTAMP_UTC_FORMAT))
+        last_reload_time = app_metadata.get('lastReloadTime')
+        if last_reload_time:
+            self._set_timestamp_field(
+                tag, 'last_reload_time',
+                datetime.strptime(last_reload_time,
+                                  self.__INCOMING_TIMESTAMP_UTC_FORMAT))
 
         stream_metadata = app_metadata.get('stream')
         if stream_metadata:
