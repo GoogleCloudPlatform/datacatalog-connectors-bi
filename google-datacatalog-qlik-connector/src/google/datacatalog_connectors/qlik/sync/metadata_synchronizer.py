@@ -117,9 +117,9 @@ class MetadataSynchronizer:
             streams_dict[stream.get('id')] = stream
 
         for app in all_apps:
-            # Not having a stream means the app is a work in progress and has
-            # not been published, so it can be skipped.
-            if not app.get('stream'):
+            # Not being published means the app is a work in progress, so it
+            # can be skipped.
+            if not app.get('published'):
                 continue
 
             stream_id = app.get('stream').get('id')

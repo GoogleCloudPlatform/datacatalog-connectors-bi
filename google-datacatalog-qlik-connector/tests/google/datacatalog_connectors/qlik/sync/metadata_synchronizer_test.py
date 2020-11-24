@@ -116,9 +116,11 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
-            'id': 'test_stream',
+            'id':
+                'test_stream',
             'apps': [{
                 'id': 'test_app',
+                'published': True,
                 'stream': {
                     'id': 'test_stream'
                 }
@@ -176,8 +178,12 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
     @classmethod
     def __make_fake_published_app(cls):
-        return {'id': 'test_app', 'stream': cls.__make_fake_stream()}
+        return {
+            'id': 'test_app',
+            'published': True,
+            'stream': cls.__make_fake_stream()
+        }
 
     @classmethod
     def __make_fake_wip_app(cls):
-        return {'id': 'test_app', 'stream': None}
+        return {'id': 'test_app', 'published': False}

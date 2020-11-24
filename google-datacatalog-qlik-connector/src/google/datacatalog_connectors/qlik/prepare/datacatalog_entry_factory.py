@@ -49,9 +49,27 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         entry.display_name = self._format_display_name(
             app_metadata.get("name"))
+        entry.description = self._format_display_name(
+            app_metadata.get("description"))
 
         entry.linked_resource = f'{self.__site_url}' \
                                 f'/sense/app/{app_metadata.get("id")}'
+
+        created_datetime = datetime.strptime(
+            app_metadata.get('createdDate'),
+            self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+        create_timestamp = timestamp_pb2.Timestamp()
+        create_timestamp.FromDatetime(created_datetime)
+        entry.source_system_timestamps.create_time = create_timestamp
+
+        modified_date = app_metadata.get('modifiedDate')
+        resolved_modified_date = modified_date \
+            if modified_date else app_metadata.get('createdDate')
+        modified_datetime = datetime.strptime(
+            resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+        update_timestamp = timestamp_pb2.Timestamp()
+        update_timestamp.FromDatetime(modified_datetime)
+        entry.source_system_timestamps.update_time = update_timestamp
 
         return generated_id, entry
 
