@@ -18,12 +18,11 @@ import configparser
 import logging
 from urllib.parse import urlparse
 
+from google.datacatalog_connectors.commons import cleanup, ingest
 from looker_sdk import error
 
-from google.datacatalog_connectors.commons import cleanup, ingest
-
 from google.datacatalog_connectors.looker import entities, prepare, scrape
-from google.datacatalog_connectors.looker.prepare import constant
+from google.datacatalog_connectors.looker.prepare import constants
 
 
 class MetadataSynchronizer:
@@ -359,16 +358,16 @@ class MetadataSynchronizer:
 
     def __make_tag_templates_dict(self):
         return {
-            constant.TAG_TEMPLATE_ID_DASHBOARD:
+            constants.TAG_TEMPLATE_ID_DASHBOARD:
                 self.__tag_template_factory.make_tag_template_for_dashboard(),
-            constant.TAG_TEMPLATE_ID_DASHBOARD_ELEMENT:
+            constants.TAG_TEMPLATE_ID_DASHBOARD_ELEMENT:
                 self.__tag_template_factory.
                 make_tag_template_for_dashboard_element(),
-            constant.TAG_TEMPLATE_ID_FOLDER:
+            constants.TAG_TEMPLATE_ID_FOLDER:
                 self.__tag_template_factory.make_tag_template_for_folder(),
-            constant.TAG_TEMPLATE_ID_LOOK:
+            constants.TAG_TEMPLATE_ID_LOOK:
                 self.__tag_template_factory.make_tag_template_for_look(),
-            constant.TAG_TEMPLATE_ID_QUERY:
+            constants.TAG_TEMPLATE_ID_QUERY:
                 self.__tag_template_factory.make_tag_template_for_query(),
         }
 

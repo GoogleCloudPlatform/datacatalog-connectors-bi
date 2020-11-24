@@ -15,10 +15,9 @@
 # limitations under the License.
 
 from google.cloud import datacatalog
-
 from google.datacatalog_connectors.commons import prepare
 
-from . import constant
+from google.datacatalog_connectors.tableau.prepare import constants
 
 
 class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
@@ -30,7 +29,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self.__location_id = location_id
 
     def make_tag_template_for_dashboard(self):
-        tag_template_id = constant.TAG_TEMPLATE_DASHBOARD_ID
+        tag_template_id = constants.TAG_TEMPLATE_ID_DASHBOARD
 
         tag_template = datacatalog.TagTemplate()
 
@@ -70,7 +69,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         return tag_template_id, tag_template
 
     def make_tag_template_for_sheet(self):
-        tag_template_id = constant.TAG_TEMPLATE_SHEET_ID
+        tag_template_id = constants.TAG_TEMPLATE_ID_SHEET
 
         tag_template = datacatalog.TagTemplate()
 
@@ -110,7 +109,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         return tag_template_id, tag_template
 
     def make_tag_template_for_workbook(self):
-        tag_template_id = constant.TAG_TEMPLATE_WORKBOOK_ID
+        tag_template_id = constants.TAG_TEMPLATE_ID_WORKBOOK
 
         tag_template = datacatalog.TagTemplate()
 

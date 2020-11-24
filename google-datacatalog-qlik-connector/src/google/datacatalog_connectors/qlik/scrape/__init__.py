@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.datacatalog_connectors.qlik.scrape.metadata_scraper import \
-    MetadataScraper
+from .metadata_scraper import MetadataScraper
 
 __all__ = ('MetadataScraper',)

@@ -16,8 +16,8 @@
 
 import logging
 
-from .. import prepare
-from . import metadata_synchronizer
+from google.datacatalog_connectors.tableau import prepare
+from google.datacatalog_connectors.tableau.sync import metadata_synchronizer
 
 
 class SitesSynchronizer(metadata_synchronizer.MetadataSynchronizer):
@@ -34,8 +34,8 @@ class SitesSynchronizer(metadata_synchronizer.MetadataSynchronizer):
         super().__init__(tableau_server_address, tableau_api_version,
                          tableau_username, tableau_password,
                          datacatalog_project_id, datacatalog_location_id, [
-                             prepare.constant.USER_SPECIFIED_TYPE_WORKBOOK,
-                             prepare.constant.USER_SPECIFIED_TYPE_SHEET
+                             prepare.constants.USER_SPECIFIED_TYPE_WORKBOOK,
+                             prepare.constants.USER_SPECIFIED_TYPE_SHEET
                          ], tableau_site)
 
     def _scrape_source_system_metadata(self, query_filter=None):

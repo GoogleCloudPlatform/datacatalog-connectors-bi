@@ -18,14 +18,13 @@ from datetime import datetime
 import logging
 
 from google.cloud import datacatalog
+from google.datacatalog_connectors.commons import prepare
 from google.protobuf import timestamp_pb2
 
-from google.datacatalog_connectors.commons.prepare.base_entry_factory import \
-    BaseEntryFactory
-from . import constant
+from google.datacatalog_connectors.tableau.prepare import constants
 
 
-class DataCatalogEntryFactory(BaseEntryFactory):
+class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     # The incoming timestamp format is UTC
     __INCOMING_TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -47,7 +46,7 @@ class DataCatalogEntryFactory(BaseEntryFactory):
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constant.USER_SPECIFIED_TYPE_DASHBOARD
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_DASHBOARD
 
         entry.display_name = self._format_display_name(
             dashboard_metadata.get('name'))
@@ -93,7 +92,7 @@ class DataCatalogEntryFactory(BaseEntryFactory):
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constant.USER_SPECIFIED_TYPE_SHEET
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_SHEET
 
         entry.display_name = self._format_display_name(
             sheet_metadata.get('name'))
@@ -134,7 +133,7 @@ class DataCatalogEntryFactory(BaseEntryFactory):
             generated_id)
 
         entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constant.USER_SPECIFIED_TYPE_WORKBOOK
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_WORKBOOK
 
         entry.display_name = self._format_display_name(
             workbook_metadata.get('name'))
@@ -166,10 +165,10 @@ class DataCatalogEntryFactory(BaseEntryFactory):
     @classmethod
     def __format_id(cls, source_id):
         no_prefix_fmt_id = cls._format_id(source_id)
-        if len(no_prefix_fmt_id) > constant.NO_PREFIX_ENTRY_ID_LENGTH:
+        if len(no_prefix_fmt_id) > constants.NO_PREFIX_ENTRY_ID_LENGTH:
             no_prefix_fmt_id = \
-                no_prefix_fmt_id[:constant.NO_PREFIX_ENTRY_ID_LENGTH]
-        return f'{constant.ENTRY_ID_PREFIX}{no_prefix_fmt_id}'
+                no_prefix_fmt_id[:constants.NO_PREFIX_ENTRY_ID_LENGTH]
+        return f'{constants.ENTRY_ID_PREFIX}{no_prefix_fmt_id}'
 
     @classmethod
     def __format_site_content_url(cls, workbook_metadata):

@@ -16,7 +16,7 @@
 
 from google.datacatalog_connectors.commons import prepare
 
-from . import constant
+from google.datacatalog_connectors.tableau.prepare import constants
 
 
 class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
@@ -34,12 +34,12 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
 
         dashboard_entries_data = filter(
             lambda assembled_entry_data: assembled_entry_data.entry.
-            user_specified_type == constant.USER_SPECIFIED_TYPE_DASHBOARD,
+            user_specified_type == constants.USER_SPECIFIED_TYPE_DASHBOARD,
             assembled_entries_data)
 
         for dashboard_entry_data in dashboard_entries_data:
             cls._map_related_entry(dashboard_entry_data,
-                                   constant.USER_SPECIFIED_TYPE_WORKBOOK,
+                                   constants.USER_SPECIFIED_TYPE_WORKBOOK,
                                    'workbook_luid', 'workbook_entry',
                                    id_name_pairs)
 
@@ -48,12 +48,12 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
 
         sheet_entries_data = filter(
             lambda assembled_entry_data: assembled_entry_data.entry.
-            user_specified_type == constant.USER_SPECIFIED_TYPE_SHEET,
+            user_specified_type == constants.USER_SPECIFIED_TYPE_SHEET,
             assembled_entries_data)
 
         for sheet_entry_data in sheet_entries_data:
             cls._map_related_entry(sheet_entry_data,
-                                   constant.USER_SPECIFIED_TYPE_WORKBOOK,
+                                   constants.USER_SPECIFIED_TYPE_WORKBOOK,
                                    'workbook_luid', 'workbook_entry',
                                    id_name_pairs)
 

@@ -15,10 +15,9 @@
 # limitations under the License.
 
 from google.cloud import datacatalog
-
 from google.datacatalog_connectors.commons import prepare
 
-from . import constant
+from google.datacatalog_connectors.looker.prepare import constants
 
 
 class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
@@ -37,7 +36,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=constant.TAG_TEMPLATE_ID_DASHBOARD)
+            tag_template=constants.TAG_TEMPLATE_ID_DASHBOARD)
 
         tag_template.display_name = 'Looker Dashboard Metadata'
 
@@ -102,7 +101,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=constant.TAG_TEMPLATE_ID_DASHBOARD_ELEMENT)
+            tag_template=constants.TAG_TEMPLATE_ID_DASHBOARD_ELEMENT)
 
         tag_template.display_name = 'Looker Dashboard Element Metadata'
 
@@ -155,7 +154,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=constant.TAG_TEMPLATE_ID_FOLDER)
+            tag_template=constants.TAG_TEMPLATE_ID_FOLDER)
 
         tag_template.display_name = 'Looker Folder Metadata'
 
@@ -202,7 +201,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=constant.TAG_TEMPLATE_ID_LOOK)
+            tag_template=constants.TAG_TEMPLATE_ID_LOOK)
 
         tag_template.display_name = 'Looker Look Metadata'
 
@@ -295,7 +294,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=constant.TAG_TEMPLATE_ID_QUERY)
+            tag_template=constants.TAG_TEMPLATE_ID_QUERY)
 
         tag_template.display_name = 'Looker Query Metadata'
 

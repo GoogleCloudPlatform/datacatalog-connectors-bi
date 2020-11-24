@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..prepare import constant
-from . import metadata_synchronizer
+from google.datacatalog_connectors.tableau.prepare import constants
+from google.datacatalog_connectors.tableau.sync import metadata_synchronizer
 
 
 class DashboardsSynchronizer(metadata_synchronizer.MetadataSynchronizer):
@@ -32,7 +32,7 @@ class DashboardsSynchronizer(metadata_synchronizer.MetadataSynchronizer):
         super().__init__(tableau_server_address, tableau_api_version,
                          tableau_username, tableau_password,
                          datacatalog_project_id, datacatalog_location_id,
-                         [constant.USER_SPECIFIED_TYPE_DASHBOARD],
+                         [constants.USER_SPECIFIED_TYPE_DASHBOARD],
                          tableau_site)
 
     def _scrape_source_system_metadata(self, query_filter=None):
@@ -61,5 +61,5 @@ class DashboardsSynchronizer(metadata_synchronizer.MetadataSynchronizer):
         return [
             assembled_entry for assembled_entry in assembled_entries
             if assembled_entry.entry.user_specified_type ==
-            constant.USER_SPECIFIED_TYPE_DASHBOARD
+            constants.USER_SPECIFIED_TYPE_DASHBOARD
         ]

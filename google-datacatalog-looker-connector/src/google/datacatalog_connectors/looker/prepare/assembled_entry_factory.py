@@ -16,8 +16,8 @@
 
 from google.datacatalog_connectors.commons import prepare
 
-from . import constant
-from . import datacatalog_entry_factory, datacatalog_tag_factory
+from google.datacatalog_connectors.looker.prepare import \
+    constants, datacatalog_entry_factory, datacatalog_tag_factory
 
 
 class AssembledEntryFactory:
@@ -39,15 +39,15 @@ class AssembledEntryFactory:
                                     tag_templates_dict):
 
         folder_tag_template = self.__get_tag_template(
-            constant.TAG_TEMPLATE_ID_FOLDER, tag_templates_dict)
+            constants.TAG_TEMPLATE_ID_FOLDER, tag_templates_dict)
         dashboard_tag_template = self.__get_tag_template(
-            constant.TAG_TEMPLATE_ID_DASHBOARD, tag_templates_dict)
+            constants.TAG_TEMPLATE_ID_DASHBOARD, tag_templates_dict)
         element_tag_template = self.__get_tag_template(
-            constant.TAG_TEMPLATE_ID_DASHBOARD_ELEMENT, tag_templates_dict)
+            constants.TAG_TEMPLATE_ID_DASHBOARD_ELEMENT, tag_templates_dict)
         look_tag_template = self.__get_tag_template(
-            constant.TAG_TEMPLATE_ID_LOOK, tag_templates_dict)
+            constants.TAG_TEMPLATE_ID_LOOK, tag_templates_dict)
         query_tag_template = self.__get_tag_template(
-            constant.TAG_TEMPLATE_ID_QUERY, tag_templates_dict)
+            constants.TAG_TEMPLATE_ID_QUERY, tag_templates_dict)
 
         assembled_entries = []
         for folder in folders:

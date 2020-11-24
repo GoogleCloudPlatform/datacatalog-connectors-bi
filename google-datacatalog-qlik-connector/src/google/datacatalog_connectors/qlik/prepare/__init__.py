@@ -14,13 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.datacatalog_connectors.qlik.prepare import constants
-from google.datacatalog_connectors.qlik.prepare.assembled_entry_factory \
-    import AssembledEntryFactory
-from google.datacatalog_connectors.qlik.prepare\
-    .datacatalog_tag_template_factory import DataCatalogTagTemplateFactory
-from google.datacatalog_connectors.qlik.prepare.entry_relationship_mapper \
-    import EntryRelationshipMapper
+from . import constants
+from .assembled_entry_factory import AssembledEntryFactory
+from .datacatalog_tag_template_factory import DataCatalogTagTemplateFactory
+from .entry_relationship_mapper import EntryRelationshipMapper
 
 __all__ = (
     'constants',

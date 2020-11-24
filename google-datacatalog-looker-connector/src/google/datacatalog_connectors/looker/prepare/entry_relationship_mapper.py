@@ -16,15 +16,15 @@
 
 from google.datacatalog_connectors.commons import prepare
 
-from . import constant
+from google.datacatalog_connectors.looker.prepare import constants
 
 
 class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
-    __DASHBOARD = constant.USER_SPECIFIED_TYPE_DASHBOARD
-    __DASHBOARD_ELEMENT = constant.USER_SPECIFIED_TYPE_DASHBOARD_ELEMENT
-    __FOLDER = constant.USER_SPECIFIED_TYPE_FOLDER
-    __LOOK = constant.USER_SPECIFIED_TYPE_LOOK
-    __QUERY = constant.USER_SPECIFIED_TYPE_QUERY
+    __DASHBOARD = constants.USER_SPECIFIED_TYPE_DASHBOARD
+    __DASHBOARD_ELEMENT = constants.USER_SPECIFIED_TYPE_DASHBOARD_ELEMENT
+    __FOLDER = constants.USER_SPECIFIED_TYPE_FOLDER
+    __LOOK = constants.USER_SPECIFIED_TYPE_LOOK
+    __QUERY = constants.USER_SPECIFIED_TYPE_QUERY
 
     def fulfill_tag_fields(self, assembled_entries_data):
         resolvers = (self.__resolve_dashboard_mappings,

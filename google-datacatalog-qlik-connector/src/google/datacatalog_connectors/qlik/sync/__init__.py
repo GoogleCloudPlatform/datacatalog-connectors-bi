@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.datacatalog_connectors.qlik.sync.metadata_synchronizer import \
-    MetadataSynchronizer
+from .metadata_synchronizer import MetadataSynchronizer
 
 __all__ = ['MetadataSynchronizer']

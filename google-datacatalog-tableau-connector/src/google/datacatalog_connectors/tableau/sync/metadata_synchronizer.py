@@ -20,7 +20,7 @@ import logging
 
 from google.datacatalog_connectors.commons import cleanup, ingest
 
-from .. import prepare, scrape
+from google.datacatalog_connectors.tableau import prepare, scrape
 
 
 class MetadataSynchronizer(abc.ABC):
