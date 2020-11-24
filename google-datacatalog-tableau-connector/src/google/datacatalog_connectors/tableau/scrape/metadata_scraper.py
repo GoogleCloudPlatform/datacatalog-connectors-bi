@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import authenticator, metadata_api_helper, rest_api_helper
+from google.datacatalog_connectors.tableau.scrape import \
+    authenticator, metadata_api_helper, rest_api_helper
 
 
 class MetadataScraper:

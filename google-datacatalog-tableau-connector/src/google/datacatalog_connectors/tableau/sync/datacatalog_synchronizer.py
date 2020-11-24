@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import dashboards_synchronizer, sites_synchronizer, \
-    workbooks_synchronizer
+from google.datacatalog_connectors.tableau.sync import \
+    dashboards_synchronizer, sites_synchronizer, workbooks_synchronizer
 
 
 class DataCatalogSynchronizer:

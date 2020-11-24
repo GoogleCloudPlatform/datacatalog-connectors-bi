@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..prepare import constants
-from . import metadata_synchronizer
+from google.datacatalog_connectors.tableau.prepare import constants
+from google.datacatalog_connectors.tableau.sync import metadata_synchronizer
 
 
 class DashboardsSynchronizer(metadata_synchronizer.MetadataSynchronizer):

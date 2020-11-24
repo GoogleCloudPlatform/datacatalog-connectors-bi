@@ -18,9 +18,8 @@ import configparser
 import logging
 from urllib.parse import urlparse
 
-from looker_sdk import error
-
 from google.datacatalog_connectors.commons import cleanup, ingest
+from looker_sdk import error
 
 from google.datacatalog_connectors.looker import entities, prepare, scrape
 from google.datacatalog_connectors.looker.prepare import constants

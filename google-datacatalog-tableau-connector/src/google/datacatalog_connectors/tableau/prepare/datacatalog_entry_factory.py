@@ -18,14 +18,13 @@ from datetime import datetime
 import logging
 
 from google.cloud import datacatalog
+from google.datacatalog_connectors.commons import prepare
 from google.protobuf import timestamp_pb2
 
-from google.datacatalog_connectors.commons.prepare.base_entry_factory import \
-    BaseEntryFactory
-from . import constants
+from google.datacatalog_connectors.tableau.prepare import constants
 
 
-class DataCatalogEntryFactory(BaseEntryFactory):
+class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     # The incoming timestamp format is UTC
     __INCOMING_TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 

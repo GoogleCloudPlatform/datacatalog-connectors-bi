@@ -16,8 +16,8 @@
 
 import logging
 
-from .. import prepare
-from . import metadata_synchronizer
+from google.datacatalog_connectors.tableau import prepare
+from google.datacatalog_connectors.tableau.sync import metadata_synchronizer
 
 
 class WorkbooksSynchronizer(metadata_synchronizer.MetadataSynchronizer):

@@ -16,7 +16,7 @@
 
 import requests
 
-from . import metadata_api_constants
+from google.datacatalog_connectors.tableau.scrape import metadata_api_constants
 
 
 class MetadataAPIHelper:

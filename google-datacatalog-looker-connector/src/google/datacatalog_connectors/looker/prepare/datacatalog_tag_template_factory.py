@@ -15,10 +15,9 @@
 # limitations under the License.
 
 from google.cloud import datacatalog
-
 from google.datacatalog_connectors.commons import prepare
 
-from . import constants
+from google.datacatalog_connectors.looker.prepare import constants
 
 
 class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
