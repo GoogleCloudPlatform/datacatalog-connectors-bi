@@ -89,7 +89,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('a123-b456', tag.fields['stream_id'].string_value)
         self.assertEqual('Test stream', tag.fields['stream_name'].string_value)
-        self.assertEqual(43394841, tag.fields['file_size'].double_value)
+        self.assertEqual('41.38 MB', tag.fields['file_size'].string_value)
         self.assertEqual(
             'https://test.server.com'
             '/appcontent/c987-d654/test-thumbnail.jpg',

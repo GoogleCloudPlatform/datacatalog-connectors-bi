@@ -67,7 +67,11 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             self._set_string_field(tag, 'stream_name',
                                    stream_metadata.get('name'))
 
-        self._set_double_field(tag, 'file_size', app_metadata.get('fileSize'))
+        file_size = app_metadata.get('fileSize')
+        if file_size is not None:
+            self._set_string_field(
+                tag, 'file_size',
+                self.__get_human_readable_size_value(file_size))
 
         if app_metadata.get('thumbnail'):
             self._set_string_field(
@@ -112,3 +116,19 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'site_url', self.__site_url)
 
         return tag
+
+    @classmethod
+    def __get_human_readable_size_value(cls, size_bytes):
+        """
+
+        :param size_bytes: int or string, in bytes
+        :return: human-readable size
+        """
+        size_val = int(size_bytes)
+        units = ['bytes', 'KB', 'MB', 'GB']
+        for unit in units:
+            if size_val < 1024.0:
+                human_readable_space = f'{size_val} {unit}'
+                return human_readable_space
+            size_val = round(size_val / 1024.0, 2)
+        return f'{size_val} TB'

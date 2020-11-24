@@ -105,7 +105,7 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual('Data Catalog Entry for the Stream',
                          tag_template.fields['stream_entry'].display_name)
 
-        self.assertEqual(self.__DOUBLE_TYPE,
+        self.assertEqual(self.__STRING_TYPE,
                          tag_template.fields['file_size'].type.primitive_type)
         self.assertEqual('File size',
                          tag_template.fields['file_size'].display_name)

@@ -74,7 +74,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        'Data Catalog Entry for the Stream')
 
         self._add_primitive_type_field(tag_template, 'file_size',
-                                       self.__DOUBLE_TYPE, 'File size')
+                                       self.__STRING_TYPE, 'File size')
 
         self._add_primitive_type_field(tag_template, 'thumbnail',
                                        self.__STRING_TYPE, 'Thumbnail')
