@@ -46,15 +46,3 @@ class FakeResponseWithNoCookies:
 
     def __init__(self):
         self.cookies = []
-
-
-class FakeResponseWithLocationHeader:
-
-    def __init__(self, auth_url):
-        self.headers = {'Location': auth_url}
-
-
-class FakeSessionWithCookies:
-
-    def __init__(self):
-        self.cookies = [FakeQPSSessionCookie()]

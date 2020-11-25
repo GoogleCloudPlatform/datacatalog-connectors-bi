@@ -29,14 +29,14 @@ class RepositoryServicesAPIHelper:
     QRS returns full objects when /full is included in the request path;
     otherwise, it returns condensed objects. Full objects are preferred
     because they allow the connector to read a richer metadata set (see [Full
-    versus condensed objects](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Connect-API-Full-vs-Condensed-Objects.htm) # noqa E501
+    versus condensed objects](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Connect-API-Full-vs-Condensed-Objects.htm)  # noqa E501
     for more information).
 
     """
 
     def __init__(self, server_address):
         self.__base_api_endpoint = f'{server_address}/qrs'
-        self.__headers = {
+        self.__common_headers = {
             'Content-Type': constants.JSON_CONTENT_TYPE,
             'Accept': constants.JSON_CONTENT_TYPE,
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
@@ -52,7 +52,7 @@ class RepositoryServicesAPIHelper:
         url = f'{self.__base_api_endpoint}' \
               f'/app/hublist/full?Xrfkey={constants.XRFKEY}'
 
-        return session.get(url=url, headers=self.__headers).json()
+        return session.get(url=url, headers=self.__common_headers).json()
 
     def get_full_stream_list(self, session):
         """Get the list of streams with full metadata from a given server.
@@ -63,7 +63,7 @@ class RepositoryServicesAPIHelper:
         url = f'{self.__base_api_endpoint}' \
               f'/stream/full?Xrfkey={constants.XRFKEY}'
 
-        return session.get(url=url, headers=self.__headers).json()
+        return session.get(url=url, headers=self.__common_headers).json()
 
     def get_windows_authentication_url(self, session):
         """Get a Windows Authentication url.
@@ -78,12 +78,13 @@ class RepositoryServicesAPIHelper:
         """
         url = f'{self.__base_api_endpoint}/about?Xrfkey={constants.XRFKEY}'
 
-        # Sets the User-Agent to Windows to get a Windows Authentication URL
-        # that is required by the NTLM authentication flow.
-        self.__headers['User-Agent'] = constants.WINDOWS_USER_AGENT
+        # Sets the User-Agent to Windows temporarily to get a Windows
+        # Authentication URL that is required by the NTLM authentication flow.
+        headers = self.__common_headers.copy()
+        headers['User-Agent'] = constants.WINDOWS_USER_AGENT
 
         response = requests.get(url=url,
-                                headers=self.__headers,
+                                headers=headers,
                                 allow_redirects=False)
 
         return session.get_redirect_target(response)

@@ -84,7 +84,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         self.__synchronizer.run()
 
-        expected_make_assembled_entries_call_arg = {'id': 'test_stream'}
+        expected_make_assembled_entries_call_arg = {
+            'id': 'test_stream',
+        }
 
         make_assembled_entries_args = \
             assembled_entry_factory.make_assembled_entries_list.call_args[0]
@@ -112,6 +114,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
+        scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
 
@@ -123,7 +126,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
                 'published': True,
                 'stream': {
                     'id': 'test_stream'
-                }
+                },
+                'sheets': [],
             }]
         }
 
@@ -154,7 +158,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         self.__synchronizer.run()
 
-        expected_make_assembled_entries_call_arg = {'id': 'test_stream'}
+        expected_make_assembled_entries_call_arg = {
+            'id': 'test_stream',
+        }
 
         make_assembled_entries_args = \
             assembled_entry_factory.make_assembled_entries_list.call_args[0]
@@ -181,9 +187,12 @@ class MetadataSynchronizerTest(unittest.TestCase):
         return {
             'id': 'test_app',
             'published': True,
-            'stream': cls.__make_fake_stream()
+            'stream': cls.__make_fake_stream(),
         }
 
     @classmethod
     def __make_fake_wip_app(cls):
-        return {'id': 'test_app', 'published': False}
+        return {
+            'id': 'test_app',
+            'published': False,
+        }

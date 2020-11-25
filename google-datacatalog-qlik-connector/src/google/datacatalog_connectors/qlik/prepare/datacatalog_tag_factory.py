@@ -128,7 +128,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         units = ['bytes', 'KB', 'MB', 'GB']
         for unit in units:
             if size_val < 1024.0:
-                human_readable_space = f'{size_val} {unit}'
+                human_readable_space = f'{round(size_val, 2)} {unit}'
                 return human_readable_space
-            size_val = round(size_val / 1024.0, 2)
-        return f'{size_val} TB'
+            size_val = size_val / 1024.0
+        return f'{round(size_val, 2)} TB'

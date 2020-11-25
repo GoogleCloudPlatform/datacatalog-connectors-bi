@@ -36,7 +36,8 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
         self.assertEqual(
             'test-server/qrs',
             attrs['_RepositoryServicesAPIHelper__base_api_endpoint'])
-        self.assertIsNotNone(attrs['_RepositoryServicesAPIHelper__headers'])
+        self.assertIsNotNone(
+            attrs['_RepositoryServicesAPIHelper__common_headers'])
 
     def test_get_full_app_list_should_use_session_to_call_api(self):
         mock_session = mock.Mock(sessions.Session())
@@ -48,7 +49,7 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
         mock_session.get.assert_called_with(
             url=f'test-server/qrs/app/hublist/full?Xrfkey={constants.XRFKEY}',
             headers=self.__helper.
-            __dict__['_RepositoryServicesAPIHelper__headers'],
+            __dict__['_RepositoryServicesAPIHelper__common_headers'],
         )
 
     def test_get_full_stream_list_should_use_session_to_call_api(self):
@@ -61,7 +62,7 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
         mock_session.get.assert_called_with(
             url=f'test-server/qrs/stream/full?Xrfkey={constants.XRFKEY}',
             headers=self.__helper.
-            __dict__['_RepositoryServicesAPIHelper__headers'],
+            __dict__['_RepositoryServicesAPIHelper__common_headers'],
         )
 
     @mock.patch(f'{__SCRAPE_PACKAGE}.repository_services_api_helper.requests')
