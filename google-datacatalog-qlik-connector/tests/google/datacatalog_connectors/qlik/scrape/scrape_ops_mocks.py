@@ -46,3 +46,9 @@ class FakeResponseWithNoCookies:
 
     def __init__(self):
         self.cookies = []
+
+
+class FakeSessionWithCookies:
+
+    def __init__(self):
+        self.cookies = [FakeQPSSessionCookie()]

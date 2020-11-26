@@ -47,18 +47,27 @@ class MetadataScraper:
             engine_api_helper.EngineAPIHelper(server_address)
 
         self.__qrs_api_session = None
-        self.__initialize_qrs_api_session()
-
         self.__engine_api_auth_cookie = None
-        self.__initialize_engine_api_auth_cookie()
+
+    def scrape_all_apps(self):
+        self.__initialize_qrs_api_session()
+        return self.__qrs_api_helper.get_full_app_list(self.__qrs_api_session)
+
+    def scrape_all_streams(self):
+        self.__initialize_qrs_api_session()
+        return self.__qrs_api_helper.get_full_stream_list(
+            self.__qrs_api_session)
 
     def __initialize_qrs_api_session(self):
+        if self.__qrs_api_session:
+            return
+
         self.__qrs_api_session = sessions.Session()
 
         windows_auth_url = \
             self.__qrs_api_helper.get_windows_authentication_url(
                 self.__qrs_api_session)
-        qps_session_cookie = authenticator.Authenticator\
+        qps_session_cookie = authenticator.Authenticator \
             .get_qps_session_cookie_windows_auth(
                 ad_domain=self.__ad_domain,
                 username=self.__username,
@@ -69,7 +78,16 @@ class MetadataScraper:
         logging.debug('QPS session cookie issued for the QRS API: %s',
                       qps_session_cookie)
 
+    def scrape_sheets(self, app):
+        self.__initialize_engine_api_auth_cookie()
+        app_id = app.get('id')
+        return self.__engine_api_helper.get_sheets(
+            app_id, self.__engine_api_auth_cookie)
+
     def __initialize_engine_api_auth_cookie(self):
+        if self.__engine_api_auth_cookie:
+            return
+
         windows_auth_url = \
             self.__engine_api_helper.get_windows_authentication_url()
         self.__engine_api_auth_cookie = authenticator.Authenticator\
@@ -80,15 +98,3 @@ class MetadataScraper:
                 auth_url=windows_auth_url)
         logging.debug('QPS session cookie issued for the Engine API: %s',
                       self.__engine_api_auth_cookie)
-
-    def scrape_all_apps(self):
-        return self.__qrs_api_helper.get_full_app_list(self.__qrs_api_session)
-
-    def scrape_all_streams(self):
-        return self.__qrs_api_helper.get_full_stream_list(
-            self.__qrs_api_session)
-
-    def scrape_sheets(self, app):
-        app_id = app.get('id')
-        return self.__engine_api_helper.get_sheets(
-            app_id, self.__engine_api_auth_cookie)
