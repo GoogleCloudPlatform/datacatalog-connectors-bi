@@ -66,7 +66,8 @@ class EngineAPIHelper:
         Returns:
             A list of sheets.
         """
-        return self.__run_async(self.__get_sheets(app_id, auth_cookie))
+        return self.__run_until_complete(self.__get_sheets(
+            app_id, auth_cookie))
 
     async def __get_sheets(self, app_id, auth_cookie):
         websocket = await self.__connect_websocket(app_id, auth_cookie)
@@ -121,7 +122,8 @@ class EngineAPIHelper:
                 return result.get('qReturn')
 
     def get_windows_authentication_url(self):
-        return self.__run_async(self.__get_windows_authentication_url())
+        return self.__run_until_complete(
+            self.__get_windows_authentication_url())
 
     async def __get_windows_authentication_url(self):
         """Get a Windows Authentication url.
@@ -154,6 +156,6 @@ class EngineAPIHelper:
                 return params.get('loginUri')
 
     @classmethod
-    def __run_async(cls, method_call):
+    def __run_until_complete(cls, async_method_call):
         loop = asyncio.get_event_loop()
-        return loop.run_until_complete(method_call)
+        return loop.run_until_complete(async_method_call)
