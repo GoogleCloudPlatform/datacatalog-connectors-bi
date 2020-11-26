@@ -47,23 +47,10 @@ class EngineAPIHelper:
         # The server address starts with an http/https scheme. The below
         # statement replaces the original scheme with 'wss', which is used for
         # secure websockets communication.
-        self.__base_api_endpoint = \
-            f'wss://{self.__extract_server_netloc(server_address)}'
+        self.__base_api_endpoint = f'wss://{urlparse(server_address).hostname}'
         self.__common_headers = {
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
-
-    @classmethod
-    def __extract_server_netloc(cls, server_address):
-        parsed_uri = urlparse(server_address)
-        netloc = parsed_uri.netloc
-        netloc_colon_index = netloc.find(':')
-
-        if netloc_colon_index > 0:
-            # Strip the port number.
-            return netloc[:netloc_colon_index]
-
-        return netloc
 
     def get_sheets(self, app_id, auth_cookie):
         """Get the list of Sheets that belong to a given App.
