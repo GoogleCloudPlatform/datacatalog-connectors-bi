@@ -32,8 +32,13 @@ class EngineAPIHelper:
     objects are organized in a hierarchical structure.
 
     Websockets use an asynchronous communication channel, but the public
-    methods from this class are intended to be called synchronously. They
-    take care of handling the async API calls for their clients.
+    methods from this class are intended to be called synchronously to keep
+    consistency with the overall scrape > prepare > ingest  workflow. The
+    public methods take care of handling the async API calls for their clients.
+
+    Most private coroutines (async methods) rely on 'async with' statements.
+    They work with an asynchronous context manager and the connection is closed
+    when exiting the context.
 
     """
 
@@ -70,27 +75,27 @@ class EngineAPIHelper:
             app_id, auth_cookie))
 
     async def __get_sheets(self, app_id, auth_cookie):
-        websocket = await self.__connect_websocket(app_id, auth_cookie)
-        open_doc_return = await self.__open_doc(app_id, websocket)
+        async with self.__connect_websocket(app_id, auth_cookie) as websocket:
+            open_doc_return = await self.__open_doc(app_id, websocket)
 
-        await websocket.send(
-            json.dumps({
-                'handle': open_doc_return.get('qHandle'),
-                'method': 'GetObjects',
-                'params': {
-                    'qOptions': {
-                        'qTypes': ['sheet'],
+            await websocket.send(
+                json.dumps({
+                    'handle': open_doc_return.get('qHandle'),
+                    'method': 'GetObjects',
+                    'params': {
+                        'qOptions': {
+                            'qTypes': ['sheet'],
+                        },
                     },
-                },
-            }))
+                }))
 
-        async for message in websocket:
-            json_message = json.loads(message)
-            result = json_message.get('result')
-            if result:
-                return result.get('qList')
+            async for message in websocket:
+                json_message = json.loads(message)
+                result = json_message.get('result')
+                if result:
+                    return result.get('qList')
 
-    async def __connect_websocket(self, app_id, auth_cookie):
+    def __connect_websocket(self, app_id, auth_cookie):
         url = f'{self.__base_api_endpoint}/app/{app_id}' \
               f'?Xrfkey={constants.XRFKEY}'
 
@@ -98,7 +103,7 @@ class EngineAPIHelper:
         # Format the header value as <key>=<value> string.
         headers['Cookie'] = f'{auth_cookie.name}={auth_cookie.value}'
 
-        return await websockets.connect(url, extra_headers=headers)
+        return websockets.connect(url, extra_headers=headers)
 
     @classmethod
     async def __open_doc(cls, app_id, websocket):
@@ -147,13 +152,12 @@ class EngineAPIHelper:
         headers = self.__common_headers.copy()
         headers['User-Agent'] = constants.WINDOWS_USER_AGENT
 
-        websocket = await websockets.connect(url, extra_headers=headers)
-
-        async for message in websocket:
-            json_message = json.loads(message)
-            params = json_message.get('params')
-            if params:
-                return params.get('loginUri')
+        async with websockets.connect(url, extra_headers=headers) as websocket:
+            async for message in websocket:
+                json_message = json.loads(message)
+                params = json_message.get('params')
+                if params:
+                    return params.get('loginUri')
 
     @classmethod
     def __run_until_complete(cls, async_method_call):
