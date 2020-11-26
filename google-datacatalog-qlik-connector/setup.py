@@ -38,9 +38,9 @@ setuptools.setup(
     },
     include_package_data=True,
     install_requires=(
-        'google-datacatalog-connectors-commons >= 0.6.0',
-        'requests_ntlm',
-        'websockets',
+        'google-datacatalog-connectors-commons ~= 0.6',
+        'requests_ntlm ~= 1.1',
+        'websockets ~= 8.1',
     ),
     setup_requires=('pytest-runner',),
     tests_require=('pytest-cov',),
