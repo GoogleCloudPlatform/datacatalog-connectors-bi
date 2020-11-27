@@ -51,12 +51,6 @@ class FakeResponseWithNoCookies:
 # the 'AsyncMock' class. The present solution is based on the 'Strategies for #
 # Testing Async Code in Python' blog post (https://www.agari.com/email-security-blog/strategies-testing-async-code-python/)  # noqa E510
 # =========================================================================== #
-class AsyncMock(mock.MagicMock):
-
-    async def __call__(self, *args, **kwargs):
-        return super().__call__(*args, **kwargs)
-
-
 class AsyncContextManager(mock.MagicMock):
 
     def __init__(self, *args, **kwargs):
@@ -84,4 +78,4 @@ class AsyncContextManager(mock.MagicMock):
         self.itr_index = -1
 
     async def send(self, *args, **kwargs):
-        return AsyncMock()
+        pass
