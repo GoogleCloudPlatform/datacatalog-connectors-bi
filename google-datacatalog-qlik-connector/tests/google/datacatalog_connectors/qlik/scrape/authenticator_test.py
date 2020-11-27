@@ -53,8 +53,7 @@ class AuthenticatorTest(unittest.TestCase):
 
     def test_get_qps_cookie_win_auth_should_return_none_on_cookie_not_found(
             self, mock_requests):
-        mock_requests.get.return_value = \
-            scrape_ops_mocks.FakeResponseWithIgnoredCookies()
+        mock_requests.get.return_value = mock.MagicMock()
 
         cookie = authenticator.Authenticator \
             .get_qps_session_cookie_windows_auth(

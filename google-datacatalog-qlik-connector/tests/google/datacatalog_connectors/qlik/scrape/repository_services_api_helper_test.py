@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from requests import sessions
 import unittest
 from unittest import mock
 
@@ -40,7 +39,7 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
             attrs['_RepositoryServicesAPIHelper__common_headers'])
 
     def test_get_full_app_list_should_use_session_to_call_api(self):
-        mock_session = mock.Mock(sessions.Session())
+        mock_session = mock.MagicMock()
 
         apps = self.__helper.get_full_app_list(mock_session)
 
@@ -53,7 +52,7 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
         )
 
     def test_get_full_stream_list_should_use_session_to_call_api(self):
-        mock_session = mock.Mock(sessions.Session())
+        mock_session = mock.MagicMock()
 
         streams = self.__helper.get_full_stream_list(mock_session)
 
@@ -69,7 +68,7 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
     def test_get_windows_authentication_url_should_return_url_from_header(
             self, mock_requests):
 
-        mock_session = mock.Mock(sessions.Session())
+        mock_session = mock.MagicMock()
         mock_session.get_redirect_target.return_value = 'redirect-url'
 
         url = self.__helper.get_windows_authentication_url(mock_session)

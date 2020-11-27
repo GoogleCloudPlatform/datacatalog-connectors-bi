@@ -101,14 +101,14 @@ class EngineAPIHelper:
             An awaiting function that yields a :class:`WebSocketClientProtocol`
             which can then be used to send and receive messages.
         """
-        url = f'{self.__base_api_endpoint}/app/{app_id}' \
+        uri = f'{self.__base_api_endpoint}/app/{app_id}' \
               f'?Xrfkey={constants.XRFKEY}'
 
         headers = self.__common_headers.copy()
         # Format the header value as <key>=<value> string.
         headers['Cookie'] = f'{auth_cookie.name}={auth_cookie.value}'
 
-        return websockets.connect(url, extra_headers=headers)
+        return websockets.connect(uri=uri, extra_headers=headers)
 
     @classmethod
     async def __open_doc(cls, app_id, websocket):
@@ -150,7 +150,7 @@ class EngineAPIHelper:
         Returns:
             A string.
         """
-        url = f'{self.__base_api_endpoint}/app/?transient=' \
+        uri = f'{self.__base_api_endpoint}/app/?transient=' \
               f'?Xrfkey={constants.XRFKEY}' \
               f'&reloadUri={self.__server_address}/dev-hub/engine-api-explorer'
 
@@ -159,7 +159,8 @@ class EngineAPIHelper:
         headers = self.__common_headers.copy()
         headers['User-Agent'] = constants.WINDOWS_USER_AGENT
 
-        async with websockets.connect(url, extra_headers=headers) as websocket:
+        async with websockets.connect(uri=uri,
+                                      extra_headers=headers) as websocket:
             async for message in websocket:
                 json_message = json.loads(message)
                 params = json_message.get('params')

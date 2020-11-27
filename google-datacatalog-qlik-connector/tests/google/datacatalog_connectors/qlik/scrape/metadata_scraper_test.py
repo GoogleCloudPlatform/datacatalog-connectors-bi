@@ -19,8 +19,6 @@ from unittest import mock
 
 from google.datacatalog_connectors.qlik import scrape
 
-from . import scrape_ops_mocks
-
 
 class MetadataScraperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
@@ -64,7 +62,7 @@ class MetadataScraperTest(unittest.TestCase):
 
         qrs_api_helper.get_windows_authentication_url.return_value = 'test-url'
         mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
-            scrape_ops_mocks.FakeQPSSessionCookie()
+            mock.MagicMock()
         qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
         streams = self.__scraper.scrape_all_streams()
@@ -87,8 +85,7 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'app-id',
         }]
 
-        attrs['_MetadataScraper__qrs_api_session'] = \
-            scrape_ops_mocks.FakeSessionWithCookies()
+        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
         qrs_api_helper.get_full_app_list.return_value = apps_metadata
 
         apps = self.__scraper.scrape_all_apps()
@@ -105,8 +102,7 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'stream-id',
         }]
 
-        attrs['_MetadataScraper__qrs_api_session'] = \
-            scrape_ops_mocks.FakeSessionWithCookies()
+        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
         qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
         streams = self.__scraper.scrape_all_streams()
@@ -128,7 +124,7 @@ class MetadataScraperTest(unittest.TestCase):
         engine_api_helper.get_windows_authentication_url.return_value = \
             'test-url'
         mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
-            scrape_ops_mocks.FakeQPSSessionCookie()
+            mock.MagicMock()
         engine_api_helper.get_sheets.return_value = sheets_metadata
 
         sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
@@ -151,8 +147,7 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'sheet-id',
         }]
 
-        attrs['_MetadataScraper__engine_api_auth_cookie'] = \
-            scrape_ops_mocks.FakeQPSSessionCookie()
+        attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
         engine_api_helper.get_sheets.return_value = sheets_metadata
 
         sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
