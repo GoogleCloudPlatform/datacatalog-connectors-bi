@@ -54,7 +54,7 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertIsNone(attrs['_MetadataScraper__engine_api_auth_cookie'])
 
     @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator')
-    def test_scrape_should_authenticate_user(self, mock_authenticator):
+    def test_scrape_qrs_api_should_authenticate_user(self, mock_authenticator):
         attrs = self.__scraper.__dict__
         qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
 
@@ -114,3 +114,49 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
         qrs_api_helper.get_full_stream_list.assert_called_once()
+
+    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator')
+    def test_scrape_engine_api_should_authenticate_user(
+            self, mock_authenticator):
+        attrs = self.__scraper.__dict__
+        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
+
+        sheets_metadata = [{
+            'id': 'sheet-id',
+        }]
+
+        engine_api_helper.get_windows_authentication_url.return_value = \
+            'test-url'
+        mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
+            scrape_ops_mocks.FakeQPSSessionCookie()
+        engine_api_helper.get_sheets.return_value = sheets_metadata
+
+        sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
+
+        self.assertEqual(1, len(sheets))
+        self.assertEqual('sheet-id', sheets[0].get('id'))
+        mock_authenticator.get_qps_session_cookie_windows_auth \
+            .assert_called_with(
+                ad_domain='test-domain',
+                username='test-username',
+                password='test-password',
+                auth_url='test-url')
+        engine_api_helper.get_sheets.assert_called_once()
+
+    def test_scrape_sheets_should_return_list_on_success(self):
+        attrs = self.__scraper.__dict__
+        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
+
+        sheets_metadata = [{
+            'id': 'sheet-id',
+        }]
+
+        attrs['_MetadataScraper__engine_api_auth_cookie'] = \
+            scrape_ops_mocks.FakeQPSSessionCookie()
+        engine_api_helper.get_sheets.return_value = sheets_metadata
+
+        sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
+
+        self.assertEqual(1, len(sheets))
+        self.assertEqual('sheet-id', sheets[0].get('id'))
+        engine_api_helper.get_sheets.assert_called_once()
