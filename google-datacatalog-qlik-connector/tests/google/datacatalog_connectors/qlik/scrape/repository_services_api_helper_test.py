@@ -20,6 +20,8 @@ from unittest import mock
 from google.datacatalog_connectors.qlik.scrape import \
     constants, repository_services_api_helper
 
+from . import scrape_ops_mocks
+
 
 class RepositoryServicesAPIHelperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
@@ -38,12 +40,15 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
         self.assertIsNotNone(
             attrs['_RepositoryServicesAPIHelper__common_headers'])
 
-    def test_get_full_app_list_should_use_session_to_call_api(self):
+    def test_get_full_app_list_should_return_list_on_success(self):
         mock_session = mock.MagicMock()
+        mock_session.get.return_value = \
+            scrape_ops_mocks.FakeResponseWithContent('[{\"id\": \"app-id\"}]')
 
         apps = self.__helper.get_full_app_list(mock_session)
 
-        self.assertIsNotNone(apps)
+        self.assertEqual(1, len(apps))
+        self.assertEqual('app-id', apps[0].get('id'))
         mock_session.get.assert_called_once()
         mock_session.get.assert_called_with(
             url=f'test-server/qrs/app/hublist/full?Xrfkey={constants.XRFKEY}',
@@ -53,10 +58,14 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
 
     def test_get_full_stream_list_should_use_session_to_call_api(self):
         mock_session = mock.MagicMock()
+        mock_session.get.return_value = \
+            scrape_ops_mocks.FakeResponseWithContent(
+                '[{\"id\": \"stream-id\"}]')
 
         streams = self.__helper.get_full_stream_list(mock_session)
 
-        self.assertIsNotNone(streams)
+        self.assertEqual(1, len(streams))
+        self.assertEqual('stream-id', streams[0].get('id'))
         mock_session.get.assert_called_once()
         mock_session.get.assert_called_with(
             url=f'test-server/qrs/stream/full?Xrfkey={constants.XRFKEY}',

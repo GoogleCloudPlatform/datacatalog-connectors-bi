@@ -31,6 +31,15 @@ class FakeQPSSessionCookie:
 # ============== #
 # HTTP Responses #
 # ============== #
+class FakeResponseWithContent:
+
+    def __init__(self, content):
+        self.__content = content
+
+    def json(self):
+        return json.loads(self.__content)
+
+
 class FakeResponseWithCookies:
 
     def __init__(self):
