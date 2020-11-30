@@ -75,16 +75,18 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def test_run_stream_metadata_should_succeed(self, mock_mapper,
                                                 mock_cleaner, mock_ingestor):
 
-        scraper = self.__synchronizer.__dict__[
-            '_MetadataSynchronizer__metadata_scraper']
-        assembled_entry_factory = self.__synchronizer.__dict__[
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
 
         self.__synchronizer.run()
 
-        expected_make_assembled_entries_call_arg = {'id': 'test_stream'}
+        expected_make_assembled_entries_call_arg = {
+            'id': 'test_stream',
+        }
 
         make_assembled_entries_args = \
             assembled_entry_factory.make_assembled_entries_list.call_args[0]
@@ -104,14 +106,15 @@ class MetadataSynchronizerTest(unittest.TestCase):
                                                        mock_cleaner,
                                                        mock_ingestor):
 
-        scraper = self.__synchronizer.__dict__[
-            '_MetadataSynchronizer__metadata_scraper']
-        assembled_entry_factory = self.__synchronizer.__dict__[
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
+        scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
 
@@ -123,7 +126,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
                 'published': True,
                 'stream': {
                     'id': 'test_stream'
-                }
+                },
+                'sheets': [],
             }]
         }
 
@@ -144,9 +148,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def test_run_wip_app_metadata_should_succeed(self, mock_mapper,
                                                  mock_cleaner, mock_ingestor):
 
-        scraper = self.__synchronizer.__dict__[
-            '_MetadataSynchronizer__metadata_scraper']
-        assembled_entry_factory = self.__synchronizer.__dict__[
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
@@ -154,7 +158,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         self.__synchronizer.run()
 
-        expected_make_assembled_entries_call_arg = {'id': 'test_stream'}
+        expected_make_assembled_entries_call_arg = {
+            'id': 'test_stream',
+        }
 
         make_assembled_entries_args = \
             assembled_entry_factory.make_assembled_entries_list.call_args[0]
@@ -181,9 +187,12 @@ class MetadataSynchronizerTest(unittest.TestCase):
         return {
             'id': 'test_app',
             'published': True,
-            'stream': cls.__make_fake_stream()
+            'stream': cls.__make_fake_stream(),
         }
 
     @classmethod
     def __make_fake_wip_app(cls):
-        return {'id': 'test_app', 'published': False}
+        return {
+            'id': 'test_app',
+            'published': False,
+        }

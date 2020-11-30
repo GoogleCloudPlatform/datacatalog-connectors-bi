@@ -19,16 +19,15 @@ from unittest import mock
 
 from google.datacatalog_connectors.qlik import scrape
 
-from . import scrape_ops_mocks
-
 
 class MetadataScraperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
     __SCRAPER_MODULE = f'{__SCRAPE_PACKAGE}.metadata_scraper'
 
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_helper.EngineAPIHelper')
     @mock.patch(f'{__SCRAPER_MODULE}.repository_services_api_helper'
                 f'.RepositoryServicesAPIHelper')
-    def setUp(self, mock_qrs_api_helper):
+    def setUp(self, mock_qrs_api_helper, mock_engine_api_helper):
         self.__scraper = scrape.MetadataScraper(server_address='test-server',
                                                 ad_domain='test-domain',
                                                 username='test-username',
@@ -36,40 +35,8 @@ class MetadataScraperTest(unittest.TestCase):
 
     def test_constructor_should_set_instance_attributes(self):
         attrs = self.__scraper.__dict__
-
-        self.assertEqual('test-server',
-                         attrs['_MetadataScraper__server_address'])
-        self.assertEqual('test-domain', attrs['_MetadataScraper__ad_domain'])
-        self.assertEqual('test-username', attrs['_MetadataScraper__username'])
-        self.assertEqual('test-password', attrs['_MetadataScraper__password'])
-        self.assertIsNotNone(attrs['_MetadataScraper__session'])
         self.assertIsNotNone(attrs['_MetadataScraper__qrs_api_helper'])
-
-    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator')
-    def test_scrape_should_authenticate_user(self, mock_authenticator):
-        attrs = self.__scraper.__dict__
-        qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
-
-        streams_metadata = [{
-            'id': 'stream-id',
-        }]
-
-        qrs_api_helper.get_windows_authentication_url.return_value = 'test-url'
-        mock_authenticator.get_qps_session_cookie_windows_auth.return_value =\
-            scrape_ops_mocks.FakeQPSSessionCookie()
-        qrs_api_helper.get_full_stream_list.return_value = streams_metadata
-
-        streams = self.__scraper.scrape_all_streams()
-
-        self.assertEqual(1, len(streams))
-        self.assertEqual('stream-id', streams[0].get('id'))
-        mock_authenticator.get_qps_session_cookie_windows_auth\
-            .assert_called_with(
-                ad_domain='test-domain',
-                username='test-username',
-                password='test-password',
-                auth_url='test-url')
-        qrs_api_helper.get_full_stream_list.assert_called_once()
+        self.assertIsNotNone(attrs['_MetadataScraper__engine_api_helper'])
 
     def test_scrape_all_apps_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
@@ -79,8 +46,7 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'app-id',
         }]
 
-        attrs['_MetadataScraper__session'] = \
-            scrape_ops_mocks.FakeSessionWithCookies()
+        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
         qrs_api_helper.get_full_app_list.return_value = apps_metadata
 
         apps = self.__scraper.scrape_all_apps()
@@ -97,8 +63,7 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'stream-id',
         }]
 
-        attrs['_MetadataScraper__session'] = \
-            scrape_ops_mocks.FakeSessionWithCookies()
+        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
         qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
         streams = self.__scraper.scrape_all_streams()
@@ -106,3 +71,37 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
         qrs_api_helper.get_full_stream_list.assert_called_once()
+
+    def test_scrape_sheets_should_return_list_on_success(self):
+        attrs = self.__scraper.__dict__
+        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
+
+        sheets_metadata = [{
+            'qInfo': {
+                'qId': 'sheet-id',
+                'qType': 'sheet'
+            },
+        }]
+
+        attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
+        engine_api_helper.get_sheets.return_value = sheets_metadata
+
+        sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
+
+        self.assertEqual(1, len(sheets))
+        self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
+        engine_api_helper.get_sheets.assert_called_once()
+
+    def test_scrape_sheets_should_return_empty_list_on_no_server_response(
+            self):
+
+        attrs = self.__scraper.__dict__
+        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
+
+        attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
+        engine_api_helper.get_sheets.return_value = None
+
+        sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
+
+        self.assertEqual(0, len(sheets))
+        engine_api_helper.get_sheets.assert_called_once()

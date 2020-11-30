@@ -59,12 +59,8 @@ class MetadataSynchronizer:
         api_url = config_parser['Looker']['base_url']
 
         parsed_uri = urlparse(api_url)
-        scheme = parsed_uri.scheme
 
-        # Strip the port number.
-        server_address = parsed_uri.netloc[:parsed_uri.netloc.find(':')]
-
-        return f'{scheme}://{server_address}'
+        return f'{parsed_uri.scheme}://{parsed_uri.hostname}'
 
     def run(self):
         """Coordinates a full scrape > prepare > ingest process."""

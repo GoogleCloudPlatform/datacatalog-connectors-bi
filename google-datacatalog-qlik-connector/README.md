@@ -7,6 +7,9 @@ currently supporting below asset types:
 
 **Disclaimer: This is not an officially supported Google product.**
 
+> **WORK IN PROGRESS**: This connector is under active development and breaking
+> changes are expected in the coming weeks!
+
 <!--
   ⚠️ DO NOT UPDATE THE TABLE OF CONTENTS MANUALLY ️️⚠️
   run `npx markdown-toc -i README.md`.

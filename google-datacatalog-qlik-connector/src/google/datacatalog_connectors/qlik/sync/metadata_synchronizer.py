@@ -57,7 +57,7 @@ class MetadataSynchronizer:
         logging.info('===> Scraping Qlik Sense metadata...')
 
         logging.info('')
-        logging.info('Streams and apps...')
+        logging.info('Objects to be scraped: Streams, Apps, and Sheets')
         streams = self.__scrape_streams()
         logging.info('==== DONE ========================================')
 
@@ -101,6 +101,13 @@ class MetadataSynchronizer:
         """
         all_streams = self.__metadata_scraper.scrape_all_streams()
         all_apps = self.__metadata_scraper.scrape_all_apps()
+
+        for app in all_apps:
+            logging.info('')
+            logging.info(' . Scraping Sheets from "%s"', app.get('name'))
+            app['sheets'] = self.__metadata_scraper.scrape_sheets(app)
+            logging.info(' .. The App has %d Sheets', len(app['sheets']))
+        logging.info('')
 
         self.__assemble_stream_metadata_from_flat_lists(all_streams, all_apps)
 
@@ -195,7 +202,7 @@ class MetadataSynchronizer:
             stream_entries_count = len(assembled_entries)
 
             logging.info('')
-            logging.info('==== The Stream identified by %s has %d entries.',
+            logging.info('==== The Stream identified by "%s" has %d entries.',
                          stream_id, stream_entries_count)
             metadata_ingestor.ingest_metadata(assembled_entries,
                                               tag_templates_dict)

@@ -89,7 +89,6 @@ jobs:
       matrix:
         build-dir:
           [
-            "./google-datacatalog-qlik-connector",
             "./google-datacatalog-tableau-connector",
           ]
         python-version: [3.8]
