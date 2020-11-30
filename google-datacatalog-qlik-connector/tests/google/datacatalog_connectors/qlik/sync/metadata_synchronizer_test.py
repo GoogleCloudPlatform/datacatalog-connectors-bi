@@ -75,9 +75,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def test_run_stream_metadata_should_succeed(self, mock_mapper,
                                                 mock_cleaner, mock_ingestor):
 
-        scraper = self.__synchronizer.__dict__[
-            '_MetadataSynchronizer__metadata_scraper']
-        assembled_entry_factory = self.__synchronizer.__dict__[
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
@@ -106,9 +106,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
                                                        mock_cleaner,
                                                        mock_ingestor):
 
-        scraper = self.__synchronizer.__dict__[
-            '_MetadataSynchronizer__metadata_scraper']
-        assembled_entry_factory = self.__synchronizer.__dict__[
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
@@ -148,9 +148,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def test_run_wip_app_metadata_should_succeed(self, mock_mapper,
                                                  mock_cleaner, mock_ingestor):
 
-        scraper = self.__synchronizer.__dict__[
-            '_MetadataSynchronizer__metadata_scraper']
-        assembled_entry_factory = self.__synchronizer.__dict__[
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]

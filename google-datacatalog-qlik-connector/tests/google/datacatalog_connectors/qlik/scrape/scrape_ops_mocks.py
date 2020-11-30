@@ -26,6 +26,8 @@ class FakeQPSSessionCookie:
     def __init__(self):
         self.name = 'X-Qlik-Session'
         self.value = 'Test cookie'
+        self.domain = 'localhost'
+        self.path = '/'
 
 
 # ============== #
@@ -50,6 +52,13 @@ class FakeResponseWithNoCookies:
 
     def __init__(self):
         self.cookies = []
+
+
+class FakeResponseWithHeader:
+
+    def __init__(self, header_name, header_value, is_redirect=False):
+        self.headers = {header_name: header_value}
+        self.is_redirect = is_redirect
 
 
 # =========================================================================== #

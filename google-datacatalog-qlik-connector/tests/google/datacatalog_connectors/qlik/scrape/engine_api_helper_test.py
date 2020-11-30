@@ -29,6 +29,7 @@ _SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
 @mock.patch(f'{_SCRAPE_PACKAGE}.engine_api_helper.websockets.connect',
             new_callable=scrape_ops_mocks.AsyncContextManager)
 class EngineAPIHelperTest(unittest.TestCase):
+    __HELPER_MODULE = f'{_SCRAPE_PACKAGE}.engine_api_helper'
 
     def setUp(self):
         # Set a constant seed so generated numbers will always be the same when
@@ -36,16 +37,76 @@ class EngineAPIHelperTest(unittest.TestCase):
         random.seed(1)
 
         self.__helper = engine_api_helper.EngineAPIHelper(
-            server_address='https://test-server')
+            server_address='https://test-server',
+            ad_domain='test-domain',
+            username='test-username',
+            password='test-password')
 
     def test_constructor_should_set_instance_attributes(self, mock_websocket):
         attrs = self.__helper.__dict__
 
         self.assertEqual('https://test-server',
                          attrs['_EngineAPIHelper__server_address'])
+        self.assertEqual('test-domain', attrs['_EngineAPIHelper__ad_domain'])
+        self.assertEqual('test-username', attrs['_EngineAPIHelper__username'])
+        self.assertEqual('test-password', attrs['_EngineAPIHelper__password'])
+
         self.assertEqual('wss://test-server',
                          attrs['_EngineAPIHelper__base_api_endpoint'])
         self.assertIsNotNone(attrs['_EngineAPIHelper__common_headers'])
+
+    def test_constructor_should_not_set_auth_related_attributes(
+            self, mock_websocket):
+
+        attrs = self.__helper.__dict__
+        self.assertIsNone(attrs['_EngineAPIHelper__auth_cookie'])
+
+    @mock.patch(f'{__HELPER_MODULE}.authenticator.Authenticator')
+    def test_scrape_operations_should_authenticate_user_beforehand(
+            self, mock_authenticator, mock_websocket):
+
+        mock_websocket.return_value.__enter__.return_value.set_data([
+            {
+                'id': 2202,
+                'params': {
+                    'loginUri': 'redirect-url'
+                }
+            },
+            {
+                'id': 9326,
+                'result': {
+                    'qReturn': {}
+                }
+            },
+        ])
+
+        mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
+            mock.MagicMock()
+
+        # Call a public method to trigger the authentication workflow.
+        self.__helper.get_sheets('app-id')
+
+        attrs = self.__helper.__dict__
+        extra_headers = attrs['_EngineAPIHelper__common_headers'].copy()
+        extra_headers['User-Agent'] = 'Windows'
+
+        expected_first_ws_call_args = mock.call(
+            uri=f'wss://test-server/app/?transient=?Xrfkey={constants.XRFKEY}'
+            f'&reloadUri=https://test-server/dev-hub/engine-api-explorer',
+            extra_headers=extra_headers)
+        actual_first_ws_call_args = mock_websocket.call_args_list[0]
+        self.assertEqual(expected_first_ws_call_args,
+                         actual_first_ws_call_args)
+
+        mock_authenticator.get_qps_session_cookie_windows_auth\
+            .assert_called_once()
+        mock_authenticator.get_qps_session_cookie_windows_auth \
+            .assert_called_with(
+                ad_domain='test-domain',
+                username='test-username',
+                password='test-password',
+                auth_url='redirect-url')
+        self.assertIsNotNone(attrs['_EngineAPIHelper__auth_cookie'])
 
     def test_websocket_connection_should_use_cookie(self, mock_websocket):
         mock_websocket.return_value.__enter__.return_value.set_data([
@@ -57,13 +118,15 @@ class EngineAPIHelperTest(unittest.TestCase):
             },
         ])
 
-        fake_cookie = scrape_ops_mocks.FakeQPSSessionCookie()
-        self.__helper.get_sheets('app-id', fake_cookie)
+        attrs = self.__helper.__dict__
+        attrs['_EngineAPIHelper__auth_cookie'] = \
+            scrape_ops_mocks.FakeQPSSessionCookie()
+
+        self.__helper.get_sheets('app-id')
 
         mock_websocket.assert_called_once()
 
-        extra_headers = self.__helper.__dict__[
-            '_EngineAPIHelper__common_headers'].copy()
+        extra_headers = attrs['_EngineAPIHelper__common_headers'].copy()
         extra_headers['Cookie'] = 'X-Qlik-Session=Test cookie'
         mock_websocket.assert_called_with(
             uri=f'wss://test-server/app/app-id?Xrfkey={constants.XRFKEY}',
@@ -92,7 +155,10 @@ class EngineAPIHelperTest(unittest.TestCase):
             },
         ])
 
-        sheets = self.__helper.get_sheets({'id': 'app-id'}, mock.MagicMock())
+        self.__helper.__dict__[
+            '_EngineAPIHelper__auth_cookie'] = mock.MagicMock()
+
+        sheets = self.__helper.get_sheets('app-id')
 
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
@@ -110,7 +176,7 @@ class EngineAPIHelperTest(unittest.TestCase):
                 }
             },
             {
-                'id': 9327,
+                'id': 0,
                 'result': {
                     'qList': [{
                         'qInfo': {
@@ -122,30 +188,9 @@ class EngineAPIHelperTest(unittest.TestCase):
             },
         ])
 
-        sheets = self.__helper.get_sheets({'id': 'app-id'}, mock.MagicMock())
+        self.__helper.__dict__[
+            '_EngineAPIHelper__auth_cookie'] = mock.MagicMock()
+
+        sheets = self.__helper.get_sheets('app-id')
 
         self.assertIsNone(sheets)
-
-    def test_get_windows_authentication_url_should_return_url_from_response(
-            self, mock_websocket):
-
-        mock_websocket.return_value.__enter__.return_value.set_data([
-            {
-                'id': 2202,
-                'params': {
-                    'loginUri': 'redirect-url'
-                }
-            },
-        ])
-
-        url = self.__helper.get_windows_authentication_url()
-
-        extra_headers = self.__helper.__dict__[
-            '_EngineAPIHelper__common_headers'].copy()
-        extra_headers['User-Agent'] = 'Windows'
-
-        self.assertEqual('redirect-url', url)
-        mock_websocket.assert_called_with(
-            uri=f'wss://test-server/app/?transient=?Xrfkey={constants.XRFKEY}'
-            f'&reloadUri=https://test-server/dev-hub/engine-api-explorer',
-            extra_headers=extra_headers)

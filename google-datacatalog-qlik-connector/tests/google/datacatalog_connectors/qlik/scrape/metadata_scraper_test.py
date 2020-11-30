@@ -35,43 +35,8 @@ class MetadataScraperTest(unittest.TestCase):
 
     def test_constructor_should_set_instance_attributes(self):
         attrs = self.__scraper.__dict__
-
-        self.assertEqual('test-server',
-                         attrs['_MetadataScraper__server_address'])
-        self.assertEqual('test-domain', attrs['_MetadataScraper__ad_domain'])
-        self.assertEqual('test-username', attrs['_MetadataScraper__username'])
-        self.assertEqual('test-password', attrs['_MetadataScraper__password'])
-
         self.assertIsNotNone(attrs['_MetadataScraper__qrs_api_helper'])
         self.assertIsNotNone(attrs['_MetadataScraper__engine_api_helper'])
-
-    def test_constructor_should_not_set_session_related_attributes(self):
-        attrs = self.__scraper.__dict__
-
-        self.assertIsNone(attrs['_MetadataScraper__qrs_api_session'])
-        self.assertIsNone(attrs['_MetadataScraper__engine_api_auth_cookie'])
-
-    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator')
-    def test_scrape_qrs_api_should_authenticate_user(self, mock_authenticator):
-        attrs = self.__scraper.__dict__
-        qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
-
-        qrs_api_helper.get_windows_authentication_url.return_value = 'test-url'
-        mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
-            mock.MagicMock()
-        qrs_api_helper.get_full_stream_list.return_value = []
-
-        self.__scraper.scrape_all_streams()
-
-        qrs_api_helper.get_windows_authentication_url.assert_called_once()
-        mock_authenticator.get_qps_session_cookie_windows_auth\
-            .assert_called_once()
-        mock_authenticator.get_qps_session_cookie_windows_auth \
-            .assert_called_with(
-                ad_domain='test-domain',
-                username='test-username',
-                password='test-password',
-                auth_url='test-url')
 
     def test_scrape_all_apps_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
@@ -106,30 +71,6 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
         qrs_api_helper.get_full_stream_list.assert_called_once()
-
-    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator')
-    def test_scrape_engine_api_should_authenticate_user(
-            self, mock_authenticator):
-        attrs = self.__scraper.__dict__
-        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
-
-        engine_api_helper.get_windows_authentication_url.return_value = \
-            'test-url'
-        mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
-            mock.MagicMock()
-        engine_api_helper.get_sheets.return_value = None
-
-        self.__scraper.scrape_sheets({'id': 'app-id'})
-
-        engine_api_helper.get_sheets.assert_called_once()
-        mock_authenticator.get_qps_session_cookie_windows_auth\
-            .assert_called_once()
-        mock_authenticator.get_qps_session_cookie_windows_auth \
-            .assert_called_with(
-                ad_domain='test-domain',
-                username='test-username',
-                password='test-password',
-                auth_url='test-url')
 
     def test_scrape_sheets_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__

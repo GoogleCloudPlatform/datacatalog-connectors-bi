@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import requests
+from requests import sessions
 
-from google.datacatalog_connectors.qlik.scrape import constants
+from google.datacatalog_connectors.qlik.scrape import authenticator, constants
 
 
 class RepositoryServicesAPIHelper:
@@ -32,9 +34,17 @@ class RepositoryServicesAPIHelper:
     versus condensed objects](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Connect-API-Full-vs-Condensed-Objects.htm)  # noqa E501
     for more information).
 
+    Attributes:
+        __http_session: An HTTP session for the QRS RESP API calls.
+
     """
 
-    def __init__(self, server_address):
+    def __init__(self, server_address, ad_domain, username, password):
+        self.__server_address = server_address
+        self.__ad_domain = ad_domain
+        self.__username = username
+        self.__password = password
+
         self.__base_api_endpoint = f'{server_address}/qrs'
         self.__common_headers = {
             'Content-Type': constants.JSON_CONTENT_TYPE,
@@ -42,7 +52,9 @@ class RepositoryServicesAPIHelper:
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
 
-    def get_full_app_list(self, session):
+        self.__http_session = None
+
+    def get_full_app_list(self):
         """Get the list of all apps that can be opened by the current user,
         via the current proxy.
 
@@ -52,9 +64,11 @@ class RepositoryServicesAPIHelper:
         url = f'{self.__base_api_endpoint}' \
               f'/app/hublist/full?Xrfkey={constants.XRFKEY}'
 
-        return session.get(url=url, headers=self.__common_headers).json()
+        self.__set_up_http_session()
+        return self.__http_session.get(url=url,
+                                       headers=self.__common_headers).json()
 
-    def get_full_stream_list(self, session):
+    def get_full_stream_list(self):
         """Get the list of streams with full metadata from a given server.
 
         Returns:
@@ -63,9 +77,30 @@ class RepositoryServicesAPIHelper:
         url = f'{self.__base_api_endpoint}' \
               f'/stream/full?Xrfkey={constants.XRFKEY}'
 
-        return session.get(url=url, headers=self.__common_headers).json()
+        self.__set_up_http_session()
+        return self.__http_session.get(url=url,
+                                       headers=self.__common_headers).json()
 
-    def get_windows_authentication_url(self, session):
+    def __set_up_http_session(self):
+        if self.__http_session:
+            return
+
+        self.__http_session = sessions.Session()
+
+        windows_auth_url = self.__get_windows_authentication_url(
+            self.__http_session)
+        qps_session_cookie = authenticator.Authenticator \
+            .get_qps_session_cookie_windows_auth(
+                ad_domain=self.__ad_domain,
+                username=self.__username,
+                password=self.__password,
+                auth_url=windows_auth_url)
+
+        self.__http_session.cookies.set_cookie(qps_session_cookie)
+        logging.debug('QPS session cookie issued for the QRS API: %s',
+                      qps_session_cookie)
+
+    def __get_windows_authentication_url(self, session):
         """Get a Windows Authentication url.
 
         This method sends an unauthenticated request to a well known endpoint

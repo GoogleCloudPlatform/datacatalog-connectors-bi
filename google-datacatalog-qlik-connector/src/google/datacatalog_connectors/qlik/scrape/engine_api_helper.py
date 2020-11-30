@@ -16,12 +16,13 @@
 
 import asyncio
 import json
+import logging
 import random
 
 from urllib.parse import urlparse
 import websockets
 
-from google.datacatalog_connectors.qlik.scrape import constants
+from google.datacatalog_connectors.qlik.scrape import authenticator, constants
 
 
 class EngineAPIHelper:
@@ -41,10 +42,17 @@ class EngineAPIHelper:
     They work with an asynchronous context manager and the connection is closed
     when exiting the context.
 
+    Attributes:
+        __auth_cookie: An HTTP cookie used to authorize the requests.
+
     """
 
-    def __init__(self, server_address):
+    def __init__(self, server_address, ad_domain, username, password):
         self.__server_address = server_address
+        self.__ad_domain = ad_domain
+        self.__username = username
+        self.__password = password
+
         # The server address starts with an http/https scheme. The below
         # statement replaces the original scheme with 'wss', which is used for
         # secure websockets communication.
@@ -53,17 +61,24 @@ class EngineAPIHelper:
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
 
-    def get_sheets(self, app_id, auth_cookie):
+        self.__auth_cookie = None
+
+    def get_sheets(self, app_id):
         """Get the list of Sheets that belong to a given App.
 
         Returns:
             A list of sheets.
         """
-        return self.__run_until_complete(self.__get_sheets(
-            app_id, auth_cookie))
+        self.__set_up_auth_cookie()
+        return self.__run_until_complete(self.__get_sheets(app_id))
 
-    async def __get_sheets(self, app_id, auth_cookie):
-        async with self.__connect_websocket(app_id, auth_cookie) as websocket:
+    @classmethod
+    def __run_until_complete(cls, async_method_call):
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(async_method_call)
+
+    async def __get_sheets(self, app_id):
+        async with self.__connect_websocket(app_id) as websocket:
             open_doc_return = await self.__open_doc(app_id, websocket)
 
             request_id = self.__generate_request_id()
@@ -85,7 +100,62 @@ class EngineAPIHelper:
                 if request_id == response_id:
                     return json_message.get('result').get('qList')
 
-    def __connect_websocket(self, app_id, auth_cookie):
+    def __set_up_auth_cookie(self):
+        if self.__auth_cookie:
+            return
+
+        windows_auth_url = self.__run_until_complete(
+            self.__get_windows_authentication_url())
+        self.__auth_cookie = authenticator.Authenticator\
+            .get_qps_session_cookie_windows_auth(
+                ad_domain=self.__ad_domain,
+                username=self.__username,
+                password=self.__password,
+                auth_url=windows_auth_url)
+        logging.debug('QPS session cookie issued for the Engine API: %s',
+                      self.__auth_cookie)
+
+    async def __get_windows_authentication_url(self):
+        """Get a Windows Authentication url.
+
+        This method sends an unauthenticated request to a well known endpoint
+        of the Qlik Engine JSON API. The expected response has a `loginUri`
+        param, which is the Windows Authentication url.
+
+        P.S. The endpoint was manually captured from the Engine API Explorer's
+        Execution Logs (https://<qlik-site>/dev-hub/engine-api-explorer).
+
+        Returns:
+            A string.
+        """
+        uri = f'{self.__base_api_endpoint}/app/?transient=' \
+              f'?Xrfkey={constants.XRFKEY}' \
+              f'&reloadUri={self.__server_address}/dev-hub/engine-api-explorer'
+
+        # Sets the User-Agent to Windows temporarily to get a Windows
+        # Authentication URL that is required by the NTLM authentication flow.
+        headers = self.__common_headers.copy()
+        headers['User-Agent'] = constants.WINDOWS_USER_AGENT
+
+        async with websockets.connect(uri=uri,
+                                      extra_headers=headers) as websocket:
+
+            request_id = self.__generate_request_id()
+            await websocket.send(
+                json.dumps({
+                    'handle': -1,
+                    'method': 'GetDocList',
+                    'params': [],
+                    'id': request_id,
+                }))
+
+            async for message in websocket:
+                json_message = json.loads(message)
+                response_id = json_message.get('id')
+                if request_id == response_id:
+                    return json_message.get('params').get('loginUri')
+
+    def __connect_websocket(self, app_id):
         """Open websocket connection.
 
         Args:
@@ -94,8 +164,6 @@ class EngineAPIHelper:
               websocket connections and then get an isolated Qlik Engine
               session for each Qlik App (see [Connecting to the Qlik Engine
               JSON API](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/EngineAPI/Content/Sense_EngineAPI/GettingStarted/connecting-to-engine-api.htm)).  # noqa E510
-            auth_cookie:
-              An HTTP cookie used to authorize the requests.
 
         Returns:
             An awaiting function that yields a :class:`WebSocketClientProtocol`
@@ -106,7 +174,8 @@ class EngineAPIHelper:
 
         headers = self.__common_headers.copy()
         # Format the header value as <key>=<value> string.
-        headers['Cookie'] = f'{auth_cookie.name}={auth_cookie.value}'
+        headers['Cookie'] = \
+            f'{self.__auth_cookie.name}={self.__auth_cookie.value}'
 
         return websockets.connect(uri=uri, extra_headers=headers)
 
@@ -133,45 +202,6 @@ class EngineAPIHelper:
             if request_id == response_id:
                 return json_message.get('result').get('qReturn')
 
-    def get_windows_authentication_url(self):
-        return self.__run_until_complete(
-            self.__get_windows_authentication_url())
-
-    async def __get_windows_authentication_url(self):
-        """Get a Windows Authentication url.
-
-        This method sends an unauthenticated request to a well known endpoint
-        of the Qlik Engine JSON API. The expected response has a `loginUri`
-        param, which is the Windows Authentication url.
-
-        P.S. The endpoint was manually captured from the Engine API Explorer's
-        Execution Logs (https://<qlik-site>/dev-hub/engine-api-explorer).
-
-        Returns:
-            A string.
-        """
-        uri = f'{self.__base_api_endpoint}/app/?transient=' \
-              f'?Xrfkey={constants.XRFKEY}' \
-              f'&reloadUri={self.__server_address}/dev-hub/engine-api-explorer'
-
-        # Sets the User-Agent to Windows temporarily to get a Windows
-        # Authentication URL that is required by the NTLM authentication flow.
-        headers = self.__common_headers.copy()
-        headers['User-Agent'] = constants.WINDOWS_USER_AGENT
-
-        async with websockets.connect(uri=uri,
-                                      extra_headers=headers) as websocket:
-            async for message in websocket:
-                json_message = json.loads(message)
-                params = json_message.get('params')
-                if params:
-                    return params.get('loginUri')
-
     @classmethod
     def __generate_request_id(cls):
         return random.randint(1, 9999)
-
-    @classmethod
-    def __run_until_complete(cls, async_method_call):
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(async_method_call)
