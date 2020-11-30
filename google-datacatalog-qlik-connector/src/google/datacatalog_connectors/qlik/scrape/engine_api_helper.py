@@ -140,20 +140,11 @@ class EngineAPIHelper:
         async with websockets.connect(uri=uri,
                                       extra_headers=headers) as websocket:
 
-            request_id = self.__generate_request_id()
-            await websocket.send(
-                json.dumps({
-                    'handle': -1,
-                    'method': 'GetDocList',
-                    'params': [],
-                    'id': request_id,
-                }))
-
             async for message in websocket:
                 json_message = json.loads(message)
-                response_id = json_message.get('id')
-                if request_id == response_id:
-                    return json_message.get('params').get('loginUri')
+                params = json_message.get('params')
+                if params:
+                    return params.get('loginUri')
 
     def __connect_websocket(self, app_id):
         """Open websocket connection.

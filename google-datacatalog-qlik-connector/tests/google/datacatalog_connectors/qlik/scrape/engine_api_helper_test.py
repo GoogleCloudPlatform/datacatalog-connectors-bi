@@ -67,13 +67,12 @@ class EngineAPIHelperTest(unittest.TestCase):
 
         mock_websocket.return_value.__enter__.return_value.set_data([
             {
-                'id': 2202,
                 'params': {
                     'loginUri': 'redirect-url'
                 }
             },
             {
-                'id': 9326,
+                'id': 2202,
                 'result': {
                     'qReturn': {}
                 }
