@@ -25,7 +25,7 @@ from google.datacatalog_connectors.qlik.scrape import constants
 
 
 class EngineAPIHelper:
-    """Wraps requests to the Qlik Qlik Engine JSON API.
+    """Wraps requests to the Qlik Engine JSON API.
 
     The Qlik Engine JSON API is a WebSocket protocol that uses JSON to pass
     information between the Qlik associative engine and the clients. This API

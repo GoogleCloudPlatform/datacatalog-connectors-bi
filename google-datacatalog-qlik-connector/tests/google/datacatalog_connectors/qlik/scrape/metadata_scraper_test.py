@@ -144,7 +144,10 @@ class MetadataScraperTest(unittest.TestCase):
         engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
 
         sheets_metadata = [{
-            'id': 'sheet-id',
+            'qInfo': {
+                'qId': 'sheet-id',
+                'qType': 'sheet'
+            },
         }]
 
         attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
@@ -153,5 +156,19 @@ class MetadataScraperTest(unittest.TestCase):
         sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
 
         self.assertEqual(1, len(sheets))
-        self.assertEqual('sheet-id', sheets[0].get('id'))
+        self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
+        engine_api_helper.get_sheets.assert_called_once()
+
+    def test_scrape_sheets_should_return_empty_list_on_no_server_response(
+            self):
+
+        attrs = self.__scraper.__dict__
+        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
+
+        attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
+        engine_api_helper.get_sheets.return_value = None
+
+        sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
+
+        self.assertEqual(0, len(sheets))
         engine_api_helper.get_sheets.assert_called_once()

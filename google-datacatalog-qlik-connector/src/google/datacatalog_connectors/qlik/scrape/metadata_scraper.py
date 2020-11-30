@@ -81,8 +81,9 @@ class MetadataScraper:
     def scrape_sheets(self, app):
         self.__initialize_engine_api_auth_cookie()
         app_id = app.get('id')
-        return self.__engine_api_helper.get_sheets(
+        sheets = self.__engine_api_helper.get_sheets(
             app_id, self.__engine_api_auth_cookie)
+        return sheets if sheets else []
 
     def __initialize_engine_api_auth_cookie(self):
         if self.__engine_api_auth_cookie:

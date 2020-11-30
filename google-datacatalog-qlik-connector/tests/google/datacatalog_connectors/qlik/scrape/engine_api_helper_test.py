@@ -31,8 +31,8 @@ _SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
 class EngineAPIHelperTest(unittest.TestCase):
 
     def setUp(self):
-        # Set a constant seed to ensure generated numbers will always be the
-        # same when running the tests.
+        # Set a constant seed so generated numbers will always be the same when
+        # running the tests.
         random.seed(1)
 
         self.__helper = engine_api_helper.EngineAPIHelper(
@@ -82,14 +82,49 @@ class EngineAPIHelperTest(unittest.TestCase):
             {
                 'id': 9326,
                 'result': {
-                    'qList': []
+                    'qList': [{
+                        'qInfo': {
+                            'qId': 'sheet-id',
+                            'qType': 'sheet'
+                        },
+                    }]
                 }
             },
         ])
 
         sheets = self.__helper.get_sheets({'id': 'app-id'}, mock.MagicMock())
 
-        self.assertIsNotNone(sheets)
+        self.assertEqual(1, len(sheets))
+        self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
+
+    def test_get_sheets_should_return_none_on_no_server_response(
+            self, mock_websocket):
+
+        mock_websocket.return_value.__enter__.return_value.set_data([
+            {
+                'id': 2202,
+                'result': {
+                    'qReturn': {
+                        'qHandle': 1
+                    }
+                }
+            },
+            {
+                'id': 9327,
+                'result': {
+                    'qList': [{
+                        'qInfo': {
+                            'qId': 'sheet-id',
+                            'qType': 'sheet'
+                        },
+                    }]
+                }
+            },
+        ])
+
+        sheets = self.__helper.get_sheets({'id': 'app-id'}, mock.MagicMock())
+
+        self.assertIsNone(sheets)
 
     def test_get_windows_authentication_url_should_return_url_from_response(
             self, mock_websocket):
