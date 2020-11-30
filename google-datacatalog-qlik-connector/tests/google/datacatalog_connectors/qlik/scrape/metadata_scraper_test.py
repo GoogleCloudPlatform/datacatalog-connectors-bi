@@ -56,26 +56,22 @@ class MetadataScraperTest(unittest.TestCase):
         attrs = self.__scraper.__dict__
         qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
 
-        streams_metadata = [{
-            'id': 'stream-id',
-        }]
-
         qrs_api_helper.get_windows_authentication_url.return_value = 'test-url'
         mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
             mock.MagicMock()
-        qrs_api_helper.get_full_stream_list.return_value = streams_metadata
+        qrs_api_helper.get_full_stream_list.return_value = []
 
-        streams = self.__scraper.scrape_all_streams()
+        self.__scraper.scrape_all_streams()
 
-        self.assertEqual(1, len(streams))
-        self.assertEqual('stream-id', streams[0].get('id'))
+        qrs_api_helper.get_windows_authentication_url.assert_called_once()
+        mock_authenticator.get_qps_session_cookie_windows_auth\
+            .assert_called_once()
         mock_authenticator.get_qps_session_cookie_windows_auth \
             .assert_called_with(
                 ad_domain='test-domain',
                 username='test-username',
                 password='test-password',
                 auth_url='test-url')
-        qrs_api_helper.get_full_stream_list.assert_called_once()
 
     def test_scrape_all_apps_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
@@ -117,27 +113,23 @@ class MetadataScraperTest(unittest.TestCase):
         attrs = self.__scraper.__dict__
         engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
 
-        sheets_metadata = [{
-            'id': 'sheet-id',
-        }]
-
         engine_api_helper.get_windows_authentication_url.return_value = \
             'test-url'
         mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
             mock.MagicMock()
-        engine_api_helper.get_sheets.return_value = sheets_metadata
+        engine_api_helper.get_sheets.return_value = None
 
-        sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
+        self.__scraper.scrape_sheets({'id': 'app-id'})
 
-        self.assertEqual(1, len(sheets))
-        self.assertEqual('sheet-id', sheets[0].get('id'))
+        engine_api_helper.get_sheets.assert_called_once()
+        mock_authenticator.get_qps_session_cookie_windows_auth\
+            .assert_called_once()
         mock_authenticator.get_qps_session_cookie_windows_auth \
             .assert_called_with(
                 ad_domain='test-domain',
                 username='test-username',
                 password='test-password',
                 auth_url='test-url')
-        engine_api_helper.get_sheets.assert_called_once()
 
     def test_scrape_sheets_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
