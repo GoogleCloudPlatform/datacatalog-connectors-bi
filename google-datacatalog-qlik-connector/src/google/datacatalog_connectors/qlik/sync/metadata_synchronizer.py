@@ -103,11 +103,10 @@ class MetadataSynchronizer:
         all_apps = self.__metadata_scraper.scrape_all_apps()
 
         for app in all_apps:
-            logging.info('')
-            logging.info(' . Scraping Sheets from "%s"', app.get('name'))
+            # The 'sheets' field is not available in the API response but is
+            # injected into the returned metadata object to make further
+            # processing more efficient.
             app['sheets'] = self.__metadata_scraper.scrape_sheets(app)
-            logging.info(' .. The App has %d Sheets', len(app['sheets']))
-        logging.info('')
 
         self.__assemble_stream_metadata_from_flat_lists(all_streams, all_apps)
 

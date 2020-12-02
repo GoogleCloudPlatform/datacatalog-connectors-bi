@@ -109,6 +109,14 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         return generated_id, entry
 
+    def make_entry_for_sheet(self, sheet_metadata):
+        entry = datacatalog.Entry()
+
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_STREAM,
+                                        sheet_metadata.get('id'))
+
+        return
+
     @classmethod
     def __format_id(cls, source_type_identifier, source_id):
         no_prefix_fmt_id = cls._format_id(
