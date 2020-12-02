@@ -41,9 +41,9 @@ class MetadataScraper:
         logging.info('  %s Apps found:', len(apps))
         for app in apps:
             logging.info(
-                '    - %s/%s [%s]',
+                '    - %s :: %s [%s]',
                 app.get('stream').get('name')
-                if app.get('published') else 'NOT PUBLISHED', app.get('name'),
+                if app.get('published') else 'NOT PUBLIC!', app.get('name'),
                 app.get('id'))
 
         return apps
@@ -59,15 +59,17 @@ class MetadataScraper:
         return streams
 
     def scrape_sheets(self, app_metadata):
-        self.__log_scrape_start('Scraping Sheets from "%s"',
+        self.__log_scrape_start('Scraping Sheets from the "%s" App',
                                 app_metadata.get('name'))
-        sheets = self.__engine_api_helper.get_sheets(app_metadata.get('id'))
-        sheets = sheets if sheets else []
+        sheets = self.__engine_api_helper.get_sheets(
+            app_metadata.get('id')) or []
 
         logging.info('  %s Sheets found:', len(sheets))
         for sheet in sheets:
-            logging.info('    - %s [%s]',
-                         sheet.get('qMeta').get('title'),
+            q_meta = sheet.get('qMeta')
+            logging.info('    - %s%s [%s]',
+                         '' if q_meta.get('published') else 'NOT PUBLIC! ',
+                         q_meta.get('title'),
                          sheet.get('qInfo').get('qId'))
 
         return sheets

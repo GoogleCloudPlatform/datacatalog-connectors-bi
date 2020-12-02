@@ -102,19 +102,32 @@ class MetadataSynchronizer:
         all_streams = self.__metadata_scraper.scrape_all_streams()
         all_apps = self.__metadata_scraper.scrape_all_apps()
 
-        for app in all_apps:
+        # Not being public means the app is a work in progress, so it can be
+        # skipped.
+        public_apps = [app for app in all_apps if app.get('published')]
+
+        for app in public_apps:
+            sheets = self.__metadata_scraper.scrape_sheets(app)
+            # Not being public means the sheet is a work in progress, so it can
+            # be skipped.
+            public_sheets = [
+                sheet for sheet in sheets
+                if sheet.get('qMeta').get('published')
+            ]
             # The 'sheets' field is not available in the API response but is
             # injected into the returned metadata object to make further
             # processing more efficient.
-            app['sheets'] = self.__metadata_scraper.scrape_sheets(app)
+            app['sheets'] = public_sheets
 
-        self.__assemble_stream_metadata_from_flat_lists(all_streams, all_apps)
+        self.__assemble_streams_metadata_from_flat_lists(
+            all_streams, public_apps)
 
         return all_streams
 
     @classmethod
-    def __assemble_stream_metadata_from_flat_lists(cls, all_streams, all_apps):
-        """Assemble the stream's metadata from the given flat asset lists.
+    def __assemble_streams_metadata_from_flat_lists(cls, all_streams,
+                                                    public_apps):
+        """Assemble the streams metadata from the given flat asset lists.
 
         """
         streams_dict = {}
@@ -122,12 +135,7 @@ class MetadataSynchronizer:
         for stream in all_streams:
             streams_dict[stream.get('id')] = stream
 
-        for app in all_apps:
-            # Not being published means the app is a work in progress, so it
-            # can be skipped.
-            if not app.get('published'):
-                continue
-
+        for app in public_apps:
             stream_id = app.get('stream').get('id')
 
             # The 'apps' field is not available in the API response but is

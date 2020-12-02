@@ -53,7 +53,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'name': 'Test app',
             'description': 'Description of the Test app',
             'createdDate': '2019-09-12T16:30:00.005Z',
-            'modifiedDate': '2019-09-12T16:30:00.005Z',
+            'modifiedDate': '2019-09-12T16:31:00.005Z',
         }
 
         entry_id, entry = self.__factory.make_entry_for_app(metadata)
@@ -75,6 +75,25 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.create_time.timestamp())
+
+        updated_datetime = datetime.strptime('2019-09-12T16:31:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
+
+    def test_make_entry_for_app_should_use_created_on_missing_modified_date(
+            self):
+
+        metadata = {
+            'id': 'a123-b456',
+            'createdDate': '2019-09-12T16:30:00.005Z',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_app(metadata)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
@@ -84,7 +103,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'id': 'a123-b456',
             'name': 'Test stream',
             'createdDate': '2019-09-12T16:30:00.005Z',
-            'modifiedDate': '2019-09-12T16:30:00.005Z',
+            'modifiedDate': '2019-09-12T16:31:00.005Z',
         }
 
         entry_id, entry = self.__factory.make_entry_for_stream(metadata)
@@ -105,6 +124,25 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.create_time.timestamp())
+
+        updated_datetime = datetime.strptime('2019-09-12T16:31:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
+
+    def test_make_entry_for_stream_should_use_created_on_missing_modified_date(
+            self):
+
+        metadata = {
+            'id': 'a123-b456',
+            'createdDate': '2019-09-12T16:30:00.005Z',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_stream(metadata)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
