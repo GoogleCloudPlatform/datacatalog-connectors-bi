@@ -72,6 +72,42 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         return generated_id, entry
 
+    def make_entry_for_sheet(self, app_id, sheet_metadata):
+        entry = datacatalog.Entry()
+
+        sheet_id = sheet_metadata.get('qInfo').get('qId')
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_SHEET,
+                                        sheet_id)
+        entry.name = datacatalog.DataCatalogClient.entry_path(
+            self.__project_id, self.__location_id, self.__entry_group_id,
+            generated_id)
+
+        entry.user_specified_system = self.__user_specified_system
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_SHEET
+
+        q_meta = sheet_metadata.get('qMeta')
+        entry.display_name = self._format_display_name(q_meta.get("title"))
+        entry.description = q_meta.get("description")
+
+        entry.linked_resource = f'{self.__site_url}' \
+                                f'/sense/app/{app_id}/sheet/{sheet_id}'
+
+        created_datetime = datetime.strptime(
+            q_meta.get('createdDate'), self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+        create_timestamp = timestamp_pb2.Timestamp()
+        create_timestamp.FromDatetime(created_datetime)
+        entry.source_system_timestamps.create_time = create_timestamp
+
+        modified_date = q_meta.get('modifiedDate')
+        resolved_modified_date = modified_date or q_meta.get('createdDate')
+        modified_datetime = datetime.strptime(
+            resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+        update_timestamp = timestamp_pb2.Timestamp()
+        update_timestamp.FromDatetime(modified_datetime)
+        entry.source_system_timestamps.update_time = update_timestamp
+
+        return generated_id, entry
+
     def make_entry_for_stream(self, stream_metadata):
         entry = datacatalog.Entry()
 
@@ -100,42 +136,6 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         modified_date = stream_metadata.get('modifiedDate')
         resolved_modified_date = modified_date or stream_metadata.get(
             'createdDate')
-        modified_datetime = datetime.strptime(
-            resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
-        update_timestamp = timestamp_pb2.Timestamp()
-        update_timestamp.FromDatetime(modified_datetime)
-        entry.source_system_timestamps.update_time = update_timestamp
-
-        return generated_id, entry
-
-    def make_entry_for_sheet(self, app_id, sheet_metadata):
-        entry = datacatalog.Entry()
-
-        sheet_id = sheet_metadata.get('qInfo').get('qId')
-        generated_id = self.__format_id(constants.ENTRY_ID_PART_STREAM,
-                                        sheet_id)
-        entry.name = datacatalog.DataCatalogClient.entry_path(
-            self.__project_id, self.__location_id, self.__entry_group_id,
-            generated_id)
-
-        entry.user_specified_system = self.__user_specified_system
-        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_SHEET
-
-        q_meta = sheet_metadata.get('qMeta')
-        entry.display_name = self._format_display_name(q_meta.get("title"))
-        entry.description = q_meta.get("description")
-
-        entry.linked_resource = f'{self.__site_url}' \
-                                f'/sense/app/{app_id}/sheet/{sheet_id}'
-
-        created_datetime = datetime.strptime(
-            q_meta.get('createdDate'), self.__INCOMING_TIMESTAMP_UTC_FORMAT)
-        create_timestamp = timestamp_pb2.Timestamp()
-        create_timestamp.FromDatetime(created_datetime)
-        entry.source_system_timestamps.create_time = create_timestamp
-
-        modified_date = q_meta.get('modifiedDate')
-        resolved_modified_date = modified_date or q_meta.get('createdDate')
         modified_datetime = datetime.strptime(
             resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
         update_timestamp = timestamp_pb2.Timestamp()

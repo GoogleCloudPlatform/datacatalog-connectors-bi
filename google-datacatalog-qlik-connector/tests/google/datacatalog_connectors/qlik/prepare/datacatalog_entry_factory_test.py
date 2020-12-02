@@ -98,6 +98,68 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+    def test_make_entry_for_sheet_should_set_all_available_fields(self):
+        metadata = {
+            'qInfo': {
+                'qId': 'a123-b456',
+            },
+            'qMeta': {
+                'title': 'Test sheet',
+                'description': 'Description of the Test sheet',
+                'createdDate': '2019-09-12T16:30:00.005Z',
+                'modifiedDate': '2019-09-12T16:31:00.005Z',
+            },
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_sheet(
+            'app-id', metadata)
+        self.assertEqual('qlik_sht_a123_b456', entry_id)
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'entryGroups/test-entry-group/entries/'
+            'qlik_sht_a123_b456', entry.name)
+        self.assertEqual('test-system', entry.user_specified_system)
+        self.assertEqual('sheet', entry.user_specified_type)
+        self.assertEqual('Test sheet', entry.display_name)
+        self.assertEqual('Description of the Test sheet', entry.description)
+        self.assertEqual(
+            'https://test.server.com'
+            '/sense/app/app-id/sheet/a123-b456', entry.linked_resource)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
+
+        updated_datetime = datetime.strptime('2019-09-12T16:31:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
+
+    def test_make_entry_for_sheet_should_use_created_on_missing_modified_date(
+            self):
+
+        metadata = {
+            'qInfo': {
+                'qId': 'a123-b456',
+            },
+            'qMeta': {
+                'createdDate': '2019-09-12T16:30:00.005Z',
+            },
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_sheet(
+            'app-id', metadata)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
+
     def test_make_entry_for_stream_should_set_all_available_fields(self):
         metadata = {
             'id': 'a123-b456',
