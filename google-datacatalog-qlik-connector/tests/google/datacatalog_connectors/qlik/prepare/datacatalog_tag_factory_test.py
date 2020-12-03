@@ -73,13 +73,13 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('test-directory\\\\test.userid',
                          tag.fields['modified_by_username'].string_value)
 
+        self.assertEqual(True, tag.fields['published'].bool_value)
+
         publish_datetime = datetime.strptime('2020-11-04T14:49:14.504+0000',
                                              self.__DATETIME_FORMAT)
         self.assertEqual(
             publish_datetime.timestamp(),
             tag.fields['publish_time'].timestamp_value.timestamp())
-
-        self.assertEqual(True, tag.fields['published'].bool_value)
 
         last_reload_datetime = datetime.strptime(
             '2020-11-03T18:13:37.156+0000', self.__DATETIME_FORMAT)

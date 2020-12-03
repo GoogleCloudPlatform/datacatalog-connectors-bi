@@ -47,12 +47,12 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'modified_by_username',
                                app_metadata.get('modifiedByUserName'))
 
+        self._set_bool_field(tag, 'published', app_metadata.get('published'))
+
         self._set_timestamp_field(
             tag, 'publish_time',
             datetime.strptime(app_metadata.get('publishTime'),
                               self.__INCOMING_TIMESTAMP_UTC_FORMAT))
-
-        self._set_bool_field(tag, 'published', app_metadata.get('published'))
 
         last_reload_time = app_metadata.get('lastReloadTime')
         if last_reload_time:
