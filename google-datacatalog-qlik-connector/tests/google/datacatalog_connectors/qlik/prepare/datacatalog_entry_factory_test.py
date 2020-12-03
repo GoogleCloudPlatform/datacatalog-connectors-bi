@@ -57,6 +57,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_app(metadata)
+
         self.assertEqual('qlik_app_a123_b456', entry_id)
 
         self.assertEqual(
@@ -109,10 +110,13 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                 'createdDate': '2019-09-12T16:30:00.005Z',
                 'modifiedDate': '2019-09-12T16:31:00.005Z',
             },
+            'app': {
+                'id': 'app-id'
+            },
         }
 
-        entry_id, entry = self.__factory.make_entry_for_sheet(
-            'app-id', metadata)
+        entry_id, entry = self.__factory.make_entry_for_sheet(metadata)
+
         self.assertEqual('qlik_sht_a123_b456', entry_id)
 
         self.assertEqual(
@@ -149,10 +153,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'qMeta': {
                 'createdDate': '2019-09-12T16:30:00.005Z',
             },
+            'app': {
+                'id': 'app-id'
+            },
         }
 
-        entry_id, entry = self.__factory.make_entry_for_sheet(
-            'app-id', metadata)
+        entry_id, entry = self.__factory.make_entry_for_sheet(metadata)
 
         created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
                                              self.__DATETIME_FORMAT)
@@ -169,6 +175,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_stream(metadata)
+
         self.assertEqual('qlik_str_a123_b456', entry_id)
 
         self.assertEqual(

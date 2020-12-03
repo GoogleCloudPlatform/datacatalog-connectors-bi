@@ -46,7 +46,7 @@ def __delete_entries_and_groups(project_ids):
     entry_group_names = []
     for result in search_results:
         try:
-            __datacatalog.delete_entry(result.relative_resource_name)
+            __datacatalog.delete_entry(name=result.relative_resource_name)
             print('Entry deleted: {}'.format(result.relative_resource_name))
             entry_group_name = re.match(
                 pattern=entry_name_pattern,

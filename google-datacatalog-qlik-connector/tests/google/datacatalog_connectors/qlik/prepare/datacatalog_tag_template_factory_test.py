@@ -141,6 +141,11 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual('Schema path',
                          tag_template.fields['schema_path'].display_name)
 
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['site_url'].type.primitive_type)
+        self.assertEqual('Qlik Sense site url',
+                         tag_template.fields['site_url'].display_name)
+
     def test_make_tag_template_for_sheet(self):
         tag_template = self.__factory.make_tag_template_for_sheet()
 
@@ -206,6 +211,11 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
             tag_template.fields['draft_object'].type.primitive_type)
         self.assertEqual('Draft object',
                          tag_template.fields['draft_object'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['site_url'].type.primitive_type)
+        self.assertEqual('Qlik Sense site url',
+                         tag_template.fields['site_url'].display_name)
 
     def test_make_tag_template_for_stream(self):
         tag_template = self.__factory.make_tag_template_for_stream()

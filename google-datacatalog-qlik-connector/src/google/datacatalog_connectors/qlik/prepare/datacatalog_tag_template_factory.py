@@ -94,6 +94,10 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'schema_path',
                                        self.__STRING_TYPE, 'Schema path')
 
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
+
         return tag_template
 
     def make_tag_template_for_sheet(self):
@@ -139,6 +143,10 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         self._add_primitive_type_field(tag_template, 'draft_object',
                                        self.__STRING_TYPE, 'Draft object')
+
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
 
         return tag_template
 

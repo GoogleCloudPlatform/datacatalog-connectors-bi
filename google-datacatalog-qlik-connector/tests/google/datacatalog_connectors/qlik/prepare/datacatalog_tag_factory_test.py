@@ -100,6 +100,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                          tag.fields['migration_hash'].string_value)
         self.assertEqual(1, tag.fields['availability_status'].double_value)
         self.assertEqual('App', tag.fields['schema_path'].string_value)
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
 
     def test_make_tag_for_stream_should_set_all_available_fields(self):
         tag_template = \

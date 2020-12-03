@@ -120,8 +120,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         sheet_assembled_entry = assembled_entries[2]
         tags = sheet_assembled_entry.tags
 
-        self.assertEqual(0, len(tags))
-        # self.__tag_factory.make_tag_for_sheet.assert_called_once()
+        self.assertEqual(1, len(tags))
+        self.__tag_factory.make_tag_for_sheet.assert_called_once()
 
     @classmethod
     def __make_fake_stream(cls):

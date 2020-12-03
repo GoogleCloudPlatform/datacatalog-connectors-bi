@@ -87,11 +87,9 @@ class AssembledEntryFactory:
         for app_metadata in apps_metadata:
             assembled_entries.append(
                 self.__make_assembled_entry_for_app(app_metadata))
-
-            app_id = app_metadata.get('id')
             assembled_entries.extend(
                 self.__make_assembled_entries_for_sheets(
-                    app_id, app_metadata.get('sheets')))
+                    app_metadata.get('sheets')))
 
         return assembled_entries
 
@@ -107,23 +105,21 @@ class AssembledEntryFactory:
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
 
-    def __make_assembled_entries_for_sheets(self, app_id, sheets_metadata):
+    def __make_assembled_entries_for_sheets(self, sheets_metadata):
         return [
-            self.__make_assembled_entry_for_sheet(app_id, sheet_metadata)
+            self.__make_assembled_entry_for_sheet(sheet_metadata)
             for sheet_metadata in sheets_metadata
         ] if sheets_metadata else []
 
-    def __make_assembled_entry_for_sheet(self, app_id, sheet_metadata):
+    def __make_assembled_entry_for_sheet(self, sheet_metadata):
         entry_id, entry = \
             self.__datacatalog_entry_factory.make_entry_for_sheet(
-                app_id, sheet_metadata)
+                sheet_metadata)
 
         tags = []
-        """
         if self.__sheet_tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_sheet(
                     self.__sheet_tag_template, sheet_metadata))
-        """
 
         return prepare.AssembledEntryData(entry_id, entry, tags)

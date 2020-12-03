@@ -72,7 +72,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         return generated_id, entry
 
-    def make_entry_for_sheet(self, app_id, sheet_metadata):
+    def make_entry_for_sheet(self, sheet_metadata):
         entry = datacatalog.Entry()
 
         sheet_id = sheet_metadata.get('qInfo').get('qId')
@@ -90,7 +90,9 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.description = q_meta.get("description")
 
         entry.linked_resource = f'{self.__site_url}' \
-                                f'/sense/app/{app_id}/sheet/{sheet_id}'
+                                f'/sense/app/' \
+                                f'{sheet_metadata.get("app").get("id")}' \
+                                f'/sheet/{sheet_id}'
 
         created_datetime = datetime.strptime(
             q_meta.get('createdDate'), self.__INCOMING_TIMESTAMP_UTC_FORMAT)
