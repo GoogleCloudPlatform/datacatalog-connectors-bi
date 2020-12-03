@@ -53,11 +53,11 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        self.__STRING_TYPE,
                                        'Username who modified it')
 
-        self._add_primitive_type_field(tag_template, 'publish_time',
-                                       self.__TIMESTAMP_TYPE, 'Publish time')
-
         self._add_primitive_type_field(tag_template, 'published',
                                        self.__BOOL_TYPE, 'Published')
+
+        self._add_primitive_type_field(tag_template, 'publish_time',
+                                       self.__TIMESTAMP_TYPE, 'Publish time')
 
         self._add_primitive_type_field(tag_template, 'last_reload_time',
                                        self.__TIMESTAMP_TYPE,
@@ -93,6 +93,60 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         self._add_primitive_type_field(tag_template, 'schema_path',
                                        self.__STRING_TYPE, 'Schema path')
+
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
+
+        return tag_template
+
+    def make_tag_template_for_sheet(self):
+        tag_template = datacatalog.TagTemplate()
+
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=constants.TAG_TEMPLATE_ID_SHEET)
+
+        tag_template.display_name = 'Qlik Sheet Metadata'
+
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
+
+        self._add_primitive_type_field(tag_template, 'owner_username',
+                                       self.__STRING_TYPE, 'Owner username')
+
+        self._add_primitive_type_field(tag_template, 'owner_name',
+                                       self.__STRING_TYPE, 'Owner name')
+
+        self._add_primitive_type_field(tag_template, 'published',
+                                       self.__BOOL_TYPE, 'Published')
+
+        self._add_primitive_type_field(tag_template, 'publish_time',
+                                       self.__TIMESTAMP_TYPE, 'Publish time')
+
+        self._add_primitive_type_field(tag_template, 'approved',
+                                       self.__BOOL_TYPE, 'Approved')
+
+        self._add_primitive_type_field(tag_template, 'app_id',
+                                       self.__STRING_TYPE, 'App Id')
+
+        self._add_primitive_type_field(tag_template, 'app_name',
+                                       self.__STRING_TYPE, 'App name')
+
+        self._add_primitive_type_field(tag_template, 'app_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the App')
+
+        self._add_primitive_type_field(tag_template, 'source_object',
+                                       self.__STRING_TYPE, 'Source object')
+
+        self._add_primitive_type_field(tag_template, 'draft_object',
+                                       self.__STRING_TYPE, 'Draft object')
+
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
 
         return tag_template
 

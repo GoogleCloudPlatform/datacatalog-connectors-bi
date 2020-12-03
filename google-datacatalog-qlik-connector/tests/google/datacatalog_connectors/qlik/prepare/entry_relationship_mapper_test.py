@@ -48,6 +48,28 @@ class EntryRelationshipMapperTest(unittest.TestCase):
             f'{stream_entry.name}',
             app_tag.fields['stream_entry'].string_value)
 
+    def test_fulfill_tag_fields_should_resolve_sheet_app_mapping(self):
+        app_id = 'test_app'
+        app_entry = self.__make_fake_entry(app_id, 'app')
+        app_tag = self.__make_fake_tag(string_fields=(('id', app_id),))
+
+        sheet_id = 'test_app'
+        sheet_entry = self.__make_fake_entry(sheet_id, 'sheet')
+        string_fields = ('id', sheet_id), ('app_id', app_id)
+        sheet_tag = self.__make_fake_tag(string_fields=string_fields)
+
+        app_assembled_entry = commons_prepare.AssembledEntryData(
+            app_id, app_entry, [app_tag])
+        sheet_assembled_entry = commons_prepare.AssembledEntryData(
+            sheet_id, sheet_entry, [sheet_tag])
+
+        prepare.EntryRelationshipMapper().fulfill_tag_fields(
+            [app_assembled_entry, sheet_assembled_entry])
+
+        self.assertEqual(
+            f'https://console.cloud.google.com/datacatalog/'
+            f'{app_entry.name}', sheet_tag.fields['app_entry'].string_value)
+
     @classmethod
     def __make_fake_entry(cls, entry_id, entry_type):
         entry = datacatalog.Entry()

@@ -49,8 +49,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                 'name': 'Test user',
             },
             'modifiedByUserName': 'test-directory\\\\test.userid',
-            'publishTime': '2020-11-04T14:49:14.504Z',
             'published': True,
+            'publishTime': '2020-11-04T14:49:14.504Z',
             'lastReloadTime': '2020-11-03T18:13:37.156Z',
             'stream': {
                 'id': 'a123-b456',
@@ -67,20 +67,19 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
 
         self.assertEqual('c987-d654', tag.fields['id'].string_value)
+
         self.assertEqual('test-directory\\\\test.userid',
                          tag.fields['owner_username'].string_value)
         self.assertEqual('Test user', tag.fields['owner_name'].string_value)
         self.assertEqual('test-directory\\\\test.userid',
                          tag.fields['modified_by_username'].string_value)
 
+        self.assertEqual(True, tag.fields['published'].bool_value)
         publish_datetime = datetime.strptime('2020-11-04T14:49:14.504+0000',
                                              self.__DATETIME_FORMAT)
         self.assertEqual(
             publish_datetime.timestamp(),
             tag.fields['publish_time'].timestamp_value.timestamp())
-
-        self.assertEqual(True, tag.fields['published'].bool_value)
-
         last_reload_datetime = datetime.strptime(
             '2020-11-03T18:13:37.156+0000', self.__DATETIME_FORMAT)
         self.assertEqual(
@@ -90,6 +89,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('a123-b456', tag.fields['stream_id'].string_value)
         self.assertEqual('Test stream', tag.fields['stream_name'].string_value)
         self.assertEqual('41.38 MB', tag.fields['file_size'].string_value)
+
         self.assertEqual(
             'https://test.server.com'
             '/appcontent/c987-d654/test-thumbnail.jpg',
@@ -100,6 +100,62 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                          tag.fields['migration_hash'].string_value)
         self.assertEqual(1, tag.fields['availability_status'].double_value)
         self.assertEqual('App', tag.fields['schema_path'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
+
+    def test_make_tag_for_sheet_should_set_all_available_fields(self):
+        tag_template = \
+            self.__tag_template_factory.make_tag_template_for_sheet()
+
+        metadata = {
+            'qInfo': {
+                'qId': 'c987-d654',
+            },
+            'qMeta': {
+                'published': True,
+                'publishTime': '2020-11-04T14:49:14.504Z',
+                'approved': True,
+                'owner': {
+                    'userDirectory': 'test-directory',
+                    'userId': 'test.userid',
+                    'name': 'Test user',
+                },
+                'sourceObject': 'Test source object',
+                'draftObject': 'Test draft object',
+            },
+            'app': {
+                'id': 'a123-b456',
+                'name': 'Test app',
+            },
+        }
+
+        tag = self.__factory.make_tag_for_sheet(tag_template, metadata)
+
+        self.assertEqual('c987-d654', tag.fields['id'].string_value)
+
+        self.assertEqual('test-directory\\\\test.userid',
+                         tag.fields['owner_username'].string_value)
+        self.assertEqual('Test user', tag.fields['owner_name'].string_value)
+
+        self.assertEqual(True, tag.fields['published'].bool_value)
+        publish_datetime = datetime.strptime('2020-11-04T14:49:14.504+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            publish_datetime.timestamp(),
+            tag.fields['publish_time'].timestamp_value.timestamp())
+        self.assertEqual(True, tag.fields['approved'].bool_value)
+
+        self.assertEqual('a123-b456', tag.fields['app_id'].string_value)
+        self.assertEqual('Test app', tag.fields['app_name'].string_value)
+
+        self.assertEqual('Test source object',
+                         tag.fields['source_object'].string_value)
+        self.assertEqual('Test draft object',
+                         tag.fields['draft_object'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
 
     def test_make_tag_for_stream_should_set_all_available_fields(self):
         tag_template = \
@@ -118,10 +174,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         tag = self.__factory.make_tag_for_stream(tag_template, metadata)
 
         self.assertEqual('a123-b456', tag.fields['id'].string_value)
+
         self.assertEqual('test-directory\\\\test.userid',
                          tag.fields['owner_username'].string_value)
         self.assertEqual('Test user', tag.fields['owner_name'].string_value)
         self.assertEqual('test-directory\\\\test.userid',
                          tag.fields['modified_by_username'].string_value)
+
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)

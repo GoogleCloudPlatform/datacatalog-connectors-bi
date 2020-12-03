@@ -17,8 +17,6 @@
 import unittest
 from unittest import mock
 
-from google.cloud import datacatalog
-
 from google.datacatalog_connectors.qlik import prepare
 
 
@@ -49,10 +47,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
 
     def test_make_assembled_entries_list_should_process_streams(self):
         entry_factory = self.__entry_factory
-        entry_factory.make_entry_for_stream = self.__mock_make_entry
-
-        tag_factory = self.__tag_factory
-        tag_factory.make_tag_for_stream = self.__mock_make_tag
+        entry_factory.make_entry_for_stream.return_value = ('id', {})
 
         tag_templates_dict = {
             'qlik_stream_metadata': {
@@ -65,25 +60,18 @@ class AssembledEntryFactoryTest(unittest.TestCase):
                 self.__make_fake_stream(), tag_templates_dict)
 
         self.assertEqual(1, len(assembled_entries))
+        entry_factory.make_entry_for_stream.assert_called_once()
 
         stream_assembled_entry = assembled_entries[0]
-
-        self.assertEqual('test_stream', stream_assembled_entry.entry_id)
-        self.assertEqual('fake_entries/test_stream',
-                         stream_assembled_entry.entry.name)
-
         tags = stream_assembled_entry.tags
 
         self.assertEqual(1, len(tags))
-        self.assertEqual('tagTemplates/qlik_stream_metadata', tags[0].template)
+        self.__tag_factory.make_tag_for_stream.assert_called_once()
 
     def test_make_assembled_entries_list_should_process_apps(self):
         entry_factory = self.__entry_factory
-        entry_factory.make_entry_for_stream = self.__mock_make_entry
-        entry_factory.make_entry_for_app = self.__mock_make_entry
-
-        tag_factory = self.__tag_factory
-        tag_factory.make_tag_for_app = self.__mock_make_tag
+        entry_factory.make_entry_for_stream.return_value = ('id', {})
+        entry_factory.make_entry_for_app.return_value = ('id', {})
 
         tag_templates_dict = {
             'qlik_app_metadata': {
@@ -91,50 +79,73 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             }
         }
 
+        fake_stream = self.__make_fake_stream()
+        fake_stream['apps'].append(self.__make_fake_app())
         assembled_entries = \
             self.__factory.make_assembled_entries_list(
-                self.__make_fake_stream_with_apps(), tag_templates_dict)
+                fake_stream, tag_templates_dict)
 
         self.assertEqual(2, len(assembled_entries))
+        entry_factory.make_entry_for_stream.assert_called_once()
 
         app_assembled_entry = assembled_entries[1]
-
-        self.assertEqual('test_app', app_assembled_entry.entry_id)
-        self.assertEqual('fake_entries/test_app',
-                         app_assembled_entry.entry.name)
-
         tags = app_assembled_entry.tags
 
         self.assertEqual(1, len(tags))
-        self.assertEqual('tagTemplates/qlik_app_metadata', tags[0].template)
+        self.__tag_factory.make_tag_for_app.assert_called_once()
+
+    def test_make_assembled_entries_list_should_process_sheets(self):
+        entry_factory = self.__entry_factory
+        entry_factory.make_entry_for_stream.return_value = ('id', {})
+        entry_factory.make_entry_for_app.return_value = ('id', {})
+        entry_factory.make_entry_for_sheet.return_value = ('id', {})
+
+        tag_templates_dict = {
+            'qlik_sheet_metadata': {
+                'name': 'tagTemplates/qlik_sheet_metadata',
+            }
+        }
+
+        fake_stream = self.__make_fake_stream()
+        fake_app = self.__make_fake_app()
+        fake_app['sheets'].append(self.__make_fake_sheet())
+        fake_stream['apps'].append(fake_app)
+        assembled_entries = \
+            self.__factory.make_assembled_entries_list(
+                fake_stream, tag_templates_dict)
+
+        self.assertEqual(3, len(assembled_entries))
+        entry_factory.make_entry_for_sheet.assert_called_once()
+
+        sheet_assembled_entry = assembled_entries[2]
+        tags = sheet_assembled_entry.tags
+
+        self.assertEqual(1, len(tags))
+        self.__tag_factory.make_tag_for_sheet.assert_called_once()
 
     @classmethod
     def __make_fake_stream(cls):
         return {
             'id': 'test_stream',
             'name': 'Test stream',
+            'apps': [],
         }
 
     @classmethod
-    def __make_fake_stream_with_apps(cls):
+    def __make_fake_app(cls):
         return {
-            'id': 'test_stream',
-            'name': 'Test stream',
-            'apps': [{
-                'id': 'test_app',
-                'name': 'Test app',
-            }]
+            'id': 'test_app',
+            'name': 'Test app',
+            'sheets': [],
         }
 
     @classmethod
-    def __mock_make_entry(cls, asset):
-        entry = datacatalog.Entry()
-        entry_id = asset.get('id')
-        entry.name = f'fake_entries/{entry_id}'
-        return entry_id, entry
-
-    @classmethod
-    def __mock_make_tag(cls, tag_template_dict, asset):
-        tag = datacatalog.Tag()
-        tag.template = tag_template_dict['name']
-        return tag
+    def __make_fake_sheet(cls):
+        return {
+            'qInfo': {
+                'qId': 'test_sheet',
+            },
+            'qMeta': {
+                'title': 'Test sheet',
+            },
+        }

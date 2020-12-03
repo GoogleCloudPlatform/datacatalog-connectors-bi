@@ -76,12 +76,15 @@ class MetadataScraperTest(unittest.TestCase):
         attrs = self.__scraper.__dict__
         engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
 
-        sheets_metadata = [{
-            'qInfo': {
-                'qId': 'sheet-id',
-                'qType': 'sheet'
+        sheets_metadata = [
+            {
+                'qInfo': {
+                    'qId': 'sheet-id',
+                    'qType': 'sheet',
+                },
+                'qMeta': {},
             },
-        }]
+        ]
 
         attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
         engine_api_helper.get_sheets.return_value = sheets_metadata

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from google.datacatalog_connectors.qlik.scrape import \
     engine_api_helper, repository_services_api_helper
 
@@ -33,11 +35,47 @@ class MetadataScraper:
             server_address, ad_domain, username, password)
 
     def scrape_all_apps(self):
-        return self.__qrs_api_helper.get_full_app_list()
+        self.__log_scrape_start('Scraping all Apps...')
+        apps = self.__qrs_api_helper.get_full_app_list()
+
+        logging.info('  %s Apps found:', len(apps))
+        for app in apps:
+            logging.info(
+                '    - %s :: %s [%s]',
+                app.get('stream').get('name')
+                if app.get('published') else 'NOT PUBLISHED!', app.get('name'),
+                app.get('id'))
+
+        return apps
 
     def scrape_all_streams(self):
-        return self.__qrs_api_helper.get_full_stream_list()
+        self.__log_scrape_start('Scraping all Streams...')
+        streams = self.__qrs_api_helper.get_full_stream_list()
+
+        logging.info('  %s Streams found:', len(streams))
+        for stream in streams:
+            logging.info('    - %s [%s]', stream.get('name'), stream.get('id'))
+
+        return streams
 
     def scrape_sheets(self, app_metadata):
-        sheets = self.__engine_api_helper.get_sheets(app_metadata.get('id'))
-        return sheets if sheets else []
+        self.__log_scrape_start('Scraping Sheets from the "%s" App',
+                                app_metadata.get('name'))
+        sheets = self.__engine_api_helper.get_sheets(
+            app_metadata.get('id')) or []
+
+        logging.info('  %s Sheets found:', len(sheets))
+        for sheet in sheets:
+            q_meta = sheet.get('qMeta')
+            logging.info('    - %s%s [%s]',
+                         '' if q_meta.get('published') else 'NOT PUBLISHED! ',
+                         q_meta.get('title'),
+                         sheet.get('qInfo').get('qId'))
+
+        return sheets
+
+    @classmethod
+    def __log_scrape_start(cls, message, *args):
+        logging.info('')
+        logging.info(message, *args)
+        logging.info('-------------------------------------------------')

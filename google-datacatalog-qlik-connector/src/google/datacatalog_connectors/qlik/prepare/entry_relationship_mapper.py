@@ -21,19 +21,33 @@ from google.datacatalog_connectors.qlik.prepare import constants
 
 class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
     __APP = constants.USER_SPECIFIED_TYPE_APP
+    __SHEET = constants.USER_SPECIFIED_TYPE_SHEET
     __STREAM = constants.USER_SPECIFIED_TYPE_STREAM
 
-    def fulfill_tag_fields(self, assembled_entries_data):
-        resolvers = (self.__resolve_app_mappings,)
+    def fulfill_tag_fields(self, assembled_entries):
+        resolvers = (
+            self.__resolve_app_mappings,
+            self.__resolve_sheet_mappings,
+        )
 
-        self._fulfill_tag_fields(assembled_entries_data, resolvers)
+        self._fulfill_tag_fields(assembled_entries, resolvers)
 
     @classmethod
-    def __resolve_app_mappings(cls, assembled_entries_data, id_name_pairs):
-        for assembled_entry_data in assembled_entries_data:
-            entry = assembled_entry_data.entry
-            if not entry.user_specified_type == cls.__APP:
-                continue
+    def __resolve_app_mappings(cls, assembled_entries, id_name_pairs):
+        app_assembled_entries = [
+            assembled_entry for assembled_entry in assembled_entries
+            if assembled_entry.entry.user_specified_type == cls.__APP
+        ]
+        for assembled_entry in app_assembled_entries:
+            cls._map_related_entry(assembled_entry, cls.__STREAM, 'stream_id',
+                                   'stream_entry', id_name_pairs)
 
-            cls._map_related_entry(assembled_entry_data, cls.__STREAM,
-                                   'stream_id', 'stream_entry', id_name_pairs)
+    @classmethod
+    def __resolve_sheet_mappings(cls, assembled_entries, id_name_pairs):
+        sheet_assembled_entries = [
+            assembled_entry for assembled_entry in assembled_entries
+            if assembled_entry.entry.user_specified_type == cls.__SHEET
+        ]
+        for assembled_entry in sheet_assembled_entries:
+            cls._map_related_entry(assembled_entry, cls.__APP, 'app_id',
+                                   'app_entry', id_name_pairs)

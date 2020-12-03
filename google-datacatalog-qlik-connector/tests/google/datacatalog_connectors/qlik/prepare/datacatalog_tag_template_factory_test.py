@@ -71,16 +71,16 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
             'Username who modified it',
             tag_template.fields['modified_by_username'].display_name)
 
+        self.assertEqual(self.__BOOL_TYPE,
+                         tag_template.fields['published'].type.primitive_type)
+        self.assertEqual('Published',
+                         tag_template.fields['published'].display_name)
+
         self.assertEqual(
             self.__TIMESTAMP_TYPE,
             tag_template.fields['publish_time'].type.primitive_type)
         self.assertEqual('Publish time',
                          tag_template.fields['publish_time'].display_name)
-
-        self.assertEqual(self.__BOOL_TYPE,
-                         tag_template.fields['published'].type.primitive_type)
-        self.assertEqual('Published',
-                         tag_template.fields['published'].display_name)
 
         self.assertEqual(
             self.__TIMESTAMP_TYPE,
@@ -140,6 +140,82 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
             tag_template.fields['schema_path'].type.primitive_type)
         self.assertEqual('Schema path',
                          tag_template.fields['schema_path'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['site_url'].type.primitive_type)
+        self.assertEqual('Qlik Sense site url',
+                         tag_template.fields['site_url'].display_name)
+
+    def test_make_tag_template_for_sheet(self):
+        tag_template = self.__factory.make_tag_template_for_sheet()
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'tagTemplates/qlik_sheet_metadata', tag_template.name)
+
+        self.assertEqual('Qlik Sheet Metadata', tag_template.display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['id'].type.primitive_type)
+        self.assertEqual('Unique Id', tag_template.fields['id'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['owner_username'].type.primitive_type)
+        self.assertEqual('Owner username',
+                         tag_template.fields['owner_username'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['owner_name'].type.primitive_type)
+        self.assertEqual('Owner name',
+                         tag_template.fields['owner_name'].display_name)
+
+        self.assertEqual(self.__BOOL_TYPE,
+                         tag_template.fields['published'].type.primitive_type)
+        self.assertEqual('Published',
+                         tag_template.fields['published'].display_name)
+
+        self.assertEqual(
+            self.__TIMESTAMP_TYPE,
+            tag_template.fields['publish_time'].type.primitive_type)
+        self.assertEqual('Publish time',
+                         tag_template.fields['publish_time'].display_name)
+
+        self.assertEqual(self.__BOOL_TYPE,
+                         tag_template.fields['approved'].type.primitive_type)
+        self.assertEqual('Approved',
+                         tag_template.fields['approved'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['app_id'].type.primitive_type)
+        self.assertEqual('App Id', tag_template.fields['app_id'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['app_name'].type.primitive_type)
+        self.assertEqual('App name',
+                         tag_template.fields['app_name'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['app_entry'].type.primitive_type)
+        self.assertEqual('Data Catalog Entry for the App',
+                         tag_template.fields['app_entry'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['source_object'].type.primitive_type)
+        self.assertEqual('Source object',
+                         tag_template.fields['source_object'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['draft_object'].type.primitive_type)
+        self.assertEqual('Draft object',
+                         tag_template.fields['draft_object'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['site_url'].type.primitive_type)
+        self.assertEqual('Qlik Sense site url',
+                         tag_template.fields['site_url'].display_name)
 
     def test_make_tag_template_for_stream(self):
         tag_template = self.__factory.make_tag_template_for_stream()
