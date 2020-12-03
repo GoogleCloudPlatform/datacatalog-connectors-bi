@@ -53,17 +53,12 @@ class AssembledEntryFactory:
         return assembled_entries
 
     def __initialize_tag_templates(self, tag_templates_dict):
-        self.__app_tag_template = self.__get_tag_template(
-            constants.TAG_TEMPLATE_ID_APP, tag_templates_dict)
-        self.__sheet_tag_template = self.__get_tag_template(
-            constants.TAG_TEMPLATE_ID_SHEET, tag_templates_dict)
-        self.__stream_tag_template = self.__get_tag_template(
-            constants.TAG_TEMPLATE_ID_STREAM, tag_templates_dict)
-
-    @classmethod
-    def __get_tag_template(cls, tag_template_id, tag_templates_dict):
-        return tag_templates_dict[tag_template_id] \
-            if tag_template_id in tag_templates_dict else None
+        self.__app_tag_template = \
+            tag_templates_dict.get(constants.TAG_TEMPLATE_ID_APP)
+        self.__sheet_tag_template = \
+            tag_templates_dict.get(constants.TAG_TEMPLATE_ID_SHEET)
+        self.__stream_tag_template = \
+            tag_templates_dict.get(constants.TAG_TEMPLATE_ID_STREAM)
 
     def __make_assembled_entry_for_stream(self, stream_metadata):
         entry_id, entry = \
