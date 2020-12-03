@@ -102,47 +102,47 @@ class MetadataSynchronizer:
         all_streams = self.__metadata_scraper.scrape_all_streams()
         all_apps = self.__metadata_scraper.scrape_all_apps()
 
-        # Being not public means the app is a work in progress, so it can be
+        # Not being published means the app is a work in progress, so it can be
         # skipped.
-        public_apps = [app for app in all_apps if app.get('published')]
+        published_apps = [app for app in all_apps if app.get('published')]
 
-        for app in public_apps:
+        for app in published_apps:
             # The 'sheets' field is not available in the scrape apps API
             # response, so it is injected into the returned metadata object to
             # turn further processing more efficient.
-            app['sheets'] = self.__scrape_public_sheets(app)
+            app['sheets'] = self.__scrape_published_sheets(app)
 
         self.__assemble_streams_metadata_from_flat_lists(
-            all_streams, public_apps)
+            all_streams, published_apps)
 
         return all_streams
 
-    def __scrape_public_sheets(self, app):
-        """Scrape metadata from all the public Sheets the current user has
+    def __scrape_published_sheets(self, app):
+        """Scrape metadata from all the published Sheets the current user has
         access to within the given App.
 
         :return: A ``list`` of sheet metadata.
         """
         sheets = self.__metadata_scraper.scrape_sheets(app)
-        # Being not public means the sheet is a work in progress, so it can be
-        # skipped.
-        public_sheets = [
+        # Not being published means the sheet is a work in progress, so it can
+        # be skipped.
+        published_sheets = [
             sheet for sheet in sheets if sheet.get('qMeta').get('published')
         ]
         # The 'app' field is not available in the scrape sheets API response,
         # so it is injected into the returned metadata object to turn further
         # processing more efficient.
-        for sheet in public_sheets:
+        for sheet in published_sheets:
             sheet['app'] = {
                 'id': app.get('id'),
                 'name': app.get('name'),
             }
 
-        return public_sheets
+        return published_sheets
 
     @classmethod
     def __assemble_streams_metadata_from_flat_lists(cls, all_streams,
-                                                    public_apps):
+                                                    published_apps):
         """Assemble the streams metadata from the given flat asset lists.
 
         """
@@ -151,7 +151,7 @@ class MetadataSynchronizer:
         for stream in all_streams:
             streams_dict[stream.get('id')] = stream
 
-        for app in public_apps:
+        for app in published_apps:
             stream_id = app.get('stream').get('id')
 
             # The 'apps' field is not available in the scrape streams API

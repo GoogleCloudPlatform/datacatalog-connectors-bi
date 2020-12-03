@@ -102,9 +102,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_called_once()
 
-    def test_run_public_app_metadata_should_succeed(self, mock_mapper,
-                                                    mock_cleaner,
-                                                    mock_ingestor):
+    def test_run_published_app_metadata_should_succeed(self, mock_mapper,
+                                                       mock_cleaner,
+                                                       mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
         scraper = attrs['_MetadataSynchronizer__metadata_scraper']
@@ -113,7 +113,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
-            [self.__make_fake_public_app()]
+            [self.__make_fake_published_app()]
         scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
@@ -176,9 +176,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_called_once()
 
-    def test_run_public_sheet_metadata_should_succeed(self, mock_mapper,
-                                                      mock_cleaner,
-                                                      mock_ingestor):
+    def test_run_published_sheet_metadata_should_succeed(
+            self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
         scraper = attrs['_MetadataSynchronizer__metadata_scraper']
@@ -187,8 +186,10 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
-            [self.__make_fake_public_app()]
-        scraper.scrape_sheets.return_value = [self.__make_fake_public_sheet()]
+            [self.__make_fake_published_app()]
+        scraper.scrape_sheets.return_value = [
+            self.__make_fake_published_sheet()
+        ]
 
         self.__synchronizer.run()
 
@@ -243,7 +244,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
-            [self.__make_fake_public_app()]
+            [self.__make_fake_published_app()]
         scraper.scrape_sheets.return_value = [self.__make_fake_wip_sheet()]
 
         self.__synchronizer.run()
@@ -282,7 +283,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         }
 
     @classmethod
-    def __make_fake_public_app(cls):
+    def __make_fake_published_app(cls):
         return {
             'id': 'test_app',
             'published': True,
@@ -306,7 +307,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         }
 
     @classmethod
-    def __make_fake_public_sheet(cls):
+    def __make_fake_published_sheet(cls):
         sheet = cls.__make_fake_sheet()
         sheet['qMeta']['published'] = True
         return sheet
