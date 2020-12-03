@@ -176,6 +176,105 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_called_once()
 
+    def test_run_public_sheet_metadata_should_succeed(self, mock_mapper,
+                                                      mock_cleaner,
+                                                      mock_ingestor):
+
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
+            '_MetadataSynchronizer__assembled_entry_factory']
+
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_apps.return_value = \
+            [self.__make_fake_public_app()]
+        scraper.scrape_sheets.return_value = [self.__make_fake_public_sheet()]
+
+        self.__synchronizer.run()
+
+        expected_make_assembled_entries_call_arg = {
+            'id':
+                'test_stream',
+            'apps': [{
+                'id':
+                    'test_app',
+                'published':
+                    True,
+                'stream': {
+                    'id': 'test_stream'
+                },
+                'sheets': [{
+                    'qInfo': {
+                        'qId': 'test_sheet',
+                    },
+                    'qMeta': {
+                        'published': True,
+                    },
+                    'app': {
+                        'id': 'test_app',
+                        'name': None
+                    },
+                }],
+            }]
+        }
+
+        make_assembled_entries_args = \
+            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        self.assertEqual(expected_make_assembled_entries_call_arg,
+                         make_assembled_entries_args[0])
+
+        mapper = mock_mapper.return_value
+        mapper.fulfill_tag_fields.assert_called_once()
+
+        cleaner = mock_cleaner.return_value
+        cleaner.delete_obsolete_metadata.assert_called_once()
+
+        ingestor = mock_ingestor.return_value
+        ingestor.ingest_metadata.assert_called_once()
+
+    def test_run_wip_sheet_metadata_should_succeed(self, mock_mapper,
+                                                   mock_cleaner,
+                                                   mock_ingestor):
+
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
+            '_MetadataSynchronizer__assembled_entry_factory']
+
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_apps.return_value = \
+            [self.__make_fake_public_app()]
+        scraper.scrape_sheets.return_value = [self.__make_fake_wip_sheet()]
+
+        self.__synchronizer.run()
+
+        expected_make_assembled_entries_call_arg = {
+            'id':
+                'test_stream',
+            'apps': [{
+                'id': 'test_app',
+                'published': True,
+                'stream': {
+                    'id': 'test_stream'
+                },
+                'sheets': [],
+            }]
+        }
+
+        make_assembled_entries_args = \
+            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        self.assertEqual(expected_make_assembled_entries_call_arg,
+                         make_assembled_entries_args[0])
+
+        mapper = mock_mapper.return_value
+        mapper.fulfill_tag_fields.assert_called_once()
+
+        cleaner = mock_cleaner.return_value
+        cleaner.delete_obsolete_metadata.assert_called_once()
+
+        ingestor = mock_ingestor.return_value
+        ingestor.ingest_metadata.assert_called_once()
+
     @classmethod
     def __make_fake_stream(cls):
         return {
@@ -196,3 +295,24 @@ class MetadataSynchronizerTest(unittest.TestCase):
             'id': 'test_app',
             'published': False,
         }
+
+    @classmethod
+    def __make_fake_sheet(cls):
+        return {
+            'qInfo': {
+                'qId': 'test_sheet',
+            },
+            'qMeta': {},
+        }
+
+    @classmethod
+    def __make_fake_public_sheet(cls):
+        sheet = cls.__make_fake_sheet()
+        sheet['qMeta']['published'] = True
+        return sheet
+
+    @classmethod
+    def __make_fake_wip_sheet(cls):
+        sheet = cls.__make_fake_sheet()
+        sheet['qMeta']['published'] = False
+        return sheet
