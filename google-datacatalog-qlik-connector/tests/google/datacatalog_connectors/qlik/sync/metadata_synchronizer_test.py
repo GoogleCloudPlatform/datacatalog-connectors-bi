@@ -145,8 +145,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_called_once()
 
-    def test_run_wip_app_metadata_should_succeed(self, mock_mapper,
-                                                 mock_cleaner, mock_ingestor):
+    def test_run_not_published_app_metadata_should_succeed(
+            self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
         scraper = attrs['_MetadataSynchronizer__metadata_scraper']
@@ -233,9 +233,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_called_once()
 
-    def test_run_wip_sheet_metadata_should_succeed(self, mock_mapper,
-                                                   mock_cleaner,
-                                                   mock_ingestor):
+    def test_run_not_published_sheet_metadata_should_succeed(
+            self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
         scraper = attrs['_MetadataSynchronizer__metadata_scraper']
