@@ -104,6 +104,19 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)
 
+    def test_make_tag_for_app_should_not_set_published_time_if_not_published(
+            self):
+
+        tag_template = \
+            self.__tag_template_factory.make_tag_template_for_app()
+
+        metadata = {
+            'published': False,
+        }
+
+        tag = self.__factory.make_tag_for_app(tag_template, metadata)
+        self.assertFalse('publish_time' in tag.fields)
+
     def test_make_tag_for_sheet_should_set_all_available_fields(self):
         tag_template = \
             self.__tag_template_factory.make_tag_template_for_sheet()
@@ -156,6 +169,22 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)
+
+    def test_make_tag_for_sheet_should_not_set_published_time_if_not_published(
+            self):
+
+        tag_template = \
+            self.__tag_template_factory.make_tag_template_for_sheet()
+
+        metadata = {
+            'qInfo': {},
+            'qMeta': {
+                'published': False,
+            },
+        }
+
+        tag = self.__factory.make_tag_for_sheet(tag_template, metadata)
+        self.assertFalse('publish_time' in tag.fields)
 
     def test_make_tag_for_stream_should_set_all_available_fields(self):
         tag_template = \

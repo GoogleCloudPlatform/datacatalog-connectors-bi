@@ -46,10 +46,14 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'modified_by_username',
                                app_metadata.get('modifiedByUserName'))
 
-        self._set_bool_field(tag, 'published', app_metadata.get('published'))
+        published = app_metadata.get('published')
+        self._set_bool_field(tag, 'published', published)
 
         publish_time = app_metadata.get('publishTime')
-        if publish_time:
+        # The publish time may come with a value such as
+        # '1753-01-01T00:00:00.000Z' when the app has not been published,
+        # so both inputs are tested before setting the tag field.
+        if published and publish_time:
             self._set_timestamp_field(
                 tag, 'publish_time',
                 datetime.strptime(publish_time,
@@ -114,10 +118,14 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
             self._set_string_field(tag, 'owner_name', owner.get('name'))
 
-        self._set_bool_field(tag, 'published', q_meta.get('published'))
+        published = q_meta.get('published')
+        self._set_bool_field(tag, 'published', published)
 
         publish_time = q_meta.get('publishTime')
-        if publish_time:
+        # The publish time may come with a value such as
+        # '1753-01-01T00:00:00.000Z' when the sheet has not been published,
+        # so both inputs are tested before setting the tag field.
+        if published and publish_time:
             self._set_timestamp_field(
                 tag, 'publish_time',
                 datetime.strptime(publish_time,
