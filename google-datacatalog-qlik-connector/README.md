@@ -43,6 +43,8 @@ currently supporting below asset types:
   * [4.3. Run Tests](#43-run-tests)
   * [4.4. Additional resources](#44-additional-resources)
 - [5. Troubleshooting](#5-troubleshooting)
+  * [5.1. Qlik APIs compatibility](#51-qlik-apis-compatibility)
+  * [5.2. Data Catalog quota](#52-data-catalog-quota)
 
 <!-- tocstop -->
 
@@ -209,9 +211,29 @@ documentation](docs/developer-resources).
 
 ## 5. Troubleshooting
 
-In the case a connector execution hits Data Catalog quota limit, an error will
-be raised and logged with the following detailment, depending on the performed
-operation READ/WRITE/SEARCH: 
+### 5.1. Qlik APIs compatibility
+
+The connector may fail during the scrape stage if the Qlik APIs do not return
+metadata in the expected format. As a reference, the below versions were
+already validated:
+
+- Qlik Sense Repository Service API
+
+| Version                 | Result  |
+| ----------------------- | :-----: |
+| 34.16.0 (September2020) | SUCCESS |
+
+- Qlik Engine JSON API
+
+| Version                  | Result  |
+| ------------------------ | :-----: |
+| 12.763.4 (September2020) | SUCCESS |
+
+### 5.2. Data Catalog quota
+
+In case a connector execution hits Data Catalog quota limit, an error will be
+raised and logged with the following details, depending on the performed
+operation (READ/WRITE/SEARCH): 
 
 ```
 status = StatusCode.RESOURCE_EXHAUSTED

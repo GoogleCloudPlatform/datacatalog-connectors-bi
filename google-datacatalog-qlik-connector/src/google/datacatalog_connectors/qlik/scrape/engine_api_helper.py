@@ -154,7 +154,7 @@ class EngineAPIHelper:
               An App ID to be appended to the Engine API URLs when making
               websocket connections and then get an isolated Qlik Engine
               session for each Qlik App (see [Connecting to the Qlik Engine
-              JSON API](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/EngineAPI/Content/Sense_EngineAPI/GettingStarted/connecting-to-engine-api.htm)).  # noqa E510
+              JSON API](https://help.qlik.com/en-US/sense-developer/September2020/Subsystems/EngineAPI/Content/Sense_EngineAPI/GettingStarted/connecting-to-engine-api.htm)).  # noqa E510
 
         Returns:
             An awaiting function that yields a :class:`WebSocketClientProtocol`
@@ -176,7 +176,7 @@ class EngineAPIHelper:
         e.g. `GetObjects`.
 
         Returns:
-            An [ObjectInterface](https://help.qlik.com/en-US/sense-developer/November2020/APIs/EngineAPI/definitions-ObjectInterface.html).  # noqa E501
+            An [ObjectInterface](https://help.qlik.com/en-US/sense-developer/September2020/APIs/EngineAPI/definitions-ObjectInterface.html).  # noqa E501
         """
         request_id = cls.__generate_request_id()
         await websocket.send(

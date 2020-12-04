@@ -2,7 +2,7 @@
 
 Developers may leverage [Postman](https://www.postman.com/) to validate API
 requests. The available collection covers the [Qlik Sense Repository Service
-API](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Introduction.htm).
+API](https://help.qlik.com/en-US/sense-developer/September2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Introduction.htm).
 
 ## Collection for the Qlik Sense Repository Service API
 

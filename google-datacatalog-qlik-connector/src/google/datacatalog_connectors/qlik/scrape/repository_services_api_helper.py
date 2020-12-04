@@ -31,7 +31,7 @@ class RepositoryServicesAPIHelper:
     QRS returns full objects when /full is included in the request path;
     otherwise, it returns condensed objects. Full objects are preferred
     because they allow the connector to read a richer metadata set (see [Full
-    versus condensed objects](https://help.qlik.com/en-US/sense-developer/November2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Connect-API-Full-vs-Condensed-Objects.htm)  # noqa E501
+    versus condensed objects](https://help.qlik.com/en-US/sense-developer/September2020/Subsystems/RepositoryServiceAPI/Content/Sense_RepositoryServiceAPI/RepositoryServiceAPI-Connect-API-Full-vs-Condensed-Objects.htm)  # noqa E501
     for more information).
 
     Attributes:
