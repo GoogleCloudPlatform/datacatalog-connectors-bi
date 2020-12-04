@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "aaec14b2-a88e-48b1-ad44-813c86fb78e5",
+		"_postman_id": "384874ba-8316-4448-bd54-c2725dbf35a2",
 		"name": "Qlik Sense Repository Service API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -14,7 +14,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0c67375b-9ef5-4b45-afc2-c566b8e18e79",
+								"id": "e5cc771f-0aa5-44b9-8d6c-c6ac1ef50750",
 								"exec": [
 									"const jar = pm.cookies.jar();",
 									"",
@@ -32,7 +32,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1b021c78-014d-44ad-bde4-ca2b69ea86ce",
+								"id": "31fd1fa7-45b1-4462-a3ef-b7911540493b",
 								"exec": [
 									"pm.test(\"Status code is 302\", function () {",
 									"    pm.response.to.have.status(302);",
@@ -96,7 +96,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "966dfbae-2dfa-4277-a7ba-31e319e64a39",
+								"id": "1f8de89b-9b2e-4ad4-98b5-af8f630b9fa0",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -158,7 +158,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d94a2d4f-cf4a-4dfa-a777-f873fcda70e2",
+								"id": "c22cc6cf-f401-4a11-b0f4-3b4d19fcd739",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -235,7 +235,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c87cd1eb-03de-4575-b3fb-09e45b06263b",
+								"id": "edb559e2-772d-42ca-bd80-0d80f5504067",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -282,6 +282,62 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "1.02.01 Generate the API reference document",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "725f237e-a1d9-431c-b0ab-704d09336801",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/about/openapi/main?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"about",
+								"openapi",
+								"main"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -295,7 +351,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "44ad11cf-fc18-4d97-aac2-70adf4c0e9ea",
+								"id": "f318e794-bb25-4eca-b44a-fe90ef516667",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -358,7 +414,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4e2c452d-cd31-457b-8f2a-be34cac52dae",
+								"id": "a2ffdff4-9691-4e74-92e2-2d597dee7948",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -422,7 +478,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "10f70186-9025-4a7f-bda1-b11123f439fe",
+								"id": "0b6b5999-be06-49d9-b875-c2eb3c143c7d",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -475,15 +531,15 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "X Apps / Hubs",
+			"name": "3 Apps / Hubs",
 			"item": [
 				{
-					"name": "X.01.01 Get App list",
+					"name": "3.01.01 Get App list",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "72df1475-2d12-4b68-baa2-8e943fef03c2",
+								"id": "92ee4164-9083-43e7-909d-869dacd315ea",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -532,12 +588,12 @@
 					"response": []
 				},
 				{
-					"name": "X.01.02 Get App list (full)",
+					"name": "3.01.02 Get App list (full)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "cf9c0aad-40ed-492d-b4d4-aa00d6c6178a",
+								"id": "f24c05f7-7757-4c7b-87fb-03e9ae1f6787",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -587,12 +643,12 @@
 					"response": []
 				},
 				{
-					"name": "X.02.01 Get Hub list",
+					"name": "3.02.01 Get Hub list",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "732c7935-865a-4b1f-ad73-9e99405051a5",
+								"id": "d95120d7-0c99-4646-b5ec-0a9d56c569bf",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -642,12 +698,12 @@
 					"response": []
 				},
 				{
-					"name": "X.02.02 Get Hub list  (full)",
+					"name": "3.02.02 Get Hub list  (full)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "16da1c1b-677b-4703-a3d5-6e7c828bc80f",
+								"id": "0af95b9f-a183-458c-a80b-f19cc3b61613",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -709,7 +765,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "97f5f789-08a7-4c2c-9b05-8aa4b4b008f2",
+								"id": "6cf4c152-a200-4be0-b946-7a25d494f0ff",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -769,7 +825,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f5470ec8-07b6-490f-84d1-3655336c6aee",
+								"id": "4db184fa-e618-43ea-b4c7-e38cea149efe",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -829,7 +885,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "09ed9da1-24a4-4ff8-9645-d7a981ee3d34",
+								"id": "b4cb3990-422f-4381-868f-dba3f1a5b699",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
