@@ -209,7 +209,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
     # TODO Remove the below test case when there is a definitive fix for
     #  https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues/43  # noqa E501
-    def test_make_entry_non_compliant_site_name_should_replace_chars(self):
+    def test_make_entry_non_compliant_site_name_should_replace_linked_resource_chars(  # noqa E501
+            self):
+
         metadata = {
             'luid': 'a123-b456',
             'site': {
