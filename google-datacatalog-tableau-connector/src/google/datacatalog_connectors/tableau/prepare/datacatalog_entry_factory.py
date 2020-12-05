@@ -177,6 +177,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         # TODO Remove the below workaround when there is a definitive fix for
         #  https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues/43  # noqa E501
+        #  Valid Linked Resource chars: letters, numbers, periods, colons,
+        #  slashes, underscores, dashes and hashes.
         compliant_site_name = re.sub(r'[^\w.,/\-#]', '_', site_name)
 
         return '' \
