@@ -25,13 +25,15 @@ class MetadataScraper:
                  api_version,
                  username,
                  password,
-                 site=None):
+                 site_content_url=None):
 
         self.__server_address = server_address
         self.__api_version = api_version
         self.__username = username
         self.__password = password
-        self.__site = site
+        self.__site_content_url = site_content_url
+
+        self.__auth_credentials = {}
 
     def scrape_dashboards(self, query_filter=None):
         return self.__scrape_metadata(self.__scrape_dashboards, query_filter)
@@ -46,51 +48,68 @@ class MetadataScraper:
         metadata = []
 
         sites = self.__get_sites()
-        if len(sites) == 0:
+        if not sites:
             return metadata
 
+        api_helper = metadata_api_helper.MetadataAPIHelper(
+            self.__server_address)
+
         for site in sites:
-            auth_credentials = authenticator.Authenticator.authenticate(
-                self.__server_address, self.__api_version, self.__username,
-                self.__password, site)
+            site_content_url = site.get('contentUrl')
+            auth_credentials = self.__auth_credentials.get(site_content_url)
+            if not auth_credentials:
+                auth_credentials = authenticator.Authenticator.authenticate(
+                    self.__server_address, self.__api_version, self.__username,
+                    self.__password, site_content_url)
+                self.__auth_credentials[site_content_url] = auth_credentials
             metadata.extend(
-                reader_method(
-                    metadata_api_helper.MetadataAPIHelper(
-                        self.__server_address, auth_credentials),
-                    query_filter))
+                reader_method(api_helper, site, auth_credentials,
+                              query_filter))
 
         return metadata
 
     @classmethod
-    def __scrape_dashboards(cls, metadata_reader, query_filter):
-        return metadata_reader.fetch_dashboards(query_filter)
+    def __scrape_dashboards(cls, api_helper, current_site, auth_credentials,
+                            query_filter):
+
+        return api_helper.fetch_dashboards(current_site, auth_credentials,
+                                           query_filter)
 
     @classmethod
-    def __scrape_sites(cls, metadata_reader, query_filter):
-        return metadata_reader.fetch_sites(query_filter)
+    def __scrape_sites(cls, api_helper, current_site, auth_credentials,
+                       query_filter):
+
+        return api_helper.fetch_sites(current_site, auth_credentials,
+                                      query_filter)
 
     @classmethod
-    def __scrape_workbooks(cls, metadata_reader, query_filter):
-        return metadata_reader.fetch_workbooks(query_filter)
+    def __scrape_workbooks(cls, api_helper, current_site, auth_credentials,
+                           query_filter):
+
+        return api_helper.fetch_workbooks(current_site, auth_credentials,
+                                          query_filter)
 
     def __get_sites(self):
-        if self.__site:
-            sites = [self.__site]
-        else:
-            default_site_credentials = \
+        api_helper = rest_api_helper.RestAPIHelper(
+            server_address=self.__server_address,
+            api_version=self.__api_version)
+
+        if self.__site_content_url:
+            site_credentials = \
                 authenticator.Authenticator.authenticate(
                     self.__server_address,
                     self.__api_version,
                     self.__username,
-                    self.__password)
-            available_sites = rest_api_helper.RestAPIHelper(
-                server_address=self.__server_address,
-                api_version=self.__api_version,
-                auth_credentials=default_site_credentials). \
-                get_all_sites_on_server()
-            sites = [
-                available_site['contentUrl']
-                for available_site in available_sites
-            ]
+                    self.__password,
+                    site_content_url=self.__site_content_url)
+            self.__auth_credentials[self.__site_content_url] = site_credentials
+            return [api_helper.get_site(site_credentials)]
 
-        return sites
+        default_site_credentials = \
+            authenticator.Authenticator.authenticate(
+                self.__server_address,
+                self.__api_version,
+                self.__username,
+                self.__password)
+        self.__auth_credentials['default'] = default_site_credentials
+        return api_helper.get_all_sites_on_server(default_site_credentials)

@@ -25,7 +25,7 @@ class Authenticator:
                      api_version,
                      username,
                      password,
-                     site=None):
+                     site_content_url=None):
 
         url = f'{server_address}/api/{api_version}/auth/signin'
 
@@ -39,7 +39,7 @@ class Authenticator:
                 'name': username,
                 'password': password,
                 'site': {
-                    'contentUrl': site
+                    'contentUrl': site_content_url
                 }
             }
         }

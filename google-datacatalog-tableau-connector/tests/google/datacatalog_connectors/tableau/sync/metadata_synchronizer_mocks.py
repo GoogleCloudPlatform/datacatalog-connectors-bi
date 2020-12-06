@@ -37,7 +37,7 @@ class FakeSynchronizer(metadata_synchronizer.MetadataSynchronizer):
                          tableau_site='test-site',
                          datacatalog_project_id='test-project-id',
                          datacatalog_location_id='test-location-id',
-                         assets_type=['test-type'])
+                         asset_types=['test-type'])
 
     def _scrape_source_system_metadata(self, query_filter=None):
         return []

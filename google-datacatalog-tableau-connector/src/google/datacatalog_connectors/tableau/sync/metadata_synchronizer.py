@@ -34,22 +34,22 @@ class MetadataSynchronizer(abc.ABC):
                  tableau_password,
                  datacatalog_project_id,
                  datacatalog_location_id,
-                 assets_type,
+                 asset_types,
                  tableau_site=None):
 
         super().__init__()
 
         self.__project_id = datacatalog_project_id
         self.__location_id = datacatalog_location_id
-        self.__assets_type = assets_type
-        self.__site = tableau_site
+        self.__asset_types = asset_types
+        self.__site_content_url = tableau_site
 
         self._metadata_scraper = scrape.MetadataScraper(
             server_address=tableau_server_address,
             api_version=tableau_api_version,
             username=tableau_username,
             password=tableau_password,
-            site=tableau_site)
+            site_content_url=tableau_site)
 
         self._entry_factory = \
             prepare.AssembledEntryFactory(
@@ -73,9 +73,11 @@ class MetadataSynchronizer(abc.ABC):
 
         # Scrape metadata from Tableau server.
         logging.info('')
-        logging.info(f'===> Scraping Tableau metadata'
-                     f' [site: {self.__site if self.__site else "all"},'
-                     f' type: {self.__assets_type}]...')
+        logging.info(
+            f'===> Scraping Tableau metadata'
+            f' [site: '
+            f'{self.__site_content_url if self.__site_content_url else "all"},'
+            f' type: {self.__asset_types}]...')
 
         source_system_metadata = self._scrape_source_system_metadata(
             query_filter)
@@ -158,7 +160,7 @@ class MetadataSynchronizer(abc.ABC):
 
     def __get_search_query(self):
         search_query = f'system={self.__SPECIFIED_SYSTEM} ('
-        for asset_type in self.__assets_type:
+        for asset_type in self.__asset_types:
             search_query += f'type={asset_type} or '
         search_query = search_query[:-4]
         search_query += ')'

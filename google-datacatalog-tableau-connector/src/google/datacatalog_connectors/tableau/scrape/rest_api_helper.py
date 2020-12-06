@@ -16,23 +16,40 @@
 
 import requests
 
+from google.datacatalog_connectors.tableau.scrape import constants
+
 
 class RestAPIHelper:
 
-    def __init__(self, server_address, api_version, auth_credentials):
+    def __init__(self, server_address, api_version):
         self.__base_api_endpoint = f'{server_address}/api/{api_version}'
-        self.__headers = {
-            'X-Tableau-Auth': auth_credentials['token'],
+        self.__common_headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
 
-    def get_all_sites_on_server(self):
+    def get_all_sites_on_server(self, auth_credentials):
         url = f'{self.__base_api_endpoint}/sites'
 
-        result = requests.get(url=url, headers=self.__headers).json()
+        headers = self.__common_headers.copy()
+        headers[
+            constants.X_TABLEAU_AUTH_HEADER_NAME] = auth_credentials['token']
 
-        return result['sites']['site'] \
-            if result and 'sites' in result and result['sites'] \
-            and 'site' in result['sites'] \
+        response = requests.get(url=url, headers=headers).json()
+
+        return response['sites']['site'] \
+            if response and 'sites' in response and response['sites'] \
+            and 'site' in response['sites'] \
             else []
+
+    def get_site(self, auth_credentials):
+        url = f'{self.__base_api_endpoint}/sites' \
+              f'/{auth_credentials["site"]["id"]}'
+
+        headers = self.__common_headers.copy()
+        headers[
+            constants.X_TABLEAU_AUTH_HEADER_NAME] = auth_credentials['token']
+
+        response = requests.get(url=url, headers=headers).json()
+
+        return response.get('site')

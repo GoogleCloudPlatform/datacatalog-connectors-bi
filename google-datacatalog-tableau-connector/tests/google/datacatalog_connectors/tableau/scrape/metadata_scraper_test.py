@@ -41,7 +41,7 @@ class MetadataScraperTest(unittest.TestCase):
                                api_version=None,
                                username=None,
                                password=None,
-                               site='test').scrape_workbooks()
+                               site_content_url='test').scrape_workbooks()
 
         self.assertEqual(mock_post_authenticate.call_count, 1)
 
