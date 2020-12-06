@@ -16,6 +16,7 @@
 
 from datetime import datetime
 import logging
+import re
 
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare
@@ -173,4 +174,13 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     @classmethod
     def __format_site_content_url(cls, workbook_metadata):
         site_name = workbook_metadata.get('site').get('name')
-        return '' if site_name.lower() == 'default' else f'/site/{site_name}'
+
+        # TODO Remove the below workaround when there is a definitive fix for
+        #  https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues/43  # noqa E501
+        #  Valid Linked Resource chars: letters, numbers, periods, colons,
+        #  slashes, underscores, dashes and hashes.
+        compliant_site_name = re.sub(r'[^\w.,/\-#]', '_', site_name)
+
+        return '' \
+            if site_name.lower() == 'default' \
+            else f'/site/{compliant_site_name}'
