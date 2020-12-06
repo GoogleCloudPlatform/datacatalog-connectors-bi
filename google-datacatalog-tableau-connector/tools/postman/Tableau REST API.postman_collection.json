@@ -51,7 +51,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"credentials\": {\n\t\t\"name\": \"{{USERNAME}}\",\n\t\t\"password\": \"{{PASSWORD}}\",\n\t\t\"site\": {\n\t\t\t\"contentUrl\": \"{{SITE_URL}}\"\t\n\t\t}\n\t}\n}"
+							"raw": "{\n\t\"credentials\": {\n\t\t\"name\": \"{{USERNAME}}\",\n\t\t\"password\": \"{{PASSWORD}}\",\n\t\t\"site\": {\n\t\t\t\"contentUrl\": \"{{SITE_CONTENT_URL}}\"\t\n\t\t}\n\t}\n}"
 						},
 						"url": {
 							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/auth/signin",
@@ -517,6 +517,102 @@
 								"api",
 								"{{API_VERSION}}",
 								"sites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.06.02 Get Site by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{siteId}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{siteId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.06.03 Get Site by contentUrl",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Tableau-Auth",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/sites/{{SITE_CONTENT_URL}}?key=contentUrl",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"sites",
+								"{{SITE_CONTENT_URL}}"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "contentUrl"
+								}
 							]
 						}
 					},

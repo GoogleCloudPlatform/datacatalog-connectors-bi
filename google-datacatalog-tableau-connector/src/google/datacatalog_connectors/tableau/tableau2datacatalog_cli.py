@@ -53,7 +53,12 @@ class Tableau2DataCatalogCli:
         parser.add_argument('--tableau-password',
                             help='Tableau password',
                             required=True)
-        parser.add_argument('--tableau-site', help='Tableau site')
+        parser.add_argument('--tableau-site',
+                            help='The URL of the site to get information for.'
+                            ' Mandatory for Tableau Online, optional for'
+                            ' Tableau Server (the connector will read metadata'
+                            ' from all sites the user has access to in the'
+                            ' given server if this arg is not provided).')
         parser.add_argument('--datacatalog-project-id',
                             help='Google Cloud Project ID',
                             required=True)
