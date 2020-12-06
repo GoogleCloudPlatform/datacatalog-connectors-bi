@@ -51,29 +51,25 @@ class MetadataScraper:
         if not self.__site_content_urls:
             return metadata
 
-        api_helper = metadata_api_helper.MetadataAPIHelper(
-            self.__server_address)
-
         for site_content_url in self.__site_content_urls:
-            auth_credentials = authenticator.Authenticator.authenticate(
+            api_helper = metadata_api_helper.MetadataAPIHelper(
                 self.__server_address, self.__api_version, self.__username,
                 self.__password, site_content_url)
-            metadata.extend(
-                reader_method(api_helper, auth_credentials, query_filter))
+            metadata.extend(reader_method(api_helper, query_filter))
 
         return metadata
 
     @classmethod
-    def __scrape_dashboards(cls, api_helper, auth_credentials, query_filter):
-        return api_helper.fetch_dashboards(auth_credentials, query_filter)
+    def __scrape_dashboards(cls, api_helper, query_filter):
+        return api_helper.fetch_dashboards(query_filter)
 
     @classmethod
-    def __scrape_sites(cls, api_helper, auth_credentials, query_filter):
-        return api_helper.fetch_sites(auth_credentials, query_filter)
+    def __scrape_sites(cls, api_helper, query_filter):
+        return api_helper.fetch_sites(query_filter)
 
     @classmethod
-    def __scrape_workbooks(cls, api_helper, auth_credentials, query_filter):
-        return api_helper.fetch_workbooks(auth_credentials, query_filter)
+    def __scrape_workbooks(cls, api_helper, query_filter):
+        return api_helper.fetch_workbooks(query_filter)
 
     def __initialize_site_content_urls(self):
         # Single site scraping
@@ -81,16 +77,10 @@ class MetadataScraper:
             return
 
         # Multiple site scraping (only for Tableau Server)
-        default_site_credentials = \
-            authenticator.Authenticator.authenticate(
-                self.__server_address,
-                self.__api_version,
-                self.__username,
-                self.__password)
-
         api_helper = rest_api_helper.RestAPIHelper(self.__server_address,
-                                                   self.__api_version)
-        available_sites = api_helper.get_all_sites_on_server(
-            default_site_credentials)
+                                                   self.__api_version,
+                                                   self.__username,
+                                                   self.__password)
+        available_sites = api_helper.get_all_sites_on_server()
         self.__site_content_urls.extend(
             [site['contentUrl'] for site in available_sites])

@@ -16,7 +16,6 @@
 
 from datetime import datetime
 import logging
-import re
 
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare

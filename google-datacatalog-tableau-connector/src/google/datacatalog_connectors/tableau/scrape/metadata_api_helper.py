@@ -17,29 +17,46 @@
 import requests
 
 from google.datacatalog_connectors.tableau.scrape import \
-    constants, metadata_api_constants
+    authenticator, constants, metadata_api_constants
 
 
 class MetadataAPIHelper:
 
-    def __init__(self, server_address):
+    def __init__(self,
+                 server_address,
+                 api_version,
+                 username,
+                 password,
+                 site_content_url=None):
+
+        self.__server_address = server_address
+        self.__api_version = api_version
+        self.__username = username
+        self.__password = password
+        self.__site_content_url = site_content_url
+
         self.__url = f'{server_address}/relationship-service-war/graphql'
 
-    def fetch_dashboards(self, auth_credentials, query_filter=None):
+        self.__auth_credentials = None
+
+    def fetch_dashboards(self, query_filter=None):
         """
         Read dashboards metadata from a given server.
 
         Args:
-            auth_credentials (dict): Credentials to authenticate the request
             query_filter (dict): Filter fields and values
 
         Returns:
             dashboards: A list of dashboards metadata
         """
+        self.__set_up_auth_credentials()
+
         body = {'query': metadata_api_constants.FETCH_DASHBOARDS_QUERY}
         headers = {
-            constants.X_TABLEAU_AUTH_HEADER_NAME: auth_credentials['token']
+            constants.X_TABLEAU_AUTH_HEADER_NAME:
+                self.__auth_credentials['token']
         }
+
         response = requests.post(url=self.__url, headers=headers,
                                  json=body).json()
 
@@ -52,25 +69,28 @@ class MetadataAPIHelper:
         for dashboard in dashboards:
             if dashboard.get('workbook') and 'site' in dashboard['workbook']:
                 self.__add_site_content_url_field(
-                    dashboard['workbook']['site'], auth_credentials)
+                    dashboard['workbook']['site'])
 
         return dashboards
 
-    def fetch_sites(self, auth_credentials, query_filter=None):
+    def fetch_sites(self, query_filter=None):
         """
         Read sites metadata from a given server.
 
         Args:
-            auth_credentials (dict): Credentials to authenticate the request
             query_filter (dict): Filter fields and values
 
         Returns:
             sites: A list of sites metadata
         """
+        self.__set_up_auth_credentials()
+
         body = {'query': metadata_api_constants.FETCH_SITES_QUERY}
         headers = {
-            constants.X_TABLEAU_AUTH_HEADER_NAME: auth_credentials['token']
+            constants.X_TABLEAU_AUTH_HEADER_NAME:
+                self.__auth_credentials['token']
         }
+
         response = requests.post(url=self.__url, headers=headers,
                                  json=body).json()
 
@@ -81,25 +101,25 @@ class MetadataAPIHelper:
 
         # Site contentUrl handling
         for site in sites:
-            self.__add_site_content_url_field(site, auth_credentials)
+            self.__add_site_content_url_field(site)
             workbooks = site.get('workbooks') or []
             for workbook in workbooks:
-                self.__add_site_content_url_field(workbook['site'],
-                                                  auth_credentials)
+                self.__add_site_content_url_field(workbook['site'])
 
         return sites
 
-    def fetch_workbooks(self, auth_credentials, query_filter=None):
+    def fetch_workbooks(self, query_filter=None):
         """
         Read workbooks metadata from a given server.
 
         Args:
-            auth_credentials (dict): Credentials to authenticate the request
             query_filter (dict): Filter fields and values
 
         Returns:
             workbooks: A list of workbooks metadata
         """
+        self.__set_up_auth_credentials()
+
         body = {'query': metadata_api_constants.FETCH_WORKBOOKS_QUERY}
         if query_filter:
             variables = metadata_api_constants.FETCH_WORKBOOKS_FILTER_TEMPLATE
@@ -107,8 +127,10 @@ class MetadataAPIHelper:
                 variables = variables.replace(f'${key}', value)
             body['variables'] = variables
         headers = {
-            constants.X_TABLEAU_AUTH_HEADER_NAME: auth_credentials['token']
+            constants.X_TABLEAU_AUTH_HEADER_NAME:
+                self.__auth_credentials['token']
         }
+
         response = requests.post(url=self.__url, headers=headers,
                                  json=body).json()
 
@@ -120,14 +142,23 @@ class MetadataAPIHelper:
         # Site contentUrl handling
         for workbook in workbooks:
             if workbook.get('site'):
-                self.__add_site_content_url_field(workbook['site'],
-                                                  auth_credentials)
+                self.__add_site_content_url_field(workbook['site'])
 
         return workbooks
 
-    @classmethod
-    def __add_site_content_url_field(cls, original_site_metadata,
-                                     auth_credentials):
+    def __set_up_auth_credentials(self):
+        if self.__auth_credentials:
+            return
+
+        self.__auth_credentials = \
+            authenticator.Authenticator.authenticate(
+                self.__server_address,
+                self.__api_version,
+                self.__username,
+                self.__password,
+                self.__site_content_url)
+
+    def __add_site_content_url_field(self, original_site_metadata):
         """The `contentUrl` field is not available in the original
         `TableauSite` objects returned by the Metadata API but it is required
         in the prepare stage. So, it is injected into the returned objects to
@@ -135,7 +166,5 @@ class MetadataAPIHelper:
 
         Args:
             original_site_metadata: The object returned by the Metadata API
-            auth_credentials: The auth credentials for the current site
         """
-        original_site_metadata['contentUrl'] = \
-            auth_credentials['site']['contentUrl']
+        original_site_metadata['contentUrl'] = self.__site_content_url
