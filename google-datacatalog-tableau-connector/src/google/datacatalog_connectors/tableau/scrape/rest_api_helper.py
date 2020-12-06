@@ -24,8 +24,8 @@ class RestAPIHelper:
     def __init__(self, server_address, api_version):
         self.__base_api_endpoint = f'{server_address}/api/{api_version}'
         self.__common_headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Content-Type': constants.JSON_CONTENT_TYPE,
+            'Accept': constants.JSON_CONTENT_TYPE
         }
 
     def get_all_sites_on_server(self, auth_credentials):

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+JSON_CONTENT_TYPE = 'application/json'
+
 # Name of the HTTP header used to provide authentication info when sending
 # requests to the Tableau APIs.
 X_TABLEAU_AUTH_HEADER_NAME = 'X-Tableau-Auth'

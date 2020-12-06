@@ -17,6 +17,8 @@
 import logging
 import requests
 
+from google.datacatalog_connectors.tableau.scrape import constants
+
 
 class Authenticator:
 
@@ -31,8 +33,8 @@ class Authenticator:
         url = f'{server_address}/api/{api_version}/auth/signin'
 
         headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Content-Type': constants.JSON_CONTENT_TYPE,
+            'Accept': constants.JSON_CONTENT_TYPE
         }
 
         body = {
