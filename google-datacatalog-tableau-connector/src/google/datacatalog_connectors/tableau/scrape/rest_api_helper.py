@@ -32,24 +32,12 @@ class RestAPIHelper:
         url = f'{self.__base_api_endpoint}/sites'
 
         headers = self.__common_headers.copy()
-        headers[
-            constants.X_TABLEAU_AUTH_HEADER_NAME] = auth_credentials['token']
+        headers[constants.X_TABLEAU_AUTH_HEADER_NAME] = \
+            auth_credentials['token']
 
         response = requests.get(url=url, headers=headers).json()
 
         return response['sites']['site'] \
-            if response and 'sites' in response and response['sites'] \
+            if response and response.get('sites') \
             and 'site' in response['sites'] \
             else []
-
-    def get_site(self, auth_credentials):
-        url = f'{self.__base_api_endpoint}/sites' \
-              f'/{auth_credentials["site"]["id"]}'
-
-        headers = self.__common_headers.copy()
-        headers[
-            constants.X_TABLEAU_AUTH_HEADER_NAME] = auth_credentials['token']
-
-        response = requests.get(url=url, headers=headers).json()
-
-        return response.get('site')

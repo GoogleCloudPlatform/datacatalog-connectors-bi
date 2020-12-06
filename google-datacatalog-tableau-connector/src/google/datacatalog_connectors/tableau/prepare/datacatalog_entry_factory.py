@@ -173,7 +173,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
     @classmethod
     def __format_site_content_url(cls, workbook_metadata):
-        site_content_url = workbook_metadata.get('site').get('contentUrl')
+        site_content_url = workbook_metadata['site'].get('contentUrl')
         return '' \
-            if site_content_url.lower() == 'default' \
+            if not site_content_url or site_content_url.lower() == 'default' \
             else f'/site/{site_content_url}'

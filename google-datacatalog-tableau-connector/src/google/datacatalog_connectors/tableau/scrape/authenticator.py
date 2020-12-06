@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import requests
 
 
@@ -44,5 +45,10 @@ class Authenticator:
             }
         }
 
-        return requests.post(url=url, headers=headers,
-                             json=body).json()['credentials']
+        response = requests.post(url=url, headers=headers, json=body).json()
+
+        if not response.get('credentials'):
+            logging.critical(response)
+            exit(1)
+
+        return response['credentials']

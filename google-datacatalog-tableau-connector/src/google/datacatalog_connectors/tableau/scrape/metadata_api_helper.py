@@ -25,15 +25,11 @@ class MetadataAPIHelper:
     def __init__(self, server_address):
         self.__url = f'{server_address}/relationship-service-war/graphql'
 
-    def fetch_dashboards(self,
-                         current_site,
-                         auth_credentials,
-                         query_filter=None):
+    def fetch_dashboards(self, auth_credentials, query_filter=None):
         """
         Read dashboards metadata from a given server.
 
         Args:
-            current_site (dict): Metadata for the current site
             auth_credentials (dict): Credentials to authenticate the request
             query_filter (dict): Filter fields and values
 
@@ -56,16 +52,15 @@ class MetadataAPIHelper:
         for dashboard in dashboards:
             if dashboard.get('workbook') and 'site' in dashboard['workbook']:
                 self.__add_site_content_url_field(
-                    dashboard['workbook']['site'], current_site)
+                    dashboard['workbook']['site'], auth_credentials)
 
         return dashboards
 
-    def fetch_sites(self, current_site, auth_credentials, query_filter=None):
+    def fetch_sites(self, auth_credentials, query_filter=None):
         """
         Read sites metadata from a given server.
 
         Args:
-            current_site (dict): Metadata for the current site
             auth_credentials (dict): Credentials to authenticate the request
             query_filter (dict): Filter fields and values
 
@@ -86,23 +81,19 @@ class MetadataAPIHelper:
 
         # Site contentUrl handling
         for site in sites:
-            self.__add_site_content_url_field(site, current_site)
+            self.__add_site_content_url_field(site, auth_credentials)
             workbooks = site.get('workbooks') or []
             for workbook in workbooks:
                 self.__add_site_content_url_field(workbook['site'],
-                                                  current_site)
+                                                  auth_credentials)
 
         return sites
 
-    def fetch_workbooks(self,
-                        current_site,
-                        auth_credentials,
-                        query_filter=None):
+    def fetch_workbooks(self, auth_credentials, query_filter=None):
         """
         Read workbooks metadata from a given server.
 
         Args:
-            current_site (dict): Metadata for the current site
             auth_credentials (dict): Credentials to authenticate the request
             query_filter (dict): Filter fields and values
 
@@ -130,13 +121,13 @@ class MetadataAPIHelper:
         for workbook in workbooks:
             if workbook.get('site'):
                 self.__add_site_content_url_field(workbook['site'],
-                                                  current_site)
+                                                  auth_credentials)
 
         return workbooks
 
     @classmethod
     def __add_site_content_url_field(cls, original_site_metadata,
-                                     current_site):
+                                     auth_credentials):
         """The `contentUrl` field is not available in the original
         `TableauSite` objects returned by the Metadata API but it is required
         in the prepare stage. So, it is injected into the returned objects to
@@ -144,6 +135,7 @@ class MetadataAPIHelper:
 
         Args:
             original_site_metadata: The object returned by the Metadata API
-            current_site: The site which is being scraped
+            auth_credentials: The auth credentials for the current site
         """
-        original_site_metadata['contentUrl'] = current_site.get('contentUrl')
+        original_site_metadata['contentUrl'] = \
+            auth_credentials['site']['contentUrl']
