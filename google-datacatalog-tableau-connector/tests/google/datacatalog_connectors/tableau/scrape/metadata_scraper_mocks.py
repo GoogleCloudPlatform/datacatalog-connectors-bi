@@ -29,17 +29,5 @@ def make_fake_response(json_data, status_code):
     return __FakeResponse(json_data, status_code)
 
 
-def mock_authenticate(server_address,
-                      api_version,
-                      username,
-                      password,
-                      site=None):
-    return {'token': 'TEST-TOKEN'}
-
-
 def mock_get_default_site(self):
     return [{'contentUrl': ''}]
-
-
-def mock_empty_response(url, data=None, json=None, **kwargs):
-    return make_fake_response({}, 200)

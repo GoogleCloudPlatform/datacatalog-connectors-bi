@@ -55,9 +55,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'updatedAt': '2019-09-12T16:30:55Z',
             'workbook': {
                 'site': {
-                    'name': 'test-site'
-                }
-            }
+                    'contentUrl': 'test-site',
+                },
+            },
         }
 
         entry = self.__factory.make_entry_for_dashboard(metadata)
@@ -92,10 +92,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'name': 'Test Name',
             'path': 'test/sheet',
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
-        workbook_metadata = {'site': {'name': 'test-site'}}
+        workbook_metadata = {'site': {'contentUrl': 'test-site'}}
 
         entry = self.__factory.make_entry_for_sheet(metadata,
                                                     workbook_metadata)
@@ -131,10 +131,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'name': 'Test Name',
             'path': 'test/sheet',
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
-        workbook_metadata = {'site': {'name': 'test-site'}}
+        workbook_metadata = {'site': {'contentUrl': 'test-site'}}
 
         entry = self.__factory.make_entry_for_sheet(metadata,
                                                     workbook_metadata)
@@ -146,12 +146,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'luid': 'a123-b456',
             'name': 'Test Name',
             'site': {
-                'name': 'test-site'
+                'contentUrl': 'test-site',
             },
             'description': 'Test Description',
             'vizportalUrlId': 1,
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
         entry = self.__factory.make_entry_for_workbook(metadata)
@@ -188,10 +188,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'name': 'Test Name',
             'path': 'test/sheet',
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
-        workbook_metadata = {'site': {'name': 'test-site'}}
+        workbook_metadata = {'site': {'contentUrl': 'test-site'}}
 
         entry = self.__factory.make_entry_for_sheet(metadata,
                                                     workbook_metadata)
@@ -206,22 +206,3 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'entryGroups/test-entry-group/entries/'
             't__1234567890123456789012345678901234567890123456789012345678901',
             entry.name)
-
-    # TODO Remove the below test case when there is a definitive fix for
-    #  https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues/43  # noqa E501
-    def test_make_entry_non_compliant_site_name_should_replace_linked_resource_chars(  # noqa E501
-            self):
-
-        metadata = {
-            'luid': 'a123-b456',
-            'site': {
-                'name': 'Test site;'
-            },
-            'vizportalUrlId': 1,
-            'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
-        }
-
-        entry = self.__factory.make_entry_for_workbook(metadata)[1]
-        self.assertEqual('test-server/#/site/Test_site_/workbooks/1',
-                         entry.linked_resource)
