@@ -16,6 +16,7 @@
 
 import logging
 import requests
+import sys
 
 from google.datacatalog_connectors.tableau.scrape import constants
 
@@ -51,6 +52,6 @@ class Authenticator:
 
         if not response.get('credentials'):
             logging.critical(response)
-            exit(1)
+            sys.exit(1)
 
         return response['credentials']

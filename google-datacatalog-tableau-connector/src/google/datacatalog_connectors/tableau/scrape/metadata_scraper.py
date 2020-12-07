@@ -15,7 +15,7 @@
 # limitations under the License.
 
 from google.datacatalog_connectors.tableau.scrape import \
-    authenticator, metadata_api_helper, rest_api_helper
+    metadata_api_helper, rest_api_helper
 
 
 class MetadataScraper:
