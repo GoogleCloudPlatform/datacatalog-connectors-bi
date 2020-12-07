@@ -24,15 +24,16 @@ from . import metadata_scraper_mocks
 __SCRAPE_PACKAGE = 'google.datacatalog_connectors.tableau.scrape'
 
 
-@mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.requests')
+@mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.requests.post')
 class AuthenticatorTest(unittest.TestCase):
 
     def test_authenticate_should_return_credentials_on_success(
-            self, mock_requests):
+            self, mock_post):
 
-        mock_requests.post.return_value = \
-            metadata_scraper_mocks.make_fake_response(
-                {'credentials': {'token': 'TEST-TOKEN'}}, 200)
+        mock_post.return_value = metadata_scraper_mocks.make_fake_response(
+            {'credentials': {
+                'token': 'TEST-TOKEN',
+            }}, 200)
 
         credentials = authenticator.Authenticator.authenticate(
             'https://test-server.com', 'test-api', 'test-username',
@@ -40,11 +41,10 @@ class AuthenticatorTest(unittest.TestCase):
 
         self.assertEqual('TEST-TOKEN', credentials['token'])
 
-    def test_authenticate_should_raise_system_exit_on_failure(
-            self, mock_requests):
+    def test_authenticate_should_raise_system_exit_on_failure(self, mock_post):
 
-        mock_requests.post.return_value = \
-            metadata_scraper_mocks.make_fake_response({'error': {}}, 401)
+        mock_post.return_value = metadata_scraper_mocks.make_fake_response(
+            {'error': {}}, 401)
 
         self.assertRaises(SystemExit, authenticator.Authenticator.authenticate,
                           'https://test-server.com', 'test-api',

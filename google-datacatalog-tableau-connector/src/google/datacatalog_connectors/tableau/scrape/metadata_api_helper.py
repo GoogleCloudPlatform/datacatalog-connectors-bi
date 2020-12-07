@@ -35,7 +35,8 @@ class MetadataAPIHelper:
         self.__password = password
         self.__site_content_url = site_content_url
 
-        self.__url = f'{server_address}/relationship-service-war/graphql'
+        self.__api_endpoint = f'{server_address}' \
+                              f'/relationship-service-war/graphql'
 
         self.__auth_credentials = None
 
@@ -57,7 +58,8 @@ class MetadataAPIHelper:
                 self.__auth_credentials['token']
         }
 
-        response = requests.post(url=self.__url, headers=headers,
+        response = requests.post(url=self.__api_endpoint,
+                                 headers=headers,
                                  json=body).json()
 
         dashboards = response['data']['dashboards'] \
@@ -91,7 +93,8 @@ class MetadataAPIHelper:
                 self.__auth_credentials['token']
         }
 
-        response = requests.post(url=self.__url, headers=headers,
+        response = requests.post(url=self.__api_endpoint,
+                                 headers=headers,
                                  json=body).json()
 
         sites = response['data']['tableauSites'] \
@@ -131,7 +134,8 @@ class MetadataAPIHelper:
                 self.__auth_credentials['token']
         }
 
-        response = requests.post(url=self.__url, headers=headers,
+        response = requests.post(url=self.__api_endpoint,
+                                 headers=headers,
                                  json=body).json()
 
         workbooks = response['data']['workbooks'] \
@@ -141,7 +145,7 @@ class MetadataAPIHelper:
 
         # Site contentUrl handling
         for workbook in workbooks:
-            if workbook.get('site'):
+            if 'site' in workbook:
                 self.__add_site_content_url_field(workbook['site'])
 
         return workbooks

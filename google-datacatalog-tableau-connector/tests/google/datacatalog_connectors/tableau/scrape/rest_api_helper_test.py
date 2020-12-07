@@ -70,20 +70,19 @@ class RestAPIHelperTest(unittest.TestCase):
         self.assertIsNotNone(auth_credentials)
         self.assertEqual({'token': 'TEST-TOKEN'}, auth_credentials)
 
-    @mock.patch(f'{__HELPER_MODULE}.requests')
+    @mock.patch(f'{__HELPER_MODULE}.requests.get')
     def test_get_all_sites_for_server_should_return_nonempty_list_on_success(
-            self, mock_requests):
+            self, mock_get):
 
         attrs = self.__helper.__dict__
         attrs['_RestAPIHelper__auth_credentials'] = {'token': 'TEST-TOKEN'}
 
-        mock_requests.get.return_value = \
-            metadata_scraper_mocks.make_fake_response(
-                {'sites': {
-                    'site': [{
-                        'luid': 'TEST-ID-1',
-                    }]
-                }}, 200)
+        mock_get.return_value = metadata_scraper_mocks.make_fake_response(
+            {'sites': {
+                'site': [{
+                    'luid': 'TEST-ID-1',
+                }]
+            }}, 200)
 
         sites = self.__helper.get_all_sites_for_server()
 
@@ -95,21 +94,20 @@ class RestAPIHelperTest(unittest.TestCase):
             'Accept': 'application/json',
             'X-Tableau-Auth': 'TEST-TOKEN',
         }
-        mock_requests.get.assert_called_with(
-            url='test-server/api/test-api/sites', headers=headers)
+        mock_get.assert_called_with(url='test-server/api/test-api/sites',
+                                    headers=headers)
 
-    @mock.patch(f'{__HELPER_MODULE}.requests')
+    @mock.patch(f'{__HELPER_MODULE}.requests.get')
     def test_get_all_sites_for_server_should_return_empty_list_on_unexpected_response(  # noqa E510
-            self, mock_requests):
+            self, mock_get):
 
         attrs = self.__helper.__dict__
         attrs['_RestAPIHelper__auth_credentials'] = {'token': 'TEST-TOKEN'}
 
-        mock_requests.get.return_value = \
-            metadata_scraper_mocks.make_fake_response(
-                {'sites': [{
-                    'luid': 'TEST-ID-1',
-                }]}, 200)
+        mock_get.return_value = metadata_scraper_mocks.make_fake_response(
+            {'sites': [{
+                'luid': 'TEST-ID-1',
+            }]}, 200)
 
         sites = self.__helper.get_all_sites_for_server()
 
