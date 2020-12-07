@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-class __MockResponse:
+class __FakeResponse:
 
     def __init__(self, json_data, status_code):
         self.__json_data = json_data
@@ -26,7 +26,7 @@ class __MockResponse:
 
 
 def make_fake_response(json_data, status_code):
-    return __MockResponse(json_data, status_code)
+    return __FakeResponse(json_data, status_code)
 
 
 def mock_authenticate(server_address,

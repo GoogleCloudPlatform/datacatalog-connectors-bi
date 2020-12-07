@@ -43,7 +43,7 @@ class RestAPIHelper:
 
         self.__auth_credentials = None
 
-    def get_all_sites_on_server(self):
+    def get_all_sites_for_server(self):
         self.__set_up_auth_credentials()
 
         url = f'{self.__base_api_endpoint}/sites'

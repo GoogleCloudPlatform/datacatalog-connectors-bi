@@ -82,6 +82,6 @@ class MetadataScraper:
                                                    self.__api_version,
                                                    self.__username,
                                                    self.__password)
-        available_sites = api_helper.get_all_sites_on_server()
+        available_sites = api_helper.get_all_sites_for_server()
         self.__site_content_urls.extend(
             [site['contentUrl'] for site in available_sites])

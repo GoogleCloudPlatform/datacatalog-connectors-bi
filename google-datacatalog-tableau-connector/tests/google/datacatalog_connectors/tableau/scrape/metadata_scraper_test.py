@@ -30,7 +30,7 @@ class MetadataScraperTest(unittest.TestCase):
                                   f'.MetadataAPIHelper'
 
     @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_dashboards')
-    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_on_server',
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server',
                 metadata_scraper_mocks.mock_get_default_site)
     def test_scrape_dashboards_should_return_nonempty_list_on_success(
             self, mock_fetch_dashboards):
@@ -53,7 +53,7 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(2, len(metadata))
 
     @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
-    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_on_server',
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server',
                 metadata_scraper_mocks.mock_get_default_site)
     def test_scrape_sites_should_return_nonempty_list_on_success(
             self, mock_fetch_sites):
@@ -76,7 +76,7 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(2, len(metadata))
 
     @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_workbooks')
-    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_on_server',
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server',
                 metadata_scraper_mocks.mock_get_default_site)
     def test_scrape_workbooks_should_return_nonempty_list_on_success(
             self, mock_fetch_workbooks):
@@ -99,9 +99,9 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(2, len(metadata))
 
     @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
-    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_on_server')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server')
     def test_scrape_metadata_specific_site_should_fetch_assets_given_site(
-            self, mock_get_all_sites_on_server, mock_fetch_sites):
+            self, mock_get_all_sites_for_server, mock_fetch_sites):
 
         scrape.MetadataScraper(
             server_address='https://test-server.com',
@@ -110,20 +110,20 @@ class MetadataScraperTest(unittest.TestCase):
             password='test-password',
             site_content_url='test-site-url').scrape_sites()
 
-        mock_get_all_sites_on_server.assert_not_called()
+        mock_get_all_sites_for_server.assert_not_called()
         mock_fetch_sites.assert_called_once()
 
     @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
-    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_on_server')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server')
     def test_scrape_metadata_no_sites_available_should_not_fetch_assets(
-            self, mock_get_all_sites_on_server, mock_fetch_sites):
+            self, mock_get_all_sites_for_server, mock_fetch_sites):
 
-        mock_get_all_sites_on_server.return_value = []
+        mock_get_all_sites_for_server.return_value = []
 
         scrape.MetadataScraper(server_address='https://test-server.com',
                                api_version='test-api',
                                username='test-username',
                                password='test-password').scrape_sites()
 
-        mock_get_all_sites_on_server.assert_called_once()
+        mock_get_all_sites_for_server.assert_called_once()
         mock_fetch_sites.assert_not_called()

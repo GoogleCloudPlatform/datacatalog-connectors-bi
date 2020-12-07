@@ -38,7 +38,7 @@ class AuthenticatorTest(unittest.TestCase):
             'https://test-server.com', 'test-api', 'test-username',
             'test-password')
 
-        self.assertEquals('TEST-TOKEN', credentials['token'])
+        self.assertEqual('TEST-TOKEN', credentials['token'])
 
     def test_authenticate_should_raise_system_exit_on_failure(
             self, mock_requests):
