@@ -32,13 +32,13 @@ class AuthenticatorTest(unittest.TestCase):
 
         mock_requests.post.return_value = \
             metadata_scraper_mocks.make_fake_response(
-                {'credentials': {'token': 'test-token'}}, 200)
+                {'credentials': {'token': 'TEST-TOKEN'}}, 200)
 
         credentials = authenticator.Authenticator.authenticate(
             'https://test-server.com', 'test-api', 'test-username',
             'test-password')
 
-        self.assertEquals('test-token', credentials['token'])
+        self.assertEquals('TEST-TOKEN', credentials['token'])
 
     def test_authenticate_should_raise_system_exit_on_failure(
             self, mock_requests):

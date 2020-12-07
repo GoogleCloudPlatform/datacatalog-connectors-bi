@@ -33,7 +33,7 @@ class MetadataScraper:
         self.__password = password
         self.__site_content_url = site_content_url
 
-        self.__site_content_urls = [site_content_url]
+        self.__site_content_urls = []
 
     def scrape_dashboards(self, query_filter=None):
         return self.__scrape_metadata(self.__scrape_dashboards, query_filter)
@@ -73,7 +73,8 @@ class MetadataScraper:
 
     def __initialize_site_content_urls(self):
         # Single site scraping
-        if self.__site_content_urls:
+        if self.__site_content_url:
+            self.__site_content_urls.append(self.__site_content_url)
             return
 
         # Multiple site scraping (only for Tableau Server)
