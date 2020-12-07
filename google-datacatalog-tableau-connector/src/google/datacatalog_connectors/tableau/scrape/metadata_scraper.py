@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from google.datacatalog_connectors.tableau.scrape import \
     metadata_api_helper, rest_api_helper
 
@@ -52,6 +54,7 @@ class MetadataScraper:
             return metadata
 
         for site_content_url in self.__site_content_urls:
+            logging.info('Current site content URL: "%s"', site_content_url)
             api_helper = metadata_api_helper.MetadataAPIHelper(
                 self.__server_address, self.__api_version, self.__username,
                 self.__password, site_content_url)

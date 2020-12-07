@@ -51,7 +51,7 @@ class WorkbooksSynchronizer(metadata_synchronizer.MetadataSynchronizer):
         assets_count_str_len = len(str(assets_count))
 
         logging.info('')
-        logging.info('==== %s assets scraped!', assets_count)
+        logging.info('==== %s assets found!', assets_count)
         spaces_count = assets_count_str_len - len(str(workbooks_count))
         logging.info('   > %s%s workbooks', " " * spaces_count,
                      workbooks_count)

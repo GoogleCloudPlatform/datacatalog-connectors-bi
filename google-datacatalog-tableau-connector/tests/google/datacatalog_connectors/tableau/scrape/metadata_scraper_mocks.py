@@ -30,4 +30,8 @@ def make_fake_response(json_data, status_code):
 
 
 def mock_get_default_site(self):
+    """Simulates actual metadata for the Default site.
+    The `contentUrl` is always present and its value is an empty string.
+
+    """
     return [{'contentUrl': ''}]

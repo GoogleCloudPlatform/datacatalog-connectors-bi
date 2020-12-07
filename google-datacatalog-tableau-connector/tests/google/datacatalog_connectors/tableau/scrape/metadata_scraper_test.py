@@ -100,6 +100,35 @@ class MetadataScraperTest(unittest.TestCase):
 
     @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
     @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server')
+    def test_scrape_metadata_multiple_sites_should_fetch_assets_from_all(
+            self, mock_get_all_sites_for_server, mock_fetch_sites):
+
+        # The 'contentUrl' field is actually informed as an empty string for
+        # the Default site and fulfilled for all other sites created by the
+        # users.
+        mock_get_all_sites_for_server.return_value = [
+            {
+                'id': 'TEST-ID-1',
+                'name': 'Default',
+                'contentUrl': '',
+            },
+            {
+                'id': 'TEST-ID-2',
+                'name': 'My site',
+                'contentUrl': 'my-site',
+            },
+        ]
+
+        scrape.MetadataScraper(server_address='https://test-server.com',
+                               api_version='test-api',
+                               username='test-username',
+                               password='test-password').scrape_sites()
+
+        mock_get_all_sites_for_server.assert_called_once()
+        self.assertEqual(2, mock_fetch_sites.call_count)
+
+    @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server')
     def test_scrape_metadata_specific_site_should_fetch_assets_given_site(
             self, mock_get_all_sites_for_server, mock_fetch_sites):
 

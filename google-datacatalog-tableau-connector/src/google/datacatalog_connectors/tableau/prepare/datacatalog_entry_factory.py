@@ -83,8 +83,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         else:
             generated_id = self.__format_id(sheet_metadata.get('id'))
             logging.info(
-                'Sheet %s does not have a luid.'
-                ' Its id attribute was used as a fallback.',
+                'Sheet "%s" is hidden in the Workbook and does not have an'
+                ' luid. Using its id attribute as a fallback...',
                 sheet_metadata.get('name'))
 
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -97,8 +97,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.display_name = self._format_display_name(
             sheet_metadata.get('name'))
 
-        # A null path that means the sheet was hidden and included on a
-        # dashboard, or deleted from server but it is still in the workbook.
+        # A null path means the Sheet is hidden and included in a Dashboard,
+        # or deleted from the server but still remains in the Workbook.
         path = sheet_metadata.get('path')
         if path:
             site_content_url = self.__format_site_content_url(
@@ -172,7 +172,10 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
     @classmethod
     def __format_site_content_url(cls, workbook_metadata):
+        # The 'contentUrl' field is informed as an empty string for the Default
+        # site and fulfilled for all other sites created by the users.
+        #
+        # The '/site/<content-url>' part should be included in the resulting
+        # url only when 'contentUrl' is not empty.
         site_content_url = workbook_metadata['site'].get('contentUrl')
-        return '' \
-            if not site_content_url or site_content_url.lower() == 'default' \
-            else f'/site/{site_content_url}'
+        return '' if not site_content_url else f'/site/{site_content_url}'
