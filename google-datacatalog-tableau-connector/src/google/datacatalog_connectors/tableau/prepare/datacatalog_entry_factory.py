@@ -16,7 +16,6 @@
 
 from datetime import datetime
 import logging
-import re
 
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare
@@ -84,8 +83,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         else:
             generated_id = self.__format_id(sheet_metadata.get('id'))
             logging.info(
-                'Sheet %s does not have a luid.'
-                ' Its id attribute was used as a fallback.',
+                'Sheet "%s" is hidden in the Workbook and does not have an'
+                ' luid. Using its id attribute as a fallback...',
                 sheet_metadata.get('name'))
 
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -98,8 +97,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.display_name = self._format_display_name(
             sheet_metadata.get('name'))
 
-        # A null path that means the sheet was hidden and included on a
-        # dashboard, or deleted from server but it is still in the workbook.
+        # A null path means the Sheet is hidden and included in a Dashboard,
+        # or deleted from the server but still remains in the Workbook.
         path = sheet_metadata.get('path')
         if path:
             site_content_url = self.__format_site_content_url(
@@ -173,14 +172,10 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
     @classmethod
     def __format_site_content_url(cls, workbook_metadata):
-        site_name = workbook_metadata.get('site').get('name')
-
-        # TODO Remove the below workaround when there is a definitive fix for
-        #  https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues/43  # noqa E501
-        #  Valid Linked Resource chars: letters, numbers, periods, colons,
-        #  slashes, underscores, dashes and hashes.
-        compliant_site_name = re.sub(r'[^\w.,/\-#]', '_', site_name)
-
-        return '' \
-            if site_name.lower() == 'default' \
-            else f'/site/{compliant_site_name}'
+        # The 'contentUrl' field is informed as an empty string for the Default
+        # site and fulfilled for all other sites created by the users.
+        #
+        # The '/site/<content-url>' part should be included in the resulting
+        # url only when 'contentUrl' is not empty.
+        site_content_url = workbook_metadata['site'].get('contentUrl')
+        return '' if not site_content_url else f'/site/{site_content_url}'

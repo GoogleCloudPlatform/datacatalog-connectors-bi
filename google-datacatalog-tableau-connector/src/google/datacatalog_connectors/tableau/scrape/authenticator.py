@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import requests
+
+from google.datacatalog_connectors.tableau.scrape import constants
 
 
 class Authenticator:
@@ -25,13 +28,13 @@ class Authenticator:
                      api_version,
                      username,
                      password,
-                     site=None):
+                     site_content_url=None):
 
         url = f'{server_address}/api/{api_version}/auth/signin'
 
         headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Content-Type': constants.JSON_CONTENT_TYPE,
+            'Accept': constants.JSON_CONTENT_TYPE
         }
 
         body = {
@@ -39,10 +42,15 @@ class Authenticator:
                 'name': username,
                 'password': password,
                 'site': {
-                    'contentUrl': site
+                    'contentUrl': site_content_url
                 }
             }
         }
 
-        return requests.post(url=url, headers=headers,
-                             json=body).json()['credentials']
+        response = requests.post(url=url, headers=headers, json=body).json()
+
+        if not response.get('credentials'):
+            logging.info(response)
+            return
+
+        return response['credentials']

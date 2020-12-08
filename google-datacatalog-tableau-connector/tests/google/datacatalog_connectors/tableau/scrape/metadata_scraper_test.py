@@ -19,165 +19,144 @@ from unittest import mock
 
 from google.datacatalog_connectors.tableau import scrape
 
-from .metadata_scraper_mocks import make_fake_response, \
-    mock_authenticate, mock_get_default_site, mock_empty_response
+from . import metadata_scraper_mocks
 
 
 class MetadataScraperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.tableau.scrape'
+    __REST_API_HELPER_CLASS = f'{__SCRAPE_PACKAGE}.rest_api_helper' \
+                              f'.RestAPIHelper'
+    __METADATA_API_HELPER_CLASS = f'{__SCRAPE_PACKAGE}.metadata_api_helper' \
+                                  f'.MetadataAPIHelper'
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.requests.post')
-    @mock.patch(f'{__SCRAPE_PACKAGE}.metadata_api_helper'
-                f'.MetadataAPIHelper.fetch_workbooks', lambda self, *args: [])
-    def test_scrape_metadata_should_authenticate_user(self,
-                                                      mock_post_authenticate):
+    @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_dashboards')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server',
+                metadata_scraper_mocks.mock_get_default_site)
+    def test_scrape_dashboards_should_return_nonempty_list_on_success(
+            self, mock_fetch_dashboards):
 
-        mock_post_authenticate.return_value = make_fake_response(
-            {'credentials': {
-                'token': 'TEST-TOKEN'
-            }}, 200)
-
-        scrape.MetadataScraper(server_address=None,
-                               api_version=None,
-                               username=None,
-                               password=None,
-                               site='test').scrape_workbooks()
-
-        self.assertEqual(mock_post_authenticate.call_count, 1)
-
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.Authenticator.authenticate',
-                mock_authenticate)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.rest_api_helper.requests.get')
-    def test_scrape_metadata_no_sites_available_should_not_raise_exception(
-            self, mock_get_sites):  # noqa: E125
-
-        mock_get_sites.return_value = make_fake_response({}, 200)
-
-        scrape.MetadataScraper(server_address=None,
-                               api_version=None,
-                               username=None,
-                               password=None).scrape_workbooks()
-
-        self.assertEqual(mock_get_sites.call_count, 1)
-
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.Authenticator.authenticate',
-                mock_authenticate)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.rest_api_helper.RestAPIHelper'
-                f'.get_all_sites_on_server', mock_get_default_site)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.metadata_api_helper.requests.post')
-    def test_scrape_dashboards_should_return_nonempty_list(
-            self, mock_post_query_dashboards):  # noqa: E125
-
-        mock_post_query_dashboards.return_value = make_fake_response(
+        mock_fetch_dashboards.return_value = [
             {
-                'data': {
-                    'dashboards': [{
-                        'luid': 'TEST-ID-1'
-                    }, {
-                        'luid': 'TEST-ID-2'
-                    }]
-                }
-            }, 200)
+                'luid': 'TEST-ID-1',
+            },
+            {
+                'luid': 'TEST-ID-2',
+            },
+        ]
 
-        metadata = scrape.MetadataScraper(server_address=None,
-                                          api_version=None,
-                                          username=None,
-                                          password=None).scrape_dashboards()
+        metadata = scrape.MetadataScraper(
+            server_address='https://test-server.com',
+            api_version='test-api',
+            username='test-username',
+            password='test-password').scrape_dashboards()
 
         self.assertEqual(2, len(metadata))
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.Authenticator.authenticate',
-                mock_authenticate)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.rest_api_helper.RestAPIHelper'
-                f'.get_all_sites_on_server', mock_get_default_site)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.metadata_api_helper.requests.post',
-                mock_empty_response)
-    def test_scrape_dashboards_no_data_available_should_return_empty_list(
-            self):  # noqa: E125
+    @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server',
+                metadata_scraper_mocks.mock_get_default_site)
+    def test_scrape_sites_should_return_nonempty_list_on_success(
+            self, mock_fetch_sites):
 
-        metadata = scrape.MetadataScraper(server_address=None,
-                                          api_version=None,
-                                          username=None,
-                                          password=None).scrape_dashboards()
-
-        self.assertEqual(0, len(metadata))
-
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.Authenticator.authenticate',
-                mock_authenticate)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.rest_api_helper.RestAPIHelper'
-                f'.get_all_sites_on_server', mock_get_default_site)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.metadata_api_helper.requests.post')
-    def test_scrape_sites_should_return_nonempty_list(
-            self, mock_post_query_sites):  # noqa: E125
-
-        mock_post_query_sites.return_value = make_fake_response(
+        mock_fetch_sites.return_value = [
             {
-                'data': {
-                    'tableauSites': [{
-                        'luid': 'TEST-ID-1'
-                    }, {
-                        'luid': 'TEST-ID-2'
-                    }]
-                }
-            }, 200)
+                'luid': 'TEST-ID-1',
+                'workbooks': [{
+                    'sheets': []
+                }],
+            },
+            {
+                'luid': 'TEST-ID-2',
+                'workbooks': [],
+            },
+        ]
 
-        metadata = scrape.MetadataScraper(server_address=None,
-                                          api_version=None,
-                                          username=None,
-                                          password=None).scrape_sites()
+        metadata = scrape.MetadataScraper(
+            server_address='https://test-server.com',
+            api_version='test-api',
+            username='test-username',
+            password='test-password').scrape_sites()
 
         self.assertEqual(2, len(metadata))
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.Authenticator.authenticate',
-                mock_authenticate)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.rest_api_helper.RestAPIHelper'
-                f'.get_all_sites_on_server', mock_get_default_site)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.metadata_api_helper.requests.post',
-                mock_empty_response)
-    def test_scrape_sites_no_data_available_should_return_empty_list(self):
-        metadata = scrape.MetadataScraper(server_address=None,
-                                          api_version=None,
-                                          username=None,
-                                          password=None).scrape_sites()
+    @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_workbooks')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server',
+                metadata_scraper_mocks.mock_get_default_site)
+    def test_scrape_workbooks_should_return_nonempty_list_on_success(
+            self, mock_fetch_workbooks):
 
-        self.assertEqual(0, len(metadata))
-
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.Authenticator.authenticate',
-                mock_authenticate)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.rest_api_helper.RestAPIHelper'
-                f'.get_all_sites_on_server', mock_get_default_site)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.metadata_api_helper.requests.post')
-    def test_scrape_workbooks_should_return_nonempty_list(
-            self, mock_post_query_workbooks):  # noqa: E125
-
-        mock_post_query_workbooks.return_value = make_fake_response(
+        mock_fetch_workbooks.return_value = [
             {
-                'data': {
-                    'workbooks': [{
-                        'luid': 'TEST-ID-1'
-                    }, {
-                        'luid': 'TEST-ID-2'
-                    }]
-                }
-            }, 200)
+                'luid': 'TEST-ID-1',
+            },
+            {
+                'luid': 'TEST-ID-2',
+            },
+        ]
 
-        metadata = scrape.MetadataScraper(server_address=None,
-                                          api_version=None,
-                                          username=None,
-                                          password=None).scrape_workbooks()
+        metadata = scrape.MetadataScraper(
+            server_address='https://test-server.com',
+            api_version='test-api',
+            username='test-username',
+            password='test-password').scrape_workbooks()
 
         self.assertEqual(2, len(metadata))
 
-    @mock.patch(f'{__SCRAPE_PACKAGE}.authenticator.Authenticator.authenticate',
-                mock_authenticate)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.rest_api_helper.RestAPIHelper'
-                f'.get_all_sites_on_server', mock_get_default_site)
-    @mock.patch(f'{__SCRAPE_PACKAGE}.metadata_api_helper.requests.post',
-                mock_empty_response)
-    def test_scrape_workbooks_no_data_available_should_return_empty_list(self):
-        metadata = scrape.MetadataScraper(server_address=None,
-                                          api_version=None,
-                                          username=None,
-                                          password=None).scrape_workbooks()
+    @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server')
+    def test_scrape_metadata_multiple_sites_should_fetch_assets_from_all(
+            self, mock_get_all_sites_for_server, mock_fetch_sites):
 
-        self.assertEqual(0, len(metadata))
+        # The 'contentUrl' field is actually informed as an empty string for
+        # the Default site and fulfilled for all other sites created by the
+        # users.
+        mock_get_all_sites_for_server.return_value = [
+            {
+                'id': 'TEST-ID-1',
+                'name': 'Default',
+                'contentUrl': '',
+            },
+            {
+                'id': 'TEST-ID-2',
+                'name': 'My site',
+                'contentUrl': 'my-site',
+            },
+        ]
+
+        scrape.MetadataScraper(server_address='https://test-server.com',
+                               api_version='test-api',
+                               username='test-username',
+                               password='test-password').scrape_sites()
+
+        mock_get_all_sites_for_server.assert_called_once()
+        self.assertEqual(2, mock_fetch_sites.call_count)
+
+    @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server')
+    def test_scrape_metadata_specific_site_should_fetch_assets_given_site(
+            self, mock_get_all_sites_for_server, mock_fetch_sites):
+
+        scrape.MetadataScraper(
+            server_address='https://test-server.com',
+            api_version='test-api',
+            username='test-username',
+            password='test-password',
+            site_content_url='test-site-url').scrape_sites()
+
+        mock_get_all_sites_for_server.assert_not_called()
+        mock_fetch_sites.assert_called_once()
+
+    @mock.patch(f'{__METADATA_API_HELPER_CLASS}.fetch_sites')
+    @mock.patch(f'{__REST_API_HELPER_CLASS}.get_all_sites_for_server')
+    def test_scrape_metadata_no_sites_available_should_not_fetch_assets(
+            self, mock_get_all_sites_for_server, mock_fetch_sites):
+
+        mock_get_all_sites_for_server.return_value = []
+
+        scrape.MetadataScraper(server_address='https://test-server.com',
+                               api_version='test-api',
+                               username='test-username',
+                               password='test-password').scrape_sites()
+
+        mock_get_all_sites_for_server.assert_called_once()
+        mock_fetch_sites.assert_not_called()

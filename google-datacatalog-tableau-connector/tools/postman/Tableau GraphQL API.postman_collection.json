@@ -52,7 +52,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"credentials\": {\n\t\t\"name\": \"{{USERNAME}}\",\n\t\t\"password\": \"{{PASSWORD}}\",\n\t\t\"site\": {\n\t\t\t\"contentUrl\": \"{{SITE_URL}}\"\t\n\t\t}\n\t}\n}"
+							"raw": "{\n\t\"credentials\": {\n\t\t\"name\": \"{{USERNAME}}\",\n\t\t\"password\": \"{{PASSWORD}}\",\n\t\t\"site\": {\n\t\t\t\"contentUrl\": \"{{SITE_CONTENT_URL}}\"\t\n\t\t}\n\t}\n}"
 						},
 						"url": {
 							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/auth/signin",

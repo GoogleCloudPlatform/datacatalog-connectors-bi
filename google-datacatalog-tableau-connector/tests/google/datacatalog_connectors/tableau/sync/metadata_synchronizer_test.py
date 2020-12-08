@@ -41,8 +41,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertEqual('test-location-id',
                          attrs['_MetadataSynchronizer__location_id'])
         self.assertEqual(['test-type'],
-                         attrs['_MetadataSynchronizer__assets_type'])
-        self.assertEqual('test-site', attrs['_MetadataSynchronizer__site'])
+                         attrs['_MetadataSynchronizer__asset_types'])
+        self.assertEqual('test-site',
+                         attrs['_MetadataSynchronizer__site_content_url'])
 
         self.assertIsNotNone(attrs['_metadata_scraper'])
         self.assertIsNotNone(attrs['_entry_factory'])

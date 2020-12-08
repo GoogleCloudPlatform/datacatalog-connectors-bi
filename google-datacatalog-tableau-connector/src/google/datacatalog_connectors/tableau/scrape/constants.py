@@ -14,24 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+JSON_CONTENT_TYPE = 'application/json'
 
-class __FakeResponse:
-
-    def __init__(self, json_data, status_code):
-        self.__json_data = json_data
-        self.__status_code = status_code
-
-    def json(self):
-        return self.__json_data
-
-
-def make_fake_response(json_data, status_code):
-    return __FakeResponse(json_data, status_code)
-
-
-def mock_get_default_site(self):
-    """Simulates actual metadata for the Default site.
-    The `contentUrl` is always present and its value is an empty string.
-
-    """
-    return [{'contentUrl': ''}]
+# Name of the HTTP header used to provide authentication info when sending
+# requests to the Tableau APIs.
+X_TABLEAU_AUTH_HEADER_NAME = 'X-Tableau-Auth'

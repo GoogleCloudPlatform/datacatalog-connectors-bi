@@ -55,9 +55,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'updatedAt': '2019-09-12T16:30:55Z',
             'workbook': {
                 'site': {
-                    'name': 'test-site'
-                }
-            }
+                    'contentUrl': 'test-site',
+                },
+            },
         }
 
         entry = self.__factory.make_entry_for_dashboard(metadata)
@@ -92,10 +92,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'name': 'Test Name',
             'path': 'test/sheet',
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
-        workbook_metadata = {'site': {'name': 'test-site'}}
+        workbook_metadata = {'site': {'contentUrl': 'test-site'}}
 
         entry = self.__factory.make_entry_for_sheet(metadata,
                                                     workbook_metadata)
@@ -124,17 +124,17 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             updated_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
-    def test_make_entry_for_sheet_missing_luid_should_use_id_fallback(self):
+    def test_make_entry_for_hidden_sheet_should_use_id_fallback(self):
         metadata = {
             'id': 'a123-b456',
-            'luid': '',
+            'luid': '',  # Hidden Sheets do not not have an luid.
             'name': 'Test Name',
             'path': 'test/sheet',
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
-        workbook_metadata = {'site': {'name': 'test-site'}}
+        workbook_metadata = {'site': {'contentUrl': 'test-site'}}
 
         entry = self.__factory.make_entry_for_sheet(metadata,
                                                     workbook_metadata)
@@ -146,12 +146,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'luid': 'a123-b456',
             'name': 'Test Name',
             'site': {
-                'name': 'test-site'
+                'contentUrl': 'test-site',
             },
             'description': 'Test Description',
             'vizportalUrlId': 1,
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
         entry = self.__factory.make_entry_for_workbook(metadata)
@@ -186,42 +186,39 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'luid': '12345678901234567890123456789012'
                     '34567890123456789012345678901234',
             'name': 'Test Name',
-            'path': 'test/sheet',
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
-        workbook_metadata = {'site': {'name': 'test-site'}}
-
-        entry = self.__factory.make_entry_for_sheet(metadata,
-                                                    workbook_metadata)
+        entry = self.__factory.make_entry_for_workbook(metadata)
 
         self.assertEqual(
             't__1234567890123456789012345678901234567890123456789012345678901',
             entry[0])
 
-        entry = entry[1]
         self.assertEqual(
             'projects/test-project/locations/test-location/'
             'entryGroups/test-entry-group/entries/'
             't__1234567890123456789012345678901234567890123456789012345678901',
-            entry.name)
+            entry[1].name)
 
-    # TODO Remove the below test case when there is a definitive fix for
-    #  https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues/43  # noqa E501
-    def test_make_entry_non_compliant_site_name_should_replace_linked_resource_chars(  # noqa E501
+    def test_make_entry_default_site_should_not_add_site_url_linked_resource(
             self):
 
+        # The 'contentUrl' field is actually informed as an empty string for
+        # the Default site and fulfilled for all other sites created by the
+        # users.
         metadata = {
             'luid': 'a123-b456',
+            'name': 'Test Name',
             'site': {
-                'name': 'Test site;'
+                'contentUrl': '',
             },
             'vizportalUrlId': 1,
             'createdAt': '2019-09-12T16:30:00Z',
-            'updatedAt': '2019-09-12T16:30:55Z'
+            'updatedAt': '2019-09-12T16:30:55Z',
         }
 
         entry = self.__factory.make_entry_for_workbook(metadata)[1]
-        self.assertEqual('test-server/#/site/Test_site_/workbooks/1',
-                         entry.linked_resource)
+
+        self.assertEqual('test-server/#/workbooks/1', entry.linked_resource)

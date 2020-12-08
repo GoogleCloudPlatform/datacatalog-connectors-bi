@@ -16,23 +16,57 @@
 
 import requests
 
+from google.datacatalog_connectors.tableau.scrape import \
+    authenticator, constants
+
 
 class RestAPIHelper:
 
-    def __init__(self, server_address, api_version, auth_credentials):
+    def __init__(self,
+                 server_address,
+                 api_version,
+                 username,
+                 password,
+                 site_content_url=None):
+
+        self.__server_address = server_address
+        self.__api_version = api_version
+        self.__username = username
+        self.__password = password
+        self.__site_content_url = site_content_url
+
         self.__base_api_endpoint = f'{server_address}/api/{api_version}'
-        self.__headers = {
-            'X-Tableau-Auth': auth_credentials['token'],
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+        self.__common_headers = {
+            'Content-Type': constants.JSON_CONTENT_TYPE,
+            'Accept': constants.JSON_CONTENT_TYPE
         }
 
-    def get_all_sites_on_server(self):
+        self.__auth_credentials = None
+
+    def get_all_sites_for_server(self):
+        self.__set_up_auth_credentials()
+
         url = f'{self.__base_api_endpoint}/sites'
 
-        result = requests.get(url=url, headers=self.__headers).json()
+        headers = self.__common_headers.copy()
+        headers[constants.X_TABLEAU_AUTH_HEADER_NAME] = \
+            self.__auth_credentials['token']
 
-        return result['sites']['site'] \
-            if result and 'sites' in result and result['sites'] \
-            and 'site' in result['sites'] \
+        response = requests.get(url=url, headers=headers).json()
+
+        return response['sites']['site'] \
+            if response and response.get('sites') \
+            and 'site' in response['sites'] \
             else []
+
+    def __set_up_auth_credentials(self):
+        if self.__auth_credentials:
+            return
+
+        self.__auth_credentials = \
+            authenticator.Authenticator.authenticate(
+                self.__server_address,
+                self.__api_version,
+                self.__username,
+                self.__password,
+                self.__site_content_url)
