@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
 from google.datacatalog_connectors.tableau import prepare
 from google.datacatalog_connectors.tableau.sync import metadata_synchronizer
 
@@ -40,27 +38,6 @@ class SitesSynchronizer(metadata_synchronizer.MetadataSynchronizer):
 
     def _scrape_source_system_metadata(self, query_filter=None):
         return self._metadata_scraper.scrape_sites(query_filter)
-
-    def _log_scraping_results(self, metadata):
-        workbooks_count = 0
-        sheets_count = 0
-
-        for site_metadata in metadata:
-            workbooks_metadata = site_metadata['workbooks']
-            workbooks_count += len(workbooks_metadata)
-            for workbook_metadata in workbooks_metadata:
-                sheets_count += len(workbook_metadata['sheets'])
-
-        assets_count = sum([workbooks_count, sheets_count])
-        assets_count_str_len = len(str(assets_count))
-
-        logging.info('')
-        logging.info('==== %s assets found!', assets_count)
-        spaces_count = assets_count_str_len - len(str(workbooks_count))
-        logging.info('   > %s%s workbooks', " " * spaces_count,
-                     workbooks_count)
-        spaces_count = assets_count_str_len - len(str(sheets_count))
-        logging.info('   > %s%s sheets', " " * spaces_count, sheets_count)
 
     def _make_tag_templates_dict(self):
         workbook_tag_template_id, workbook_tag_template = \

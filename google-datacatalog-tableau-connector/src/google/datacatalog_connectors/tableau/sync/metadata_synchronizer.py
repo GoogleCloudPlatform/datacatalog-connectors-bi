@@ -82,7 +82,6 @@ class MetadataSynchronizer(abc.ABC):
         source_system_metadata = self._scrape_source_system_metadata(
             query_filter)
         logging.info('==== DONE =======================================')
-        self._log_scraping_results(source_system_metadata)
 
         # Prepare: convert Tableau metadata into Data Catalog entities model.
         logging.info('')
@@ -141,9 +140,6 @@ class MetadataSynchronizer(abc.ABC):
     @abstractmethod
     def _scrape_source_system_metadata(self, query_filter=None):
         pass
-
-    def _log_scraping_results(self, metadata):
-        logging.info(f'==== {len(metadata)} assets found')
 
     @abstractmethod
     def _make_tag_templates_dict(self):
