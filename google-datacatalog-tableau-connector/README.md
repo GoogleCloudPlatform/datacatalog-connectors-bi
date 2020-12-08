@@ -36,7 +36,7 @@ currently supporting below asset types:
 - [3. Running the connector](#3-running-the-connector)
   * [3.1. Python entry point](#31-python-entry-point)
   * [3.2. Docker entry point](#32-docker-entry-point)
-- [4. Set up a Tableau demo server](#4-set-up-a-tableau-demo-server)
+- [4. Tableau resources for development and demonstration purposes](#4-tableau-resources-for-development-and-demonstration-purposes)
 - [5. Developer environment](#5-developer-environment)
   * [5.1. Install and run Yapf formatter](#51-install-and-run-yapf-formatter)
   * [6.2. Install and run Flake8 linter](#62-install-and-run-flake8-linter)
@@ -162,20 +162,10 @@ docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   --datacatalog-project-id $TABLEAU2DC_DATACATALOG_PROJECT_ID
 ```
 
-## 4. Set up a Tableau demo server
+## 4. Tableau resources for development and demonstration purposes 
 
-To quickly set up a Tableau demo server, please visit
-https://www.tableau.com/developer.
-
-Click on SIGN UP FOR THE TABLEAU DEVELOPER PROGRAM. Once you have signed up you
-will receive an e-mail with subject _Tableau Online Developer - Activate your
-Site_.
-
-In the e-mail contents click on: Activate My Developer Site. Once you've done
-that you will receive another e-mail with subject _You've Successfully Created
-Your Site_.
-
-Then you will be able to use your Tableau Online dev server.
+Please refer to the [Developer Resources / Tableau
+documentation](docs/developer-resources/tableau.md).
 
 ## 5. Developer environment
 
