@@ -61,9 +61,13 @@ class MetadataScraperTest(unittest.TestCase):
         mock_fetch_sites.return_value = [
             {
                 'luid': 'TEST-ID-1',
+                'workbooks': [{
+                    'sheets': []
+                }],
             },
             {
                 'luid': 'TEST-ID-2',
+                'workbooks': [],
             },
         ]
 

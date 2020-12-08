@@ -23,24 +23,20 @@ from google.datacatalog_connectors.commons import prepare
 from google.datacatalog_connectors.tableau.sync import \
     dashboards_synchronizer
 
-_COMMONS_PACKAGE = 'google.datacatalog_connectors.commons'
-_PREPARE_PACKAGE = 'google.datacatalog_connectors.tableau.prepare'
-_SCRAPE_PACKAGE = 'google.datacatalog_connectors.tableau.scrape'
-
 
 class DashboardsSynchronizerTest(unittest.TestCase):
+    __COMMONS_PACKAGE = 'google.datacatalog_connectors.commons'
+    __PREPARE_PACKAGE = 'google.datacatalog_connectors.tableau.prepare'
+    __SCRAPE_PACKAGE = 'google.datacatalog_connectors.tableau.scrape'
 
-    @mock.patch(f'{_COMMONS_PACKAGE}.ingest.DataCatalogMetadataIngestor')
-    @mock.patch(f'{_COMMONS_PACKAGE}.cleanup.DataCatalogMetadataCleaner')
-    @mock.patch(f'{_PREPARE_PACKAGE}.EntryRelationshipMapper')
-    @mock.patch(f'{_PREPARE_PACKAGE}.AssembledEntryFactory')
-    @mock.patch(f'{_SCRAPE_PACKAGE}.MetadataScraper')
+    @mock.patch(f'{__COMMONS_PACKAGE}.ingest.DataCatalogMetadataIngestor')
+    @mock.patch(f'{__COMMONS_PACKAGE}.cleanup.DataCatalogMetadataCleaner')
+    @mock.patch(f'{__PREPARE_PACKAGE}.EntryRelationshipMapper')
+    @mock.patch(f'{__PREPARE_PACKAGE}.AssembledEntryFactory')
+    @mock.patch(f'{__SCRAPE_PACKAGE}.MetadataScraper')
     def test_run_should_process_scrape_prepare_ingest_workflow(
             self, mock_scraper, mock_assembled_entry_factory, mock_mapper,
-            mock_cleaner, mock_ingestor):  # noqa: E125
-
-        scraper = mock_scraper.return_value
-        scraper.scrape_dashboards.return_value = [{}]
+            mock_cleaner, mock_ingestor):
 
         assembled_entry_factory = mock_assembled_entry_factory.return_value
         assembled_entry_factory.make_entries_for_dashboards.return_value = [
@@ -57,7 +53,9 @@ class DashboardsSynchronizerTest(unittest.TestCase):
             datacatalog_project_id='test-project-id',
             datacatalog_location_id='test-location-id').run()
 
+        scraper = mock_scraper.return_value
         scraper.scrape_dashboards.assert_called_once()
+
         assembled_entry_factory.make_entries_for_dashboards\
             .assert_called_once()
         mock_mapper.return_value.fulfill_tag_fields.assert_called_once()

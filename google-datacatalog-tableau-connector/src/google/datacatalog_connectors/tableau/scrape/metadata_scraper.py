@@ -110,10 +110,10 @@ class MetadataScraper:
         sheets_count = 0
 
         for site_metadata in sites_metadata:
-            workbooks_metadata = site_metadata['workbooks']
+            workbooks_metadata = site_metadata.get('workbooks') or []
             workbooks_count += len(workbooks_metadata)
             for workbook_metadata in workbooks_metadata:
-                sheets_count += len(workbook_metadata['sheets'])
+                sheets_count += len(workbook_metadata.get('sheets') or [])
 
         assets_count = sum([workbooks_count, sheets_count])
         assets_count_str_len = len(str(assets_count))
@@ -129,7 +129,7 @@ class MetadataScraper:
     def __log_workbook_level_scraping_results(cls, workbooks_metadata):
         workbooks_count = len(workbooks_metadata)
         sheets_count = sum([
-            len(workbook_metadata['sheets'])
+            len(workbook_metadata.get('sheets') or [])
             for workbook_metadata in workbooks_metadata
         ])
 
