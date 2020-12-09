@@ -112,9 +112,31 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(apps))
         self.assertEqual('app-id', apps[0].get('id'))
-        mock_session.get.assert_called_once()
-        mock_session.get.assert_called_with(
+        mock_session.get.assert_called_once_with(
             url=f'test-server/qrs/app/hublist/full?Xrfkey={constants.XRFKEY}',
+            headers=attrs['_RepositoryServicesAPIHelper__common_headers'],
+        )
+
+    @mock.patch(f'{__HELPER_MODULE}.sessions.Session')
+    def test_get_full_custom_property_definition_list_should_return_list_on_success(  # noqa E510
+            self, mock_session):
+
+        mock_session.get.return_value = \
+            scrape_ops_mocks.FakeResponseWithContent(
+                '[{\"id\": \"custom-property-definition-id\"}]')
+
+        attrs = self.__helper.__dict__
+        attrs['_RepositoryServicesAPIHelper__http_session'] = mock_session
+
+        custom_property_defs = \
+            self.__helper.get_full_custom_property_definition_list()
+
+        self.assertEqual(1, len(custom_property_defs))
+        self.assertEqual('custom-property-definition-id',
+                         custom_property_defs[0].get('id'))
+        mock_session.get.assert_called_once_with(
+            url=f'test-server/qrs'
+            f'/custompropertydefinition/full?Xrfkey={constants.XRFKEY}',
             headers=attrs['_RepositoryServicesAPIHelper__common_headers'],
         )
 
@@ -133,8 +155,7 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(streams))
         self.assertEqual('stream-id', streams[0].get('id'))
-        mock_session.get.assert_called_once()
-        mock_session.get.assert_called_with(
+        mock_session.get.assert_called_once_with(
             url=f'test-server/qrs/stream/full?Xrfkey={constants.XRFKEY}',
             headers=attrs['_RepositoryServicesAPIHelper__common_headers'],
         )
