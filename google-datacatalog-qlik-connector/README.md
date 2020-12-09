@@ -219,13 +219,13 @@ already validated:
 
 - Qlik Sense Repository Service API
 
-| Version                 | Result  |
+| VERSION                 | RESULT  |
 | ----------------------- | :-----: |
 | 34.16.0 (September2020) | SUCCESS |
 
 - Qlik Engine JSON API
 
-| Version                  | Result  |
+| VERSION                  | RESULT  |
 | ------------------------ | :-----: |
 | 12.763.4 (September2020) | SUCCESS |
 

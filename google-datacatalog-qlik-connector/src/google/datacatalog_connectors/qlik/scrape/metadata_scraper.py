@@ -59,7 +59,7 @@ class MetadataScraper:
         return streams
 
     def scrape_sheets(self, app_metadata):
-        self.__log_scrape_start('Scraping Sheets from the "%s" App',
+        self.__log_scrape_start('Scraping Sheets from the "%s" App...',
                                 app_metadata.get('name'))
         sheets = self.__engine_api_helper.get_sheets(
             app_metadata.get('id')) or []

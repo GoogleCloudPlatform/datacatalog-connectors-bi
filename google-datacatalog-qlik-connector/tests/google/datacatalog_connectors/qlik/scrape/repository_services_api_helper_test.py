@@ -77,12 +77,11 @@ class RepositoryServicesAPIHelperTest(unittest.TestCase):
         self.__helper.get_full_stream_list()
 
         attrs = self.__helper.__dict__
-        extra_headers = attrs[
-            '_RepositoryServicesAPIHelper__common_headers'].copy()
-        extra_headers['User-Agent'] = 'Windows'
+        headers = attrs['_RepositoryServicesAPIHelper__common_headers'].copy()
+        headers['User-Agent'] = 'Windows'
         mock_requests.get.assert_called_with(
             url=f'test-server/qrs/about?Xrfkey={constants.XRFKEY}',
-            headers=extra_headers,
+            headers=headers,
             allow_redirects=False)
 
         mock_authenticator.get_qps_session_cookie_windows_auth \

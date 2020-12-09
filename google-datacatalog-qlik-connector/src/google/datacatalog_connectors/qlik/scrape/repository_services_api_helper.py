@@ -61,10 +61,11 @@ class RepositoryServicesAPIHelper:
         Returns:
             A list of full app metadata objects.
         """
+        self.__set_up_http_session()
+
         url = f'{self.__base_api_endpoint}' \
               f'/app/hublist/full?Xrfkey={constants.XRFKEY}'
 
-        self.__set_up_http_session()
         return self.__http_session.get(url=url,
                                        headers=self.__common_headers).json()
 
@@ -74,10 +75,11 @@ class RepositoryServicesAPIHelper:
         Returns:
             A list of full stream metadata objects.
         """
+        self.__set_up_http_session()
+
         url = f'{self.__base_api_endpoint}' \
               f'/stream/full?Xrfkey={constants.XRFKEY}'
 
-        self.__set_up_http_session()
         return self.__http_session.get(url=url,
                                        headers=self.__common_headers).json()
 
