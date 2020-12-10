@@ -55,29 +55,37 @@ class RepositoryServicesAPIHelper:
         self.__http_session = None
 
     def get_full_app_list(self):
-        """Get the list of all apps that can be opened by the current user,
+        """Get the list of all Apps that can be opened by the current user,
         via the current proxy.
 
         Returns:
-            A list of full app metadata objects.
+            A list of full App metadata objects.
         """
-        url = f'{self.__base_api_endpoint}' \
-              f'/app/hublist/full?Xrfkey={constants.XRFKEY}'
+        return self.__execute_api_call('app/hublist/full')
 
-        self.__set_up_http_session()
-        return self.__http_session.get(url=url,
-                                       headers=self.__common_headers).json()
-
-    def get_full_stream_list(self):
-        """Get the list of streams with full metadata from a given server.
+    def get_full_custom_property_definition_list(self):
+        """Get the list of Custom Property Definitions with full metadata from
+        a given server.
 
         Returns:
-            A list of full stream metadata objects.
+            A list of full Custom Property Definition metadata objects.
         """
-        url = f'{self.__base_api_endpoint}' \
-              f'/stream/full?Xrfkey={constants.XRFKEY}'
+        return self.__execute_api_call('custompropertydefinition/full')
 
+    def get_full_stream_list(self):
+        """Get the list of Streams with full metadata from a given server.
+
+        Returns:
+            A list of full Stream metadata objects.
+        """
+        return self.__execute_api_call('stream/full')
+
+    def __execute_api_call(self, resource_path):
         self.__set_up_http_session()
+
+        url = f'{self.__base_api_endpoint}/{resource_path}' \
+              f'?Xrfkey={constants.XRFKEY}'
+
         return self.__http_session.get(url=url,
                                        headers=self.__common_headers).json()
 

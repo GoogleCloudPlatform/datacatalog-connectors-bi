@@ -48,6 +48,17 @@ class MetadataScraper:
 
         return apps
 
+    def scrape_all_custom_property_definitions(self):
+        self.__log_scrape_start('Scraping all Custom Property Definitions...')
+        defs = self.__qrs_api_helper.get_full_custom_property_definition_list()
+
+        logging.info('  %s Custom Property Definitions found:', len(defs))
+        for defintion in defs:
+            logging.info('    - %s [%s]', defintion.get('name'),
+                         defintion.get('id'))
+
+        return defs
+
     def scrape_all_streams(self):
         self.__log_scrape_start('Scraping all Streams...')
         streams = self.__qrs_api_helper.get_full_stream_list()
@@ -59,7 +70,7 @@ class MetadataScraper:
         return streams
 
     def scrape_sheets(self, app_metadata):
-        self.__log_scrape_start('Scraping Sheets from the "%s" App',
+        self.__log_scrape_start('Scraping Sheets from the "%s" App...',
                                 app_metadata.get('name'))
         sheets = self.__engine_api_helper.get_sheets(
             app_metadata.get('id')) or []

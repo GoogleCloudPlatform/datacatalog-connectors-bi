@@ -55,6 +55,29 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual('app-id', apps[0].get('id'))
         qrs_api_helper.get_full_app_list.assert_called_once()
 
+    def test_scrape_all_custom_property_definitions_should_return_list_on_success(  # noqa E510
+            self):
+
+        attrs = self.__scraper.__dict__
+        qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
+
+        custom_property_defs_metadata = [{
+            'id': 'custom-property-definition-id',
+        }]
+
+        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
+        qrs_api_helper.get_full_custom_property_definition_list\
+            .return_value = custom_property_defs_metadata
+
+        custom_property_defs = \
+            self.__scraper.scrape_all_custom_property_definitions()
+
+        self.assertEqual(1, len(custom_property_defs))
+        self.assertEqual('custom-property-definition-id',
+                         custom_property_defs[0].get('id'))
+        qrs_api_helper.get_full_custom_property_definition_list\
+            .assert_called_once()
+
     def test_scrape_all_streams_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
         qrs_api_helper = attrs['_MetadataScraper__qrs_api_helper']
