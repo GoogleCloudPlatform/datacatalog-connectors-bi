@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import logging
+import re
 
 from google.datacatalog_connectors.commons import cleanup, ingest
 
@@ -25,6 +26,7 @@ from google.datacatalog_connectors.qlik.prepare import constants
 class MetadataSynchronizer:
     __ENTRY_GROUP_ID = 'qlik'
     __SPECIFIED_SYSTEM = 'qlik'
+    __TAG_TEMPLATE_NAME_PATTERN = '^(.+?)/tagTemplates/(?P<id>.+?)$'
 
     def __init__(self, qlik_server_address, qlik_ad_domain, qlik_username,
                  qlik_password, datacatalog_project_id,
@@ -274,8 +276,10 @@ class MetadataSynchronizer:
             '==== %d Custom Property Definition entries to be ingested...',
             custom_property_defs_entries_count)
 
-        metadata_ingestor.ingest_metadata(
+        required_templates_dict = self.__filter_required_tag_templates(
             custom_property_defs_assembled_entries, tag_templates_dict)
+        metadata_ingestor.ingest_metadata(
+            custom_property_defs_assembled_entries, required_templates_dict)
 
         return custom_property_defs_entries_count
 
@@ -296,8 +300,41 @@ class MetadataSynchronizer:
             logging.info(
                 '==== The Stream identified by "%s" and its nested assets'
                 ' comprise %d entries.', stream_id, asset_entries_count)
+
+            required_templates_dict = self.__filter_required_tag_templates(
+                assembled_entries, tag_templates_dict)
             metadata_ingestor.ingest_metadata(assembled_entries,
-                                              tag_templates_dict)
+                                              required_templates_dict)
             synced_entries_count += asset_entries_count
 
         return synced_entries_count
+
+    def __filter_required_tag_templates(self, assembled_entries,
+                                        tag_templates_dict):
+        """Filter the Tag Templates that are required to ingest the given
+        Entries and their Tags.
+
+        This utility method should be called before any call to
+        DataCatalogMetadataIngestor.ingest_metadata(). The tag_templates_dict,
+        containing a variety of Tag Templates created to support the whole sync
+        workflow, is intended to be shared among several calls to
+        ingest_metadata(). Each call ingests a subset of Entries and Tags, so
+        the rationale here is to filter only the Tag Templates required for a
+        specific metadata ingestion round. By doing this, it avoids unnecessary
+        Tag Template processing, which includes billable API calls, during the
+        ingestion process.
+
+        :return: A ``dict``.
+        """
+        required_templates_dict = {}
+
+        for assembled_entry in assembled_entries:
+            for tag in assembled_entry.tags:
+                template_name = tag.template
+                template_id = re.match(
+                    pattern=self.__TAG_TEMPLATE_NAME_PATTERN,
+                    string=template_name).group('id')
+                required_templates_dict[template_id] = tag_templates_dict.get(
+                    template_id)
+
+        return required_templates_dict
