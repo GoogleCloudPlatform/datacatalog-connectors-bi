@@ -94,7 +94,7 @@ class MetadataSynchronizer:
         logging.info('')
         logging.info('===> Synchronizing Qlik :: Data Catalog metadata...')
 
-        self.__ingest_metadata(tag_templates_dict, assembled_entries_dict)
+        self.__ingest_metadata(assembled_entries_dict, tag_templates_dict)
         logging.info('==== DONE ========================================')
 
     def __scrape_custom_property_definitions(self):
@@ -238,7 +238,7 @@ class MetadataSynchronizer:
             f'system={self.__SPECIFIED_SYSTEM}'
             f' tag:site_url:{self.__site_url}')
 
-    def __ingest_metadata(self, tag_templates_dict, assembled_entries_dict):
+    def __ingest_metadata(self, assembled_entries_dict, tag_templates_dict):
         metadata_ingestor = ingest.DataCatalogMetadataIngestor(
             self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID)
 
@@ -246,18 +246,58 @@ class MetadataSynchronizer:
             len(entries) for entries in assembled_entries_dict.values())
         logging.info('==== %d entries to be synchronized!', entries_count)
 
-        synced_entries_count = 0
-        for asset_id, assembled_entries in assembled_entries_dict.items():
-            asset_entries_count = len(assembled_entries)
-
-            logging.info('')
-            logging.info(
-                '==== The top-level asset identified by "%s" and its nested'
-                ' ones comprise %d entries.', asset_id, asset_entries_count)
-            metadata_ingestor.ingest_metadata(assembled_entries,
-                                              tag_templates_dict)
-            synced_entries_count += asset_entries_count
+        synced_entries_count = self.__ingest_custom_property_defs_metadata(
+            assembled_entries_dict, tag_templates_dict, metadata_ingestor)
+        synced_entries_count += self.__ingest_streams_metadata(
+            assembled_entries_dict, tag_templates_dict, metadata_ingestor)
 
         logging.info('')
         logging.info('==== %d of %d entries successfully synchronized!',
                      synced_entries_count, entries_count)
+
+    def __ingest_custom_property_defs_metadata(self, assembled_entries_dict,
+                                               tag_templates_dict,
+                                               metadata_ingestor):
+
+        custom_property_defs_assembled_entries = []
+        for assembled_entries in assembled_entries_dict.values():
+            if assembled_entries[0].entry.user_specified_type == \
+                constants.USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION:
+                custom_property_defs_assembled_entries.extend(
+                    assembled_entries)
+
+        custom_property_defs_entries_count = \
+            len(custom_property_defs_assembled_entries)
+
+        logging.info('')
+        logging.info(
+            '==== %d Custom Property Definition entries to be ingested...',
+            custom_property_defs_entries_count)
+
+        metadata_ingestor.ingest_metadata(
+            custom_property_defs_assembled_entries, tag_templates_dict)
+
+        return custom_property_defs_entries_count
+
+    def __ingest_streams_metadata(self, assembled_entries_dict,
+                                  tag_templates_dict, metadata_ingestor):
+
+        stream_entries_dict = {}
+        for stream_id, assembled_entries in assembled_entries_dict.items():
+            if assembled_entries[0].entry.user_specified_type == \
+                constants.USER_SPECIFIED_TYPE_STREAM:
+                stream_entries_dict[stream_id] = assembled_entries
+
+        synced_entries_count = 0
+        for stream_id, assembled_entries in stream_entries_dict.items():
+            asset_entries_count = len(assembled_entries)
+
+            logging.info('')
+            logging.info(
+                '==== The Stream identified by "%s" and its nested assets'
+                ' comprise %d entries.', stream_id, asset_entries_count)
+            metadata_ingestor.ingest_metadata(assembled_entries,
+                                              tag_templates_dict)
+            synced_entries_count += asset_entries_count
+
+        return synced_entries_count

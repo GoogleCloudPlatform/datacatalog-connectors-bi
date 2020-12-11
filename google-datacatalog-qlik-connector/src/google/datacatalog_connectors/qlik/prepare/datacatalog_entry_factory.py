@@ -77,8 +77,9 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         entry = datacatalog.Entry()
 
-        generated_id = self.__format_id(constants.ENTRY_ID_PART_APP,
-                                        custom_property_def_metadata.get('id'))
+        generated_id = self.__format_id(
+            constants.ENTRY_ID_PART_CUSTOM_PROPERTY_DEFINITION,
+            custom_property_def_metadata.get('id'))
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
             generated_id)
@@ -90,9 +91,6 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.display_name = self._format_display_name(
             custom_property_def_metadata.get("name"))
         entry.description = custom_property_def_metadata.get("description")
-
-        entry.linked_resource = f'{self.__site_url}/qmc/customproperties' \
-                                f'/{custom_property_def_metadata.get("id")}'
 
         created_datetime = datetime.strptime(
             custom_property_def_metadata.get('createdDate'),
