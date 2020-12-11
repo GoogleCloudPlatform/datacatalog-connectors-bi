@@ -26,7 +26,7 @@ from google.datacatalog_connectors.qlik.prepare import constants
 class MetadataSynchronizer:
     __ENTRY_GROUP_ID = 'qlik'
     __SPECIFIED_SYSTEM = 'qlik'
-    __TAG_TEMPLATE_NAME_PATTERN = '^(.+?)/tagTemplates/(?P<id>.+?)$'
+    __TAG_TEMPLATE_NAME_PATTERN = r'^(.+?)/tagTemplates/(?P<id>.+?)$'
 
     def __init__(self, qlik_server_address, qlik_ad_domain, qlik_username,
                  qlik_password, datacatalog_project_id,
@@ -72,7 +72,8 @@ class MetadataSynchronizer:
         logging.info('===> Converting Qlik metadata'
                      ' into Data Catalog entities model...')
 
-        tag_templates_dict = self.__make_tag_templates_dict()
+        tag_templates_dict = self.__make_tag_templates_dict(
+            custom_property_defs)
 
         assembled_entries_dict = self.__make_assembled_entries_dict(
             custom_property_defs, streams, tag_templates_dict)
@@ -178,18 +179,35 @@ class MetadataSynchronizer:
 
         return all_streams
 
-    def __make_tag_templates_dict(self):
-        return {
-            constants.TAG_TEMPLATE_ID_APP:
-                self.__tag_template_factory.make_tag_template_for_app(),
-            constants.TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION:
+    def __make_tag_templates_dict(self, custom_property_defs):
+        templates_dict = {}
+
+        self.__add_template_to_dict(
+            templates_dict,
+            self.__tag_template_factory.make_tag_template_for_app())
+        self.__add_template_to_dict(
+            templates_dict,
+            self.__tag_template_factory.
+            make_tag_template_for_custom_property_definition())
+        self.__add_template_to_dict(
+            templates_dict,
+            self.__tag_template_factory.make_tag_template_for_sheet())
+        self.__add_template_to_dict(
+            templates_dict,
+            self.__tag_template_factory.make_tag_template_for_stream())
+
+        for definition in custom_property_defs:
+            self.__add_template_to_dict(
+                templates_dict,
                 self.__tag_template_factory.
-                make_tag_template_for_custom_property_definition(),
-            constants.TAG_TEMPLATE_ID_SHEET:
-                self.__tag_template_factory.make_tag_template_for_sheet(),
-            constants.TAG_TEMPLATE_ID_STREAM:
-                self.__tag_template_factory.make_tag_template_for_stream(),
-        }
+                make_tag_template_for_custom_property(definition))
+
+        return templates_dict
+
+    def __add_template_to_dict(self, templates_dict, template):
+        template_id = re.match(pattern=self.__TAG_TEMPLATE_NAME_PATTERN,
+                               string=template.name).group('id')
+        templates_dict[template_id] = template
 
     def __make_assembled_entries_dict(self, custom_property_defs_metadata,
                                       streams_metadata, tag_templates_dict):

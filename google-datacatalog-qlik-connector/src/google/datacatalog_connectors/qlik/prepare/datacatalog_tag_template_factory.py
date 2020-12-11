@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+import six
+import unicodedata
+
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare
 
@@ -21,6 +25,7 @@ from google.datacatalog_connectors.qlik.prepare import constants
 
 
 class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
+    __ASCII_CHARACTER_ENCODING = 'ASCII'
     __BOOL_TYPE = datacatalog.FieldType.PrimitiveType.BOOL
     __DOUBLE_TYPE = datacatalog.FieldType.PrimitiveType.DOUBLE
     __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
@@ -97,6 +102,54 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         return tag_template
 
+    def make_tag_template_for_custom_property(self, definition_metadata):
+        tag_template = datacatalog.TagTemplate()
+
+        generated_id = f'{constants.TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY}' \
+                       f'{definition_metadata.get("id")}'
+
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=re.sub(r'[^a-z0-9_]+', '_', generated_id))
+
+        generated_display_name = f'Qlik {definition_metadata.get("name")}' \
+                                 f' Custom Property'
+        tag_template.display_name = self.__format_display_name(
+            generated_display_name)
+
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
+
+        self._add_primitive_type_field(tag_template, 'created_date',
+                                       self.__TIMESTAMP_TYPE, 'Created date')
+
+        self._add_primitive_type_field(tag_template, 'modified_date',
+                                       self.__TIMESTAMP_TYPE, 'Modified date')
+
+        self._add_primitive_type_field(tag_template, 'modified_by_username',
+                                       self.__STRING_TYPE,
+                                       'Username who modified it')
+
+        self._add_primitive_type_field(tag_template, 'value',
+                                       self.__STRING_TYPE, 'Value')
+
+        self._add_primitive_type_field(tag_template, 'definition_id',
+                                       self.__STRING_TYPE, 'Definition Id')
+
+        self._add_primitive_type_field(tag_template, 'definition_name',
+                                       self.__STRING_TYPE, 'Definition name')
+
+        self._add_primitive_type_field(
+            tag_template, 'definition_entry', self.__STRING_TYPE,
+            'Data Catalog Entry for the Definition')
+
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
+
+        return tag_template
+
     def make_tag_template_for_custom_property_definition(self):
         tag_template = datacatalog.TagTemplate()
 
@@ -126,6 +179,8 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'site_url',
                                        self.__STRING_TYPE,
                                        'Qlik Sense site url')
+
+        return tag_template
 
         return tag_template
 
@@ -207,3 +262,17 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        'Qlik Sense site url')
 
         return tag_template
+
+    @classmethod
+    def __format_display_name(cls, source_name):
+        return re.sub(r'[^\w\- ]+', '_',
+                      cls.__normalize_ascii_chars(source_name).strip())
+
+    @classmethod
+    def __normalize_ascii_chars(cls, source_string):
+        encoding = cls.__ASCII_CHARACTER_ENCODING
+        normalized = unicodedata.normalize(
+            'NFKD', source_string
+            if isinstance(source_string, six.string_types) else u'')
+        encoded = normalized.encode(encoding, 'ignore')
+        return encoded.decode()

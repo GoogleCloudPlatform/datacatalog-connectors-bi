@@ -37,6 +37,9 @@ TAG_TEMPLATE_ID_APP = 'qlik_app_metadata'
 # Custom Property Definition related Entries.
 TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION = \
     'qlik_custom_property_definition_metadata'
+# Prefix for IDs of the Tag Templates created to tag Entries with their
+# Custom Properties.
+TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY = 'qlik_custom_property__'
 # The ID of the Tag Template created to store additional metadata for the
 # Sheet-related Entries.
 TAG_TEMPLATE_ID_SHEET = 'qlik_sheet_metadata'
