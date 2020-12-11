@@ -92,6 +92,15 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             custom_property_def_metadata.get("name"))
         entry.description = custom_property_def_metadata.get("description")
 
+        # The linked_resource field is not fulfilled because there is no way to
+        # jump directly to an 'edit' page in the QlikView Management Console
+        # (QMC). The the ID wee see in the URL of the Custom Property
+        # Definition edit page is generated at the client side as a wrapper
+        # around the object. The reason for this is: if someone select a bunch
+        # of things in the QMC, it can't pick one, or have a list, so it
+        # generates a new 'synthetic' key for the edit page.
+        # -- from the Qlik Analytics Platform Architecture Team
+
         created_datetime = datetime.strptime(
             custom_property_def_metadata.get('createdDate'),
             self.__INCOMING_TIMESTAMP_UTC_FORMAT)
