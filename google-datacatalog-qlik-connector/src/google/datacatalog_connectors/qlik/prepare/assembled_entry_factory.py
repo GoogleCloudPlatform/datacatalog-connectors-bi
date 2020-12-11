@@ -32,48 +32,59 @@ class AssembledEntryFactory:
                 project_id, location_id, entry_group_id, user_specified_system,
                 site_url)
 
-        self.__app_tag_template = None
-        self.__sheet_tag_template = None
-        self.__stream_tag_template = None
-
         self.__datacatalog_tag_factory = \
             datacatalog_tag_factory.DataCatalogTagFactory(site_url)
 
-    def make_assembled_entries_list(self, stream_metadata, tag_templates_dict):
-        self.__initialize_tag_templates(tag_templates_dict)
+    def make_assembled_entry_for_custom_property_def(
+            self, custom_property_def_metadata, tag_template):
+
+        entry_id, entry = self.__datacatalog_entry_factory\
+            .make_entry_for_custom_property_definition(
+                custom_property_def_metadata)
+
+        tags = []
+        if tag_template:
+            tags.append(
+                self.__datacatalog_tag_factory.
+                make_tag_for_custom_property_defintion(
+                    tag_template, custom_property_def_metadata))
+
+        return prepare.AssembledEntryData(entry_id, entry, tags)
+
+    def make_assembled_entries_for_stream(self, stream_metadata,
+                                          tag_templates_dict):
 
         assembled_entries = [
-            self.__make_assembled_entry_for_stream(stream_metadata)
+            self.__make_assembled_entry_for_stream(stream_metadata,
+                                                   tag_templates_dict)
         ]
 
         assembled_entries.extend(
-            self.__make_assembled_entries_for_apps(
-                stream_metadata.get('apps')))
+            self.__make_assembled_entries_for_apps(stream_metadata.get('apps'),
+                                                   tag_templates_dict))
 
         return assembled_entries
 
-    def __initialize_tag_templates(self, tag_templates_dict):
-        self.__app_tag_template = \
-            tag_templates_dict.get(constants.TAG_TEMPLATE_ID_APP)
-        self.__sheet_tag_template = \
-            tag_templates_dict.get(constants.TAG_TEMPLATE_ID_SHEET)
-        self.__stream_tag_template = \
-            tag_templates_dict.get(constants.TAG_TEMPLATE_ID_STREAM)
+    def __make_assembled_entry_for_stream(self, stream_metadata,
+                                          tag_templates_dict):
 
-    def __make_assembled_entry_for_stream(self, stream_metadata):
         entry_id, entry = \
             self.__datacatalog_entry_factory.make_entry_for_stream(
                 stream_metadata)
 
+        tag_template = tag_templates_dict.get(constants.TAG_TEMPLATE_ID_STREAM)
+
         tags = []
-        if self.__stream_tag_template:
+        if tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_stream(
-                    self.__stream_tag_template, stream_metadata))
+                    tag_template, stream_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
 
-    def __make_assembled_entries_for_apps(self, apps_metadata):
+    def __make_assembled_entries_for_apps(self, apps_metadata,
+                                          tag_templates_dict):
+
         assembled_entries = []
 
         if not apps_metadata:
@@ -81,40 +92,50 @@ class AssembledEntryFactory:
 
         for app_metadata in apps_metadata:
             assembled_entries.append(
-                self.__make_assembled_entry_for_app(app_metadata))
+                self.__make_assembled_entry_for_app(app_metadata,
+                                                    tag_templates_dict))
             assembled_entries.extend(
                 self.__make_assembled_entries_for_sheets(
-                    app_metadata.get('sheets')))
+                    app_metadata.get('sheets'), tag_templates_dict))
 
         return assembled_entries
 
-    def __make_assembled_entry_for_app(self, app_metadata):
+    def __make_assembled_entry_for_app(self, app_metadata, tag_templates_dict):
         entry_id, entry = \
             self.__datacatalog_entry_factory.make_entry_for_app(app_metadata)
 
+        tag_template = tag_templates_dict.get(constants.TAG_TEMPLATE_ID_APP)
+
         tags = []
-        if self.__app_tag_template:
+        if tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_app(
-                    self.__app_tag_template, app_metadata))
+                    tag_template, app_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
 
-    def __make_assembled_entries_for_sheets(self, sheets_metadata):
+    def __make_assembled_entries_for_sheets(self, sheets_metadata,
+                                            tag_templates_dict):
+
         return [
-            self.__make_assembled_entry_for_sheet(sheet_metadata)
+            self.__make_assembled_entry_for_sheet(sheet_metadata,
+                                                  tag_templates_dict)
             for sheet_metadata in sheets_metadata
         ] if sheets_metadata else []
 
-    def __make_assembled_entry_for_sheet(self, sheet_metadata):
+    def __make_assembled_entry_for_sheet(self, sheet_metadata,
+                                         tag_templates_dict):
+
         entry_id, entry = \
             self.__datacatalog_entry_factory.make_entry_for_sheet(
                 sheet_metadata)
 
+        tag_template = tag_templates_dict.get(constants.TAG_TEMPLATE_ID_SHEET)
+
         tags = []
-        if self.__sheet_tag_template:
+        if tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_sheet(
-                    self.__sheet_tag_template, sheet_metadata))
+                    tag_template, sheet_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)

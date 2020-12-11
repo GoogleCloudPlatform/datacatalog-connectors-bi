@@ -61,7 +61,6 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'savedInProductVersion': '12.763.4',
             'migrationHash': '504d4e39a7133ee172fbe29aa58348b1e4054149',
             'availabilityStatus': 1,
-            'schemaPath': 'App',
         }
 
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
@@ -99,7 +98,6 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('504d4e39a7133ee172fbe29aa58348b1e4054149',
                          tag.fields['migration_hash'].string_value)
         self.assertEqual(1, tag.fields['availability_status'].double_value)
-        self.assertEqual('App', tag.fields['schema_path'].string_value)
 
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)
@@ -116,6 +114,41 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
         self.assertFalse('publish_time' in tag.fields)
+
+    def test_make_tag_for_custom_property_def_should_set_all_available_fields(
+            self):
+
+        tag_template = self.__tag_template_factory\
+            .make_tag_template_for_custom_property_definition()
+
+        metadata = {
+            'id': 'a123-b456',
+            'modifiedByUserName': 'test-directory\\\\test.userid',
+            'valueType': 'Text',
+            'choiceValues': [
+                'Value 1',
+                'Value 2',
+            ],
+            'objectTypes': [
+                'App',
+                'Stream',
+            ],
+        }
+
+        tag = self.__factory.make_tag_for_custom_property_defintion(
+            tag_template, metadata)
+
+        self.assertEqual('a123-b456', tag.fields['id'].string_value)
+        self.assertEqual('test-directory\\\\test.userid',
+                         tag.fields['modified_by_username'].string_value)
+        self.assertEqual('Text', tag.fields['value_type'].string_value)
+        self.assertEqual('Value 1, Value 2',
+                         tag.fields['choice_values'].string_value)
+        self.assertEqual('App, Stream',
+                         tag.fields['object_types'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
 
     def test_make_tag_for_sheet_should_set_all_available_fields(self):
         tag_template = \

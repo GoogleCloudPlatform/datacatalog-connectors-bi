@@ -757,6 +757,194 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "4 Custom Property Definitions",
+			"item": [
+				{
+					"name": "4.01.01 Get Custom Property Definition list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4ac7930d-c5f2-4a57-bd42-da042bca382b",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"const streams = jsonData;",
+									"",
+									"pm.globals.unset(\"customPropertyDefinitionId\");",
+									"",
+									"if (streams.length > 0) {",
+									"    pm.globals.set(\"customPropertyDefinitionId\", streams[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/custompropertydefinition?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"custompropertydefinition"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.01.02 Get Custom Property Definition (full)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4016c8a7-8e6b-4ca9-be4f-e0f6232c9105",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"const streams = jsonData;",
+									"",
+									"pm.globals.unset(\"customPropertyDefinitionId\");",
+									"",
+									"if (streams.length > 0) {",
+									"    pm.globals.set(\"customPropertyDefinitionId\", streams[0].id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/custompropertydefinition/full?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"custompropertydefinition",
+								"full"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.02.01 Get Custom Property Definition",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "61a23306-004b-4400-b45b-3ebe3335d0c4",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Qlik-Xrfkey",
+								"type": "text",
+								"value": "{{XRFKEY}}"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/qrs/custompropertydefinition/{{customPropertyDefinitionId}}?Xrfkey={{XRFKEY}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"qrs",
+								"custompropertydefinition",
+								"{{customPropertyDefinitionId}}"
+							],
+							"query": [
+								{
+									"key": "Xrfkey",
+									"value": "{{XRFKEY}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "X Data connections",
 			"item": [
 				{
