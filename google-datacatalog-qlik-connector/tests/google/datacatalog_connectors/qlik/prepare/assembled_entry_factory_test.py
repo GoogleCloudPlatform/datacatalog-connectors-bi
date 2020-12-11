@@ -58,16 +58,14 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             }
         }
 
-        assembled_entries = \
+        assembled_entry = \
             self.__factory.make_assembled_entry_for_custom_property_def(
                 {'id': 'test_definition'}, tag_templates_dict)
 
-        self.assertEqual(1, len(assembled_entries))
         entry_factory.make_entry_for_custom_property_definition\
             .assert_called_once()
 
-        custom_property_def_assembled_entry = assembled_entries[0]
-        tags = custom_property_def_assembled_entry.tags
+        tags = assembled_entry.tags
 
         self.assertEqual(1, len(tags))
         self.__tag_factory.make_tag_for_custom_property_defintion\

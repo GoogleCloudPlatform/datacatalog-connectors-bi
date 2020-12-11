@@ -122,7 +122,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('custom_property_definition',
                          entry.user_specified_type)
         self.assertEqual('Test custom property definition', entry.display_name)
-        self.assertIsNone(entry.linked_resource)
+        self.assertEqual('', entry.linked_resource)
 
         created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
                                              self.__DATETIME_FORMAT)

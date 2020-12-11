@@ -17,6 +17,9 @@
 import unittest
 from unittest import mock
 
+from google.cloud import datacatalog
+from google.datacatalog_connectors.commons import prepare
+
 from google.datacatalog_connectors.qlik import sync
 
 __SYNC_PACKAGE = 'google.datacatalog_connectors.qlik.sync'
@@ -40,7 +43,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
             datacatalog_location_id='test-location-id')
 
     def test_constructor_should_set_instance_attributes(
-            self, mock_mapper, mock_cleaner, mock_ingestor):  # noqa: E125
+            self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
 
@@ -56,14 +59,15 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertIsNotNone(
             attrs['_MetadataSynchronizer__assembled_entry_factory'])
 
-    def test_run_no_metadata_should_succeed(self, mock_mapper, mock_cleaner,
-                                            mock_ingestor):
+    def test_run_no_metadata_should_clean_but_not_ingest_metadata(
+            self, mock_mapper, mock_cleaner, mock_ingestor):
 
         scraper = self.__synchronizer.__dict__[
             '_MetadataSynchronizer__metadata_scraper']
 
         self.__synchronizer.run()
 
+        scraper.scrape_all_custom_property_definitions.assert_called_once()
         scraper.scrape_all_streams.assert_called_once()
 
         cleaner = mock_cleaner.return_value
@@ -72,8 +76,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_not_called()
 
-    def test_run_stream_metadata_should_succeed(self, mock_mapper,
-                                                mock_cleaner, mock_ingestor):
+    def test_run_stream_metadata_should_traverse_main_workflow_steps(
+            self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
         scraper = attrs['_MetadataSynchronizer__metadata_scraper']
@@ -81,6 +85,11 @@ class MetadataSynchronizerTest(unittest.TestCase):
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
+        assembled_entry_factory.make_assembled_entries_for_stream\
+            .return_value = [
+                prepare.AssembledEntryData(
+                    'test_stream', self.__make_fake_entry('stream'), [])
+            ]
 
         self.__synchronizer.run()
 
@@ -102,9 +111,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_called_once()
 
-    def test_run_published_app_metadata_should_succeed(self, mock_mapper,
-                                                       mock_cleaner,
-                                                       mock_ingestor):
+    def test_run_published_app_should_properly_ask_assembled_entries(
+            self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
         scraper = attrs['_MetadataSynchronizer__metadata_scraper']
@@ -136,16 +144,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertEqual(expected_make_assembled_entries_call_arg,
                          actual_call_args[0])
 
-        mapper = mock_mapper.return_value
-        mapper.fulfill_tag_fields.assert_called_once()
-
-        cleaner = mock_cleaner.return_value
-        cleaner.delete_obsolete_metadata.assert_called_once()
-
-        ingestor = mock_ingestor.return_value
-        ingestor.ingest_metadata.assert_called_once()
-
-    def test_run_not_published_app_metadata_should_succeed(
+    def test_run_not_published_app_should_properly_ask_assembled_entries(
             self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
@@ -155,6 +154,11 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = [self.__make_fake_wip_app()]
+        assembled_entry_factory.make_assembled_entries_for_stream\
+            .return_value = [
+                prepare.AssembledEntryData(
+                    'test_stream', self.__make_fake_entry('stream'), [])
+            ]
 
         self.__synchronizer.run()
 
@@ -167,16 +171,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertEqual(expected_make_assembled_entries_call_arg,
                          actual_call_args[0])
 
-        mapper = mock_mapper.return_value
-        mapper.fulfill_tag_fields.assert_called_once()
-
-        cleaner = mock_cleaner.return_value
-        cleaner.delete_obsolete_metadata.assert_called_once()
-
-        ingestor = mock_ingestor.return_value
-        ingestor.ingest_metadata.assert_called_once()
-
-    def test_run_published_sheet_metadata_should_succeed(
+    def test_run_published_sheet_should_properly_ask_assembled_entries(
             self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
@@ -224,16 +219,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertEqual(expected_make_assembled_entries_call_arg,
                          actual_call_args[0])
 
-        mapper = mock_mapper.return_value
-        mapper.fulfill_tag_fields.assert_called_once()
-
-        cleaner = mock_cleaner.return_value
-        cleaner.delete_obsolete_metadata.assert_called_once()
-
-        ingestor = mock_ingestor.return_value
-        ingestor.ingest_metadata.assert_called_once()
-
-    def test_run_not_published_sheet_metadata_should_succeed(
+    def test_run_not_published_sheet_should_properly_ask_assembled_entries(
             self, mock_mapper, mock_cleaner, mock_ingestor):
 
         attrs = self.__synchronizer.__dict__
@@ -265,15 +251,6 @@ class MetadataSynchronizerTest(unittest.TestCase):
             .make_assembled_entries_for_stream.call_args[0]
         self.assertEqual(expected_make_assembled_entries_call_arg,
                          actual_call_args[0])
-
-        mapper = mock_mapper.return_value
-        mapper.fulfill_tag_fields.assert_called_once()
-
-        cleaner = mock_cleaner.return_value
-        cleaner.delete_obsolete_metadata.assert_called_once()
-
-        ingestor = mock_ingestor.return_value
-        ingestor.ingest_metadata.assert_called_once()
 
     @classmethod
     def __make_fake_stream(cls):
@@ -316,3 +293,9 @@ class MetadataSynchronizerTest(unittest.TestCase):
         sheet = cls.__make_fake_sheet()
         sheet['qMeta']['published'] = False
         return sheet
+
+    @classmethod
+    def __make_fake_entry(cls, user_specified_type):
+        entry = datacatalog.Entry()
+        entry.user_specified_type = user_specified_type
+        return entry

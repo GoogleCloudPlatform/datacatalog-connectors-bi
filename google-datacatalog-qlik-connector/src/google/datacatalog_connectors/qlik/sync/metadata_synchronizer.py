@@ -276,6 +276,9 @@ class MetadataSynchronizer:
             '==== %d Custom Property Definition entries to be ingested...',
             custom_property_defs_entries_count)
 
+        if not custom_property_defs_assembled_entries:
+            return 0
+
         required_templates_dict = self.__filter_required_tag_templates(
             custom_property_defs_assembled_entries, tag_templates_dict)
         metadata_ingestor.ingest_metadata(
