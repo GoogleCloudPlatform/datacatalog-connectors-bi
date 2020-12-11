@@ -45,6 +45,34 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             self.__entry_factory,
             attrs['_AssembledEntryFactory__datacatalog_entry_factory'])
 
+    def test_make_assembled_entry_for_custom_property_def_should_process_def(
+            self):
+
+        entry_factory = self.__entry_factory
+        entry_factory.make_entry_for_custom_property_definition\
+            .return_value = ('id', {})
+
+        tag_templates_dict = {
+            'qlik_custom_property_definition_metadata': {
+                'name': 'tagTemplates/qlik_custom_property_def_metadata',
+            }
+        }
+
+        assembled_entries = \
+            self.__factory.make_assembled_entry_for_custom_property_def(
+                {'id': 'test_definition'}, tag_templates_dict)
+
+        self.assertEqual(1, len(assembled_entries))
+        entry_factory.make_entry_for_custom_property_definition\
+            .assert_called_once()
+
+        custom_property_def_assembled_entry = assembled_entries[0]
+        tags = custom_property_def_assembled_entry.tags
+
+        self.assertEqual(1, len(tags))
+        self.__tag_factory.make_tag_for_custom_property_defintion\
+            .assert_called_once()
+
     def test_make_assembled_entries_for_stream_should_process_stream(self):
         entry_factory = self.__entry_factory
         entry_factory.make_entry_for_stream.return_value = ('id', {})
