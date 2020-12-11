@@ -135,12 +135,6 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
             'Availability status',
             tag_template.fields['availability_status'].display_name)
 
-        self.assertEqual(
-            self.__STRING_TYPE,
-            tag_template.fields['schema_path'].type.primitive_type)
-        self.assertEqual('Schema path',
-                         tag_template.fields['schema_path'].display_name)
-
         self.assertEqual(self.__STRING_TYPE,
                          tag_template.fields['site_url'].type.primitive_type)
         self.assertEqual('Qlik Sense site url',

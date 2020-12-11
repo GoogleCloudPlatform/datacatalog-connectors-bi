@@ -88,10 +88,10 @@ class MetadataSynchronizerTest(unittest.TestCase):
             'id': 'test_stream',
         }
 
-        make_assembled_entries_args = \
-            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        actual_call_args = assembled_entry_factory\
+            .make_assembled_entries_for_stream.call_args[0]
         self.assertEqual(expected_make_assembled_entries_call_arg,
-                         make_assembled_entries_args[0])
+                         actual_call_args[0])
 
         mapper = mock_mapper.return_value
         mapper.fulfill_tag_fields.assert_called_once()
@@ -131,10 +131,10 @@ class MetadataSynchronizerTest(unittest.TestCase):
             }]
         }
 
-        make_assembled_entries_args = \
-            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        actual_call_args = assembled_entry_factory\
+            .make_assembled_entries_for_stream.call_args[0]
         self.assertEqual(expected_make_assembled_entries_call_arg,
-                         make_assembled_entries_args[0])
+                         actual_call_args[0])
 
         mapper = mock_mapper.return_value
         mapper.fulfill_tag_fields.assert_called_once()
@@ -162,10 +162,10 @@ class MetadataSynchronizerTest(unittest.TestCase):
             'id': 'test_stream',
         }
 
-        make_assembled_entries_args = \
-            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        actual_call_args = assembled_entry_factory\
+            .make_assembled_entries_for_stream.call_args[0]
         self.assertEqual(expected_make_assembled_entries_call_arg,
-                         make_assembled_entries_args[0])
+                         actual_call_args[0])
 
         mapper = mock_mapper.return_value
         mapper.fulfill_tag_fields.assert_called_once()
@@ -219,10 +219,10 @@ class MetadataSynchronizerTest(unittest.TestCase):
             }]
         }
 
-        make_assembled_entries_args = \
-            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        actual_call_args = assembled_entry_factory\
+            .make_assembled_entries_for_stream.call_args[0]
         self.assertEqual(expected_make_assembled_entries_call_arg,
-                         make_assembled_entries_args[0])
+                         actual_call_args[0])
 
         mapper = mock_mapper.return_value
         mapper.fulfill_tag_fields.assert_called_once()
@@ -261,10 +261,10 @@ class MetadataSynchronizerTest(unittest.TestCase):
             }]
         }
 
-        make_assembled_entries_args = \
-            assembled_entry_factory.make_assembled_entries_list.call_args[0]
+        actual_call_args = assembled_entry_factory\
+            .make_assembled_entries_for_stream.call_args[0]
         self.assertEqual(expected_make_assembled_entries_call_arg,
-                         make_assembled_entries_args[0])
+                         actual_call_args[0])
 
         mapper = mock_mapper.return_value
         mapper.fulfill_tag_fields.assert_called_once()

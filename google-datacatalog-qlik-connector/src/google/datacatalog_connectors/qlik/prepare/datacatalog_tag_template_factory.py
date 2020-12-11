@@ -91,8 +91,37 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        self.__DOUBLE_TYPE,
                                        'Availability status')
 
-        self._add_primitive_type_field(tag_template, 'schema_path',
-                                       self.__STRING_TYPE, 'Schema path')
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
+
+        return tag_template
+
+    def make_tag_template_for_custom_property_definition(self):
+        tag_template = datacatalog.TagTemplate()
+
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=constants.TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION)
+
+        tag_template.display_name = 'Qlik Custom Property Definition Metadata'
+
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
+
+        self._add_primitive_type_field(tag_template, 'modified_by_username',
+                                       self.__STRING_TYPE,
+                                       'Username who modified it')
+
+        self._add_primitive_type_field(tag_template, 'value_type',
+                                       self.__STRING_TYPE, 'Value type')
+
+        self._add_primitive_type_field(tag_template, 'choice_values',
+                                       self.__STRING_TYPE, 'Choice values')
+
+        self._add_primitive_type_field(tag_template, 'object_types',
+                                       self.__STRING_TYPE, 'Object types')
 
         self._add_primitive_type_field(tag_template, 'site_url',
                                        self.__STRING_TYPE,

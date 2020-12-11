@@ -19,6 +19,7 @@ ENTRY_ID_MAX_LENGTH = 64
 # The below asset type specific strings are appended to the standard
 # ENTRY_ID_PREFIX when generating Qlik Entry IDs.
 ENTRY_ID_PART_APP = 'app_'
+ENTRY_ID_PART_CUSTOM_PROPERTY_DEFINITION = 'cpd_'
 ENTRY_ID_PART_SHEET = 'sht_'
 ENTRY_ID_PART_STREAM = 'str_'
 # This is the common prefix for all Qlik Entries.
@@ -33,6 +34,10 @@ NO_PREFIX_ENTRY_ID_MAX_LENGTH = ENTRY_ID_MAX_LENGTH - len(ENTRY_ID_PREFIX)
 # App-related Entries.
 TAG_TEMPLATE_ID_APP = 'qlik_app_metadata'
 # The ID of the Tag Template created to store additional metadata for the
+# Custom Property Definition related Entries.
+TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION = \
+    'qlik_custom_property_definition_metadata'
+# The ID of the Tag Template created to store additional metadata for the
 # Sheet-related Entries.
 TAG_TEMPLATE_ID_SHEET = 'qlik_sheet_metadata'
 # The ID of the Tag Template created to store additional metadata for the
@@ -41,6 +46,8 @@ TAG_TEMPLATE_ID_STREAM = 'qlik_stream_metadata'
 
 # The user specified type of the App-related Entries.
 USER_SPECIFIED_TYPE_APP = 'app'
+# The user specified type of the Custom Property Definition related Entries.
+USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION = 'custom_property_definition'
 # The user specified type of the Sheet-related Entries.
 USER_SPECIFIED_TYPE_SHEET = 'sheet'
 # The user specified type of the Stream-related Entries.

@@ -45,7 +45,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             self.__entry_factory,
             attrs['_AssembledEntryFactory__datacatalog_entry_factory'])
 
-    def test_make_assembled_entries_list_should_process_streams(self):
+    def test_make_assembled_entries_for_stream_should_process_stream(self):
         entry_factory = self.__entry_factory
         entry_factory.make_entry_for_stream.return_value = ('id', {})
 
@@ -56,7 +56,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         }
 
         assembled_entries = \
-            self.__factory.make_assembled_entries_list(
+            self.__factory.make_assembled_entries_for_stream(
                 self.__make_fake_stream(), tag_templates_dict)
 
         self.assertEqual(1, len(assembled_entries))
@@ -68,7 +68,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         self.assertEqual(1, len(tags))
         self.__tag_factory.make_tag_for_stream.assert_called_once()
 
-    def test_make_assembled_entries_list_should_process_apps(self):
+    def test_make_assembled_entries_for_stream_should_process_apps(self):
         entry_factory = self.__entry_factory
         entry_factory.make_entry_for_stream.return_value = ('id', {})
         entry_factory.make_entry_for_app.return_value = ('id', {})
@@ -82,7 +82,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         fake_stream = self.__make_fake_stream()
         fake_stream['apps'].append(self.__make_fake_app())
         assembled_entries = \
-            self.__factory.make_assembled_entries_list(
+            self.__factory.make_assembled_entries_for_stream(
                 fake_stream, tag_templates_dict)
 
         self.assertEqual(2, len(assembled_entries))
@@ -94,7 +94,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         self.assertEqual(1, len(tags))
         self.__tag_factory.make_tag_for_app.assert_called_once()
 
-    def test_make_assembled_entries_list_should_process_sheets(self):
+    def test_make_assembled_entries_for_stream_should_process_sheets(self):
         entry_factory = self.__entry_factory
         entry_factory.make_entry_for_stream.return_value = ('id', {})
         entry_factory.make_entry_for_app.return_value = ('id', {})
@@ -111,7 +111,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         fake_app['sheets'].append(self.__make_fake_sheet())
         fake_stream['apps'].append(fake_app)
         assembled_entries = \
-            self.__factory.make_assembled_entries_list(
+            self.__factory.make_assembled_entries_for_stream(
                 fake_stream, tag_templates_dict)
 
         self.assertEqual(3, len(assembled_entries))

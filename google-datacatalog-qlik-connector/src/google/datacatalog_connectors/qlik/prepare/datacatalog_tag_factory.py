@@ -92,8 +92,32 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_double_field(tag, 'availability_status',
                                app_metadata.get('availabilityStatus'))
 
-        self._set_string_field(tag, 'schema_path',
-                               app_metadata.get('schemaPath'))
+        self._set_string_field(tag, 'site_url', self.__site_url)
+
+        return tag
+
+    def make_tag_for_custom_property_defintion(self, tag_template,
+                                               custom_property_def_metadata):
+
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id',
+                               custom_property_def_metadata.get('id'))
+
+        self._set_string_field(
+            tag, 'modified_by_username',
+            custom_property_def_metadata.get('modifiedByUserName'))
+
+        self._set_string_field(tag, 'value_type',
+                               custom_property_def_metadata.get('valueType'))
+
+        choice_values = custom_property_def_metadata.get('choiceValues') or []
+        self._set_string_field(tag, 'choice_values', ', '.join(choice_values))
+
+        object_types = custom_property_def_metadata.get('objectTypes') or []
+        self._set_string_field(tag, 'object_types', ', '.join(object_types))
 
         self._set_string_field(tag, 'site_url', self.__site_url)
 

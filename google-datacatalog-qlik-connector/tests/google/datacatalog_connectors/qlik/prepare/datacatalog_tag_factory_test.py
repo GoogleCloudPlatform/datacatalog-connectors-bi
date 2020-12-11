@@ -61,7 +61,6 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'savedInProductVersion': '12.763.4',
             'migrationHash': '504d4e39a7133ee172fbe29aa58348b1e4054149',
             'availabilityStatus': 1,
-            'schemaPath': 'App',
         }
 
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
@@ -99,7 +98,6 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('504d4e39a7133ee172fbe29aa58348b1e4054149',
                          tag.fields['migration_hash'].string_value)
         self.assertEqual(1, tag.fields['availability_status'].double_value)
-        self.assertEqual('App', tag.fields['schema_path'].string_value)
 
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)

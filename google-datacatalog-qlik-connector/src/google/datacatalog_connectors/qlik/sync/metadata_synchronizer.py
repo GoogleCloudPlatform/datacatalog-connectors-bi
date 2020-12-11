@@ -57,6 +57,10 @@ class MetadataSynchronizer:
         logging.info('===> Scraping Qlik Sense metadata...')
 
         logging.info('')
+        logging.info('Objects to be scraped: Custom Property Definitions')
+        custom_property_defs = self.__scrape_custom_property_definitions()
+
+        logging.info('')
         logging.info('Objects to be scraped: Streams, Apps, and Sheets')
         streams = self.__scrape_streams()
         logging.info('==== DONE ========================================')
@@ -69,7 +73,7 @@ class MetadataSynchronizer:
         tag_templates_dict = self.__make_tag_templates_dict()
 
         assembled_entries_dict = self.__make_assembled_entries_dict(
-            streams, tag_templates_dict)
+            custom_property_defs, streams, tag_templates_dict)
         logging.info('==== DONE ========================================')
 
         # Data Catalog entry relationships mapping.
@@ -93,11 +97,19 @@ class MetadataSynchronizer:
         self.__ingest_metadata(tag_templates_dict, assembled_entries_dict)
         logging.info('==== DONE ========================================')
 
+    def __scrape_custom_property_definitions(self):
+        """Scrape metadata from all the Custom Property Definitions the current
+        user has access to.
+
+        :return: A ``list`` of Custom Property Definition metadata.
+        """
+        return self.__metadata_scraper.scrape_all_custom_property_definitions()
+
     def __scrape_streams(self):
         """Scrape metadata from all the Streams the current user has access to.
         The returned metadata include nested objects such as Apps and Sheets.
 
-        :return: A ``list`` of stream metadata.
+        :return: A ``list`` of Stream metadata.
         """
         all_streams = self.__metadata_scraper.scrape_all_streams()
         all_apps = self.__metadata_scraper.scrape_all_apps()
@@ -168,28 +180,40 @@ class MetadataSynchronizer:
         return {
             constants.TAG_TEMPLATE_ID_APP:
                 self.__tag_template_factory.make_tag_template_for_app(),
+            constants.TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION:
+                self.__tag_template_factory.
+                make_tag_template_for_custom_property_definition(),
             constants.TAG_TEMPLATE_ID_SHEET:
                 self.__tag_template_factory.make_tag_template_for_sheet(),
             constants.TAG_TEMPLATE_ID_STREAM:
                 self.__tag_template_factory.make_tag_template_for_stream(),
         }
 
-    def __make_assembled_entries_dict(self, streams_metadata,
-                                      tag_templates_dict):
+    def __make_assembled_entries_dict(self, custom_property_defs_metadata,
+                                      streams_metadata, tag_templates_dict):
         """Make Data Catalog entries and tags for the Qlik assets the current
         user has access to.
 
         Returns:
-            A ``dict`` in which keys are equals to the stream keys and values
-            are flat lists containing assembled objects with all their related
-            entries and tags.
+            A ``dict`` in which keys are the top level asset ids and values are
+            flat lists containing those assets and their nested ones, with all
+            related entries and tags.
         """
         assembled_entries = {}
 
+        property_def_tag_template = tag_templates_dict.get(
+            constants.TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION)
+        for property_def_metadata in custom_property_defs_metadata:
+            assembled_entries[property_def_metadata.get('id')] = \
+                [self.__assembled_entry_factory
+                    .make_assembled_entry_for_custom_property_def(
+                        property_def_metadata, property_def_tag_template)]
+
         for stream_metadata in streams_metadata:
             assembled_entries[stream_metadata.get('id')] = \
-                self.__assembled_entry_factory.make_assembled_entries_list(
-                    stream_metadata, tag_templates_dict)
+                self.__assembled_entry_factory\
+                    .make_assembled_entries_for_stream(
+                        stream_metadata, tag_templates_dict)
 
         return assembled_entries
 
@@ -223,15 +247,16 @@ class MetadataSynchronizer:
         logging.info('==== %d entries to be synchronized!', entries_count)
 
         synced_entries_count = 0
-        for stream_id, assembled_entries in assembled_entries_dict.items():
-            stream_entries_count = len(assembled_entries)
+        for asset_id, assembled_entries in assembled_entries_dict.items():
+            asset_entries_count = len(assembled_entries)
 
             logging.info('')
-            logging.info('==== The Stream identified by "%s" has %d entries.',
-                         stream_id, stream_entries_count)
+            logging.info(
+                '==== The top-level asset identified by "%s" and its nested'
+                ' ones comprise %d entries.', asset_id, asset_entries_count)
             metadata_ingestor.ingest_metadata(assembled_entries,
                                               tag_templates_dict)
-            synced_entries_count = synced_entries_count + stream_entries_count
+            synced_entries_count += asset_entries_count
 
         logging.info('')
         logging.info('==== %d of %d entries successfully synchronized!',

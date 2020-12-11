@@ -39,7 +39,25 @@ class AssembledEntryFactory:
         self.__datacatalog_tag_factory = \
             datacatalog_tag_factory.DataCatalogTagFactory(site_url)
 
-    def make_assembled_entries_list(self, stream_metadata, tag_templates_dict):
+    def make_assembled_entry_for_custom_property_def(
+            self, custom_property_def_metadata, tag_template):
+
+        entry_id, entry = self.__datacatalog_entry_factory\
+            .make_entry_for_custom_property_definition(
+                custom_property_def_metadata)
+
+        tags = []
+        if tag_template:
+            tags.append(
+                self.__datacatalog_tag_factory.
+                make_tag_for_custom_property_defintion(
+                    tag_template, custom_property_def_metadata))
+
+        return prepare.AssembledEntryData(entry_id, entry, tags)
+
+    def make_assembled_entries_for_stream(self, stream_metadata,
+                                          tag_templates_dict):
+
         self.__initialize_tag_templates(tag_templates_dict)
 
         assembled_entries = [
