@@ -115,6 +115,41 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
         self.assertFalse('publish_time' in tag.fields)
 
+    def test_make_tag_for_custom_property_def_should_set_all_available_fields(
+            self):
+
+        tag_template = self.__tag_template_factory\
+            .make_tag_template_for_custom_property_definition()
+
+        metadata = {
+            'id': 'a123-b456',
+            'modifiedByUserName': 'test-directory\\\\test.userid',
+            'valueType': 'Text',
+            'choiceValues': [
+                'Value 1',
+                'Value 2',
+            ],
+            'objectTypes': [
+                'App',
+                'Stream',
+            ],
+        }
+
+        tag = self.__factory.make_tag_for_custom_property_defintion(
+            tag_template, metadata)
+
+        self.assertEqual('a123-b456', tag.fields['id'].string_value)
+        self.assertEqual('test-directory\\\\test.userid',
+                         tag.fields['modified_by_username'].string_value)
+        self.assertEqual('Text', tag.fields['value_type'].string_value)
+        self.assertEqual('Value 1, Value 2',
+                         tag.fields['choice_values'].string_value)
+        self.assertEqual('App, Stream',
+                         tag.fields['object_types'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
+
     def test_make_tag_for_sheet_should_set_all_available_fields(self):
         tag_template = \
             self.__tag_template_factory.make_tag_template_for_sheet()

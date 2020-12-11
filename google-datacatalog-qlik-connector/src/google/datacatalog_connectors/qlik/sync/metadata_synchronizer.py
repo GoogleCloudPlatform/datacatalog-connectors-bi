@@ -264,7 +264,7 @@ class MetadataSynchronizer:
         custom_property_defs_assembled_entries = []
         for assembled_entries in assembled_entries_dict.values():
             if assembled_entries[0].entry.user_specified_type == \
-                constants.USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION:
+                    constants.USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION:
                 custom_property_defs_assembled_entries.extend(
                     assembled_entries)
 
@@ -292,7 +292,7 @@ class MetadataSynchronizer:
         stream_entries_dict = {}
         for stream_id, assembled_entries in assembled_entries_dict.items():
             if assembled_entries[0].entry.user_specified_type == \
-                constants.USER_SPECIFIED_TYPE_STREAM:
+                    constants.USER_SPECIFIED_TYPE_STREAM:
                 stream_entries_dict[stream_id] = assembled_entries
 
         synced_entries_count = 0
