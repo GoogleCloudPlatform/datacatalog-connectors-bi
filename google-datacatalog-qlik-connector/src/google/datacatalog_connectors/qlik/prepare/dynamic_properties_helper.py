@@ -25,17 +25,22 @@ class DynamicPropertiesHelper:
     __ASCII_CHARACTER_ENCODING = 'ASCII'
 
     @classmethod
-    def make_display_name_for_custom_property_tag_template(
-            cls, definition_metadata):
+    def make_display_name_for_custom_property_value_tag_template(
+            cls, definition_metadata, value):
 
-        display_name = f'Qlik {definition_metadata.get("name")}' \
-                       f' Custom Property'
+        display_name = f'Qlik Custom Property' \
+                       f' - {definition_metadata.get("name")} - {value}'
         return cls.format_tag_template_display_name(display_name)
 
     @classmethod
-    def make_id_for_custom_property_tag_template(cls, definition_metadata):
+    def make_id_for_custom_property_value_tag_template(cls,
+                                                       definition_metadata,
+                                                       value):
+
+        definition_id = definition_metadata.get("id")
+        definition_id_start = definition_id[:definition_id.find('-')]
         generated_id = f'{constants.TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY}' \
-                       f'{definition_metadata.get("id")}'
+                       f'{definition_id_start}__{value}'
         return cls.format_tag_template_id(generated_id)
 
     @classmethod
@@ -47,8 +52,10 @@ class DynamicPropertiesHelper:
 
     @classmethod
     def format_tag_template_id(cls, source_id):
-        formatted_id = re.sub(r'[^a-z0-9]+', '_',
-                              cls.__normalize_ascii_chars(source_id.strip()))
+        lower_case_id = source_id.lower().strip() if source_id else ''
+        formatted_id = re.sub(
+            r'[^a-z0-9_]+', '_',
+            cls.__normalize_ascii_chars(lower_case_id.strip()))
         return formatted_id[:64] if len(formatted_id) > 64 else formatted_id
 
     @classmethod

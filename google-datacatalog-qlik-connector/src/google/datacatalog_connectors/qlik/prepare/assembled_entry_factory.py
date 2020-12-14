@@ -46,7 +46,7 @@ class AssembledEntryFactory:
         if tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.
-                make_tag_for_custom_property_defintion(
+                make_tag_for_custom_property_definition(
                     tag_template, custom_property_def_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
@@ -72,13 +72,18 @@ class AssembledEntryFactory:
             self.__datacatalog_entry_factory.make_entry_for_stream(
                 stream_metadata)
 
-        tag_template = tag_templates_dict.get(constants.TAG_TEMPLATE_ID_STREAM)
+        stream_tag_template = tag_templates_dict.get(
+            constants.TAG_TEMPLATE_ID_STREAM)
 
         tags = []
-        if tag_template:
+        if stream_tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_stream(
-                    tag_template, stream_metadata))
+                    stream_tag_template, stream_metadata))
+
+        tags.extend(
+            self.__datacatalog_tag_factory.make_tags_for_custom_properties(
+                tag_templates_dict, stream_metadata.get('customProperties')))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
 
@@ -104,13 +109,18 @@ class AssembledEntryFactory:
         entry_id, entry = \
             self.__datacatalog_entry_factory.make_entry_for_app(app_metadata)
 
-        tag_template = tag_templates_dict.get(constants.TAG_TEMPLATE_ID_APP)
+        app_tag_template = tag_templates_dict.get(
+            constants.TAG_TEMPLATE_ID_APP)
 
         tags = []
-        if tag_template:
+        if app_tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_app(
-                    tag_template, app_metadata))
+                    app_tag_template, app_metadata))
+
+        tags.extend(
+            self.__datacatalog_tag_factory.make_tags_for_custom_properties(
+                tag_templates_dict, app_metadata.get('customProperties')))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
 

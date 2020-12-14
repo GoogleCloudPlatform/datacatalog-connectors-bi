@@ -21,12 +21,15 @@ from google.datacatalog_connectors.qlik.prepare import constants
 
 class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
     __APP = constants.USER_SPECIFIED_TYPE_APP
+    __CUSTOM_PROPERTY_DEFINITION = \
+        constants.USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION
     __SHEET = constants.USER_SPECIFIED_TYPE_SHEET
     __STREAM = constants.USER_SPECIFIED_TYPE_STREAM
 
     def fulfill_tag_fields(self, assembled_entries):
         resolvers = (
             self.__resolve_app_mappings,
+            self.__resolve_custom_type_definition_mappings,
             self.__resolve_sheet_mappings,
         )
 
@@ -41,6 +44,21 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
         for assembled_entry in app_assembled_entries:
             cls._map_related_entry(assembled_entry, cls.__STREAM, 'stream_id',
                                    'stream_entry', id_name_pairs)
+
+    @classmethod
+    def __resolve_custom_type_definition_mappings(cls, assembled_entries,
+                                                  id_name_pairs):
+
+        non_custom_property_def_assembled_entries = [
+            assembled_entry for assembled_entry in assembled_entries
+            if not assembled_entry.entry.user_specified_type ==
+            cls.__CUSTOM_PROPERTY_DEFINITION
+        ]
+        for assembled_entry in non_custom_property_def_assembled_entries:
+            cls._map_related_entry(assembled_entry,
+                                   cls.__CUSTOM_PROPERTY_DEFINITION,
+                                   'definition_id', 'definition_entry',
+                                   id_name_pairs)
 
     @classmethod
     def __resolve_sheet_mappings(cls, assembled_entries, id_name_pairs):

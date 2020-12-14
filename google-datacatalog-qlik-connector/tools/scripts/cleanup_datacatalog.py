@@ -82,6 +82,8 @@ def __delete_tag_template(project_id, location_id, tag_template_id):
 
 def __delete_tag_templates(project_id, location_id):
     __delete_tag_template(project_id, location_id, 'qlik_app_metadata')
+    __delete_tag_template(project_id, location_id,
+                          'qlik_custom_property_definition_metadata')
     __delete_tag_template(project_id, location_id, 'qlik_sheet_metadata')
     __delete_tag_template(project_id, location_id, 'qlik_stream_metadata')
 

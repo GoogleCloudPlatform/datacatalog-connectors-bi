@@ -135,7 +135,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             ],
         }
 
-        tag = self.__factory.make_tag_for_custom_property_defintion(
+        tag = self.__factory.make_tag_for_custom_property_definition(
             tag_template, metadata)
 
         self.assertEqual('a123-b456', tag.fields['id'].string_value)

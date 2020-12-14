@@ -68,7 +68,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         tags = assembled_entry.tags
 
         self.assertEqual(1, len(tags))
-        self.__tag_factory.make_tag_for_custom_property_defintion\
+        self.__tag_factory.make_tag_for_custom_property_definition\
             .assert_called_once()
 
     def test_make_assembled_entries_for_stream_should_process_stream(self):

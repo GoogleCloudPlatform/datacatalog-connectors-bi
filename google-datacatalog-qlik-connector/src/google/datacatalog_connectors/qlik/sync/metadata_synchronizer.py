@@ -197,10 +197,12 @@ class MetadataSynchronizer:
             self.__tag_template_factory.make_tag_template_for_stream())
 
         for definition in custom_property_defs:
-            self.__add_template_to_dict(
-                templates_dict,
-                self.__tag_template_factory.
-                make_tag_template_for_custom_property(definition))
+            for value in definition.get('choiceValues') or []:
+                self.__add_template_to_dict(
+                    templates_dict,
+                    self.__tag_template_factory.
+                    make_tag_template_for_custom_property_value(
+                        definition, value))
 
         return templates_dict
 
