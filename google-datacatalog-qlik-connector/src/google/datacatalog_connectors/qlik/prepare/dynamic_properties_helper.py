@@ -25,12 +25,6 @@ class DynamicPropertiesHelper:
     __ASCII_CHARACTER_ENCODING = 'ASCII'
 
     @classmethod
-    def make_id_for_custom_property_tag_template(cls, definition_metadata):
-        generated_id = f'{constants.TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY}' \
-                       f'{definition_metadata.get("id")}'
-        return cls.format_tag_template_id(generated_id)
-
-    @classmethod
     def make_display_name_for_custom_property_tag_template(
             cls, definition_metadata):
 
@@ -39,10 +33,10 @@ class DynamicPropertiesHelper:
         return cls.format_tag_template_display_name(display_name)
 
     @classmethod
-    def format_tag_template_id(cls, source_id):
-        formatted_id = re.sub(r'[^a-z0-9]+', '_',
-                              cls.__normalize_ascii_chars(source_id.strip()))
-        return formatted_id[:64] if len(formatted_id) > 64 else formatted_id
+    def make_id_for_custom_property_tag_template(cls, definition_metadata):
+        generated_id = f'{constants.TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY}' \
+                       f'{definition_metadata.get("id")}'
+        return cls.format_tag_template_id(generated_id)
 
     @classmethod
     def format_tag_template_display_name(cls, source_name):
@@ -50,6 +44,12 @@ class DynamicPropertiesHelper:
             r'[^\w\- ]+', '_',
             cls.__normalize_ascii_chars(source_name).strip())
         return formatted_name
+
+    @classmethod
+    def format_tag_template_id(cls, source_id):
+        formatted_id = re.sub(r'[^a-z0-9]+', '_',
+                              cls.__normalize_ascii_chars(source_id.strip()))
+        return formatted_id[:64] if len(formatted_id) > 64 else formatted_id
 
     @classmethod
     def __normalize_ascii_chars(cls, source_string):
