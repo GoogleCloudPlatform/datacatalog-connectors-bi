@@ -14,14 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
-import six
-import unicodedata
-
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare
 
-from google.datacatalog_connectors.qlik.prepare import constants
+from google.datacatalog_connectors.qlik.prepare import \
+    constants, dynamic_properties_helper as dph
 
 
 class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
@@ -105,18 +102,16 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
     def make_tag_template_for_custom_property(self, definition_metadata):
         tag_template = datacatalog.TagTemplate()
 
-        generated_id = f'{constants.TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY}' \
-                       f'{definition_metadata.get("id")}'
-
+        template_id = dph.DynamicPropertiesHelper\
+            .make_id_for_custom_property_tag_template(definition_metadata)
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=re.sub(r'[^a-z0-9_]+', '_', generated_id))
+            tag_template=template_id)
 
-        generated_display_name = f'Qlik {definition_metadata.get("name")}' \
-                                 f' Custom Property'
-        tag_template.display_name = self.__format_display_name(
-            generated_display_name)
+        tag_template.display_name = dph.DynamicPropertiesHelper\
+            .make_display_name_for_custom_property_tag_template(
+                definition_metadata)
 
         self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
                                        'Unique Id')
@@ -262,17 +257,3 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        'Qlik Sense site url')
 
         return tag_template
-
-    @classmethod
-    def __format_display_name(cls, source_name):
-        return re.sub(r'[^\w\- ]+', '_',
-                      cls.__normalize_ascii_chars(source_name).strip())
-
-    @classmethod
-    def __normalize_ascii_chars(cls, source_string):
-        encoding = cls.__ASCII_CHARACTER_ENCODING
-        normalized = unicodedata.normalize(
-            'NFKD', source_string
-            if isinstance(source_string, six.string_types) else u'')
-        encoded = normalized.encode(encoding, 'ignore')
-        return encoded.decode()
