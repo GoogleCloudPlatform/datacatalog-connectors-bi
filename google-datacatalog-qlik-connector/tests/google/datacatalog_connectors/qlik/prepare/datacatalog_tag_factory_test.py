@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from datetime import datetime
+import re
 import unittest
 
 from google.datacatalog_connectors.qlik import prepare
@@ -24,6 +25,7 @@ from google.datacatalog_connectors.qlik.prepare import \
 
 class DataCatalogEntryFactoryTest(unittest.TestCase):
     __DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
+    __TAG_TEMPLATE_NAME_PATTERN = r'^(.+?)/tagTemplates/(?P<id>.+?)$'
 
     def setUp(self):
         self.__tag_template_factory = \
@@ -114,6 +116,134 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
         self.assertFalse('publish_time' in tag.fields)
+
+    def test_make_tags_for_custom_properties_should_make_if_proper_template(
+            self):
+
+        definition_metadata = {
+            'id': 'a123-b456',
+            'name': 'Test definition',
+        }
+
+        tag_template = self.__tag_template_factory\
+            .make_tag_template_for_custom_property_value(
+                definition_metadata, 'Value 1')
+        tag_template_id = re.match(pattern=self.__TAG_TEMPLATE_NAME_PATTERN,
+                                   string=tag_template.name).group('id')
+
+        tag_templates_dict = {tag_template_id: tag_template}
+
+        metadata = {
+            'id': 'c987-d654',
+            'createdDate': '2020-11-03T18:13:37.156Z',
+            'modifiedDate': '2020-11-04T14:49:14.504Z',
+            'modifiedByUserName': 'test-directory\\\\test.userid',
+            'value': 'Value 1',
+            'definition': definition_metadata,
+        }
+
+        tags = self.__factory.make_tags_for_custom_properties(
+            tag_templates_dict, [metadata])
+
+        self.assertEqual(1, len(tags))
+        self.assertEqual('c987-d654', tags[0].fields['id'].string_value)
+
+    def test_make_tags_for_custom_properties_should_skip_if_no_templates(self):
+        metadata = {
+            'id': 'c987-d654',
+            'createdDate': '2020-11-03T18:13:37.156Z',
+            'modifiedDate': '2020-11-04T14:49:14.504Z',
+            'modifiedByUserName': 'test-directory\\\\test.userid',
+            'value': 'Value 1',
+            'definition': {
+                'id': 'a123-b456',
+                'name': 'Test definition',
+            },
+        }
+
+        tags = self.__factory.make_tags_for_custom_properties({}, [metadata])
+
+        self.assertIsNotNone(tags)
+        self.assertEqual(0, len(tags))
+
+    def test_make_tags_for_custom_properties_should_skip_if_no_proper_template(
+            self):
+
+        definition_metadata = {
+            'id': 'a123-b456',
+            'name': 'Test first definition',
+        }
+
+        tag_template = self.__tag_template_factory\
+            .make_tag_template_for_custom_property_value(
+                definition_metadata, 'Value 1')
+        tag_template_id = re.match(pattern=self.__TAG_TEMPLATE_NAME_PATTERN,
+                                   string=tag_template.name).group('id')
+
+        tag_templates_dict = {tag_template_id: tag_template}
+
+        metadata = {
+            'id': 'c987-d654',
+            'createdDate': '2020-11-03T18:13:37.156Z',
+            'modifiedDate': '2020-11-04T14:49:14.504Z',
+            'modifiedByUserName': 'test-directory\\\\test.userid',
+            'value': 'Value 1',
+            'definition': {
+                'id': 'e567-f345',
+                'name': 'Test second definition',
+            },
+        }
+
+        tags = self.__factory.make_tags_for_custom_properties(
+            tag_templates_dict, [metadata])
+
+        self.assertIsNotNone(tags)
+        self.assertEqual(0, len(tags))
+
+    def test_make_tag_for_custom_property_should_set_all_available_fields(
+            self):
+
+        metadata = {
+            'id': 'c987-d654',
+            'createdDate': '2020-11-03T18:13:37.156Z',
+            'modifiedDate': '2020-11-04T14:49:14.504Z',
+            'modifiedByUserName': 'test-directory\\\\test.userid',
+            'value': 'Value 1',
+            'definition': {
+                'id': 'a123-b456',
+                'name': 'Test definition',
+            },
+        }
+
+        tag_template = self.__tag_template_factory\
+            .make_tag_template_for_custom_property_value(metadata, 'Value 1')
+
+        tag = self.__factory.make_tag_for_custom_property(
+            tag_template, metadata)
+
+        self.assertEqual('c987-d654', tag.fields['id'].string_value)
+
+        created_datetime = datetime.strptime('2020-11-03T18:13:37.156+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            tag.fields['created_date'].timestamp_value.timestamp())
+        modified_datetime = datetime.strptime('2020-11-04T14:49:14.504+0000',
+                                              self.__DATETIME_FORMAT)
+        self.assertEqual(
+            modified_datetime.timestamp(),
+            tag.fields['modified_date'].timestamp_value.timestamp())
+
+        self.assertEqual('test-directory\\\\test.userid',
+                         tag.fields['modified_by_username'].string_value)
+        self.assertEqual('Value 1', tag.fields['value'].string_value)
+
+        self.assertEqual('a123-b456', tag.fields['definition_id'].string_value)
+        self.assertEqual('Test definition',
+                         tag.fields['definition_name'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
 
     def test_make_tag_for_custom_property_def_should_set_all_available_fields(
             self):

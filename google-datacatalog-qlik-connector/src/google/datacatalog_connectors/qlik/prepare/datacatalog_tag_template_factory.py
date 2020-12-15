@@ -131,8 +131,6 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         return tag_template
 
-        return tag_template
-
     def make_tag_template_for_custom_property_value(self, definition_metadata,
                                                     value):
 

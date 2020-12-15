@@ -353,10 +353,9 @@ class MetadataSynchronizer:
 
         for assembled_entry in assembled_entries:
             for tag in assembled_entry.tags:
-                template_name = tag.template
                 template_id = re.match(
                     pattern=self.__TAG_TEMPLATE_NAME_PATTERN,
-                    string=template_name).group('id')
+                    string=tag.template).group('id')
                 required_templates_dict[template_id] = tag_templates_dict.get(
                     template_id)
 
