@@ -2,6 +2,7 @@
 
 Package for ingesting Qlik Sense metadata into Google Cloud Data Catalog,
 currently supporting below asset types:
+- Custom Property Definition
 - Stream
 - App (only the published ones)
 - Sheet (only the published ones)

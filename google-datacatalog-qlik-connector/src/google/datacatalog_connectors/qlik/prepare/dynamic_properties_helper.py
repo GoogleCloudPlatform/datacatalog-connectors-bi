@@ -30,7 +30,7 @@ class DynamicPropertiesHelper:
 
         display_name = f'Qlik Custom Property' \
                        f' - {definition_metadata.get("name")} - {value}'
-        return cls.format_tag_template_display_name(display_name)
+        return cls.normalize_tag_template_display_name(display_name)
 
     @classmethod
     def make_id_for_custom_property_value_tag_template(cls,
@@ -41,17 +41,17 @@ class DynamicPropertiesHelper:
         definition_id_start = definition_id[:definition_id.find('-')]
         generated_id = f'{constants.TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY}' \
                        f'{definition_id_start}__{value}'
-        return cls.format_tag_template_id(generated_id)
+        return cls.normalize_tag_template_id(generated_id)
 
     @classmethod
-    def format_tag_template_display_name(cls, source_name):
+    def normalize_tag_template_display_name(cls, source_name):
         formatted_name = re.sub(
             r'[^\w\- ]+', '_',
             cls.__normalize_ascii_chars(source_name).strip())
         return formatted_name
 
     @classmethod
-    def format_tag_template_id(cls, source_id):
+    def normalize_tag_template_id(cls, source_id):
         lower_case_id = source_id.lower().strip() if source_id else ''
         formatted_id = re.sub(
             r'[^a-z0-9_]+', '_',

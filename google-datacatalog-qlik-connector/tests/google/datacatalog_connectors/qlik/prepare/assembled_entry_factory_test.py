@@ -22,10 +22,11 @@ from google.datacatalog_connectors.qlik import prepare
 
 class AssembledEntryFactoryTest(unittest.TestCase):
     __PREPARE_PACKAGE = 'google.datacatalog_connectors.qlik.prepare'
+    __FACTORY_MODULE = f'{__PREPARE_PACKAGE}.assembled_entry_factory'
 
-    @mock.patch(f'{__PREPARE_PACKAGE}.datacatalog_tag_factory'
+    @mock.patch(f'{__FACTORY_MODULE}.datacatalog_tag_factory'
                 f'.DataCatalogTagFactory')
-    @mock.patch(f'{__PREPARE_PACKAGE}.datacatalog_entry_factory'
+    @mock.patch(f'{__FACTORY_MODULE}.datacatalog_entry_factory'
                 f'.DataCatalogEntryFactory')
     def setUp(self, mock_entry_factory, mock_tag_factory):
         self.__factory = prepare.AssembledEntryFactory(

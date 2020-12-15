@@ -17,6 +17,7 @@
 from datetime import datetime
 import re
 import unittest
+from unittest import mock
 
 from google.datacatalog_connectors.qlik import prepare
 from google.datacatalog_connectors.qlik.prepare import \
@@ -24,6 +25,8 @@ from google.datacatalog_connectors.qlik.prepare import \
 
 
 class DataCatalogEntryFactoryTest(unittest.TestCase):
+    __PREPARE_PACKAGE = 'google.datacatalog_connectors.qlik.prepare'
+
     __DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
     __TAG_TEMPLATE_NAME_PATTERN = r'^(.+?)/tagTemplates/(?P<id>.+?)$'
 
@@ -117,30 +120,24 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         tag = self.__factory.make_tag_for_app(tag_template, metadata)
         self.assertFalse('publish_time' in tag.fields)
 
+    @mock.patch(f'{__PREPARE_PACKAGE}.datacatalog_tag_template_factory.dph'
+                f'.DynamicPropertiesHelper')
     def test_make_tags_for_custom_properties_should_make_if_proper_template(
-            self):
+            self, mock_dph):
 
-        definition_metadata = {
-            'id': 'a123-b456',
-            'name': 'Test definition',
-        }
+        mock_dph.make_display_name_for_custom_property_value_tag_template\
+            .return_value = 'Test definition : Value 1'
+        mock_dph.make_id_for_custom_property_value_tag_template\
+            .return_value = 'a123||value_1'
 
         tag_template = self.__tag_template_factory\
-            .make_tag_template_for_custom_property_value(
-                definition_metadata, 'Value 1')
+            .make_tag_template_for_custom_property_value({}, 'Value 1')
         tag_template_id = re.match(pattern=self.__TAG_TEMPLATE_NAME_PATTERN,
                                    string=tag_template.name).group('id')
 
         tag_templates_dict = {tag_template_id: tag_template}
 
-        metadata = {
-            'id': 'c987-d654',
-            'createdDate': '2020-11-03T18:13:37.156Z',
-            'modifiedDate': '2020-11-04T14:49:14.504Z',
-            'modifiedByUserName': 'test-directory\\\\test.userid',
-            'value': 'Value 1',
-            'definition': definition_metadata,
-        }
+        metadata = {'id': 'c987-d654'}
 
         tags = self.__factory.make_tags_for_custom_properties(
             tag_templates_dict, [metadata])
@@ -148,51 +145,41 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual(1, len(tags))
         self.assertEqual('c987-d654', tags[0].fields['id'].string_value)
 
-    def test_make_tags_for_custom_properties_should_skip_if_no_templates(self):
-        metadata = {
-            'id': 'c987-d654',
-            'createdDate': '2020-11-03T18:13:37.156Z',
-            'modifiedDate': '2020-11-04T14:49:14.504Z',
-            'modifiedByUserName': 'test-directory\\\\test.userid',
-            'value': 'Value 1',
-            'definition': {
-                'id': 'a123-b456',
-                'name': 'Test definition',
-            },
-        }
+    @mock.patch(f'{__PREPARE_PACKAGE}.datacatalog_tag_template_factory.dph'
+                f'.DynamicPropertiesHelper')
+    def test_make_tags_for_custom_properties_should_skip_if_no_templates(
+            self, mock_dph):
+
+        mock_dph.make_display_name_for_custom_property_value_tag_template\
+            .return_value = 'Test definition : Value 1'
+        mock_dph.make_id_for_custom_property_value_tag_template\
+            .return_value = 'a123||value_1'
+
+        metadata = {'id': 'c987-d654'}
 
         tags = self.__factory.make_tags_for_custom_properties({}, [metadata])
 
         self.assertIsNotNone(tags)
         self.assertEqual(0, len(tags))
 
+    @mock.patch(f'{__PREPARE_PACKAGE}.datacatalog_tag_template_factory.dph'
+                f'.DynamicPropertiesHelper')
     def test_make_tags_for_custom_properties_should_skip_if_no_proper_template(
-            self):
+            self, mock_dph):
 
-        definition_metadata = {
-            'id': 'a123-b456',
-            'name': 'Test first definition',
-        }
+        mock_dph.make_display_name_for_custom_property_value_tag_template\
+            .return_value = 'Test definition : Value 1'
+        mock_dph.make_id_for_custom_property_value_tag_template\
+            .side_effect = ['a123||value_1', 'a123_b456||value_1']
 
         tag_template = self.__tag_template_factory\
-            .make_tag_template_for_custom_property_value(
-                definition_metadata, 'Value 1')
+            .make_tag_template_for_custom_property_value({}, 'Value 1')
         tag_template_id = re.match(pattern=self.__TAG_TEMPLATE_NAME_PATTERN,
                                    string=tag_template.name).group('id')
 
         tag_templates_dict = {tag_template_id: tag_template}
 
-        metadata = {
-            'id': 'c987-d654',
-            'createdDate': '2020-11-03T18:13:37.156Z',
-            'modifiedDate': '2020-11-04T14:49:14.504Z',
-            'modifiedByUserName': 'test-directory\\\\test.userid',
-            'value': 'Value 1',
-            'definition': {
-                'id': 'e567-f345',
-                'name': 'Test second definition',
-            },
-        }
+        metadata = {'id': 'c987-d654'}
 
         tags = self.__factory.make_tags_for_custom_properties(
             tag_templates_dict, [metadata])
@@ -200,8 +187,15 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertIsNotNone(tags)
         self.assertEqual(0, len(tags))
 
+    @mock.patch(f'{__PREPARE_PACKAGE}.datacatalog_tag_template_factory.dph'
+                f'.DynamicPropertiesHelper')
     def test_make_tag_for_custom_property_should_set_all_available_fields(
-            self):
+            self, mock_dph):
+
+        mock_dph.make_display_name_for_custom_property_value_tag_template\
+            .return_value = 'Test definition : Value 1'
+        mock_dph.make_id_for_custom_property_value_tag_template\
+            .return_value = 'a123||value_1'
 
         metadata = {
             'id': 'c987-d654',

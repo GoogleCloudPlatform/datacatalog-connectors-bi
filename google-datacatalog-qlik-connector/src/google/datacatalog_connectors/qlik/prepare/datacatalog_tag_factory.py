@@ -107,9 +107,6 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         if not (tag_templates_dict and custom_properties):
             return tags
 
-        print(tag_templates_dict)
-        print(custom_properties)
-
         for property_metadata in custom_properties:
             definition = property_metadata.get('definition')
             value = property_metadata.get('value')
@@ -117,8 +114,6 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
                 .make_id_for_custom_property_value_tag_template(
                     definition, value)
             property_value_tag_template = tag_templates_dict.get(template_id)
-            print(template_id)
-            print(property_value_tag_template)
 
             if not property_value_tag_template:
                 continue
