@@ -133,11 +133,11 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         self._set_string_field(tag, 'id', custom_property_metadata.get('id'))
 
-        modified_date = custom_property_metadata.get('createdDate')
-        if modified_date:
+        created_date = custom_property_metadata.get('createdDate')
+        if created_date:
             self._set_timestamp_field(
                 tag, 'created_date',
-                datetime.strptime(modified_date,
+                datetime.strptime(created_date,
                                   self.__INCOMING_TIMESTAMP_UTC_FORMAT))
 
         modified_date = custom_property_metadata.get('modifiedDate')

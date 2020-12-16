@@ -49,8 +49,8 @@ class EntryRelationshipMapperTest(unittest.TestCase):
             [definition_assembled_entry, app_assembled_entry])
 
         self.assertEqual(
-            f'https://console.cloud.google.com/datacatalog/'
-            f'fake_entries/test_definition',
+            'https://console.cloud.google.com/datacatalog/'
+            'fake_entries/test_definition',
             app_tag.fields['property_definition_entry'].string_value)
 
     def test_fulfill_tag_fields_should_resolve_app_stream_mapping(self):
@@ -72,8 +72,8 @@ class EntryRelationshipMapperTest(unittest.TestCase):
             [stream_assembled_entry, app_assembled_entry])
 
         self.assertEqual(
-            f'https://console.cloud.google.com/datacatalog/'
-            f'fake_entries/test_stream',
+            'https://console.cloud.google.com/datacatalog/'
+            'fake_entries/test_stream',
             app_tag.fields['stream_entry'].string_value)
 
     def test_fulfill_tag_fields_should_resolve_sheet_app_mapping(self):
@@ -95,8 +95,8 @@ class EntryRelationshipMapperTest(unittest.TestCase):
             [app_assembled_entry, sheet_assembled_entry])
 
         self.assertEqual(
-            f'https://console.cloud.google.com/datacatalog/'
-            f'fake_entries/test_app',
+            'https://console.cloud.google.com/datacatalog/'
+            'fake_entries/test_app',
             sheet_tag.fields['app_entry'].string_value)
 
     def test_fulfill_tag_fields_should_resolve_stream_custom_prop_def_mapping(
@@ -123,8 +123,8 @@ class EntryRelationshipMapperTest(unittest.TestCase):
             [definition_assembled_entry, stream_assembled_entry])
 
         self.assertEqual(
-            f'https://console.cloud.google.com/datacatalog/'
-            f'fake_entries/test_definition',
+            'https://console.cloud.google.com/datacatalog/'
+            'fake_entries/test_definition',
             stream_tag.fields['property_definition_entry'].string_value)
 
     @classmethod
