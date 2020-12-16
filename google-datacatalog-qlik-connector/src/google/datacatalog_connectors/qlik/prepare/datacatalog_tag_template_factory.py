@@ -17,10 +17,12 @@
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare
 
-from google.datacatalog_connectors.qlik.prepare import constants
+from google.datacatalog_connectors.qlik.prepare import \
+    constants, dynamic_properties_helper as dph
 
 
 class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
+    __ASCII_CHARACTER_ENCODING = 'ASCII'
     __BOOL_TYPE = datacatalog.FieldType.PrimitiveType.BOOL
     __DOUBLE_TYPE = datacatalog.FieldType.PrimitiveType.DOUBLE
     __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
@@ -122,6 +124,63 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         self._add_primitive_type_field(tag_template, 'object_types',
                                        self.__STRING_TYPE, 'Object types')
+
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
+
+        return tag_template
+
+    def make_tag_template_for_custom_property_value(self, definition_metadata,
+                                                    value):
+
+        tag_template = datacatalog.TagTemplate()
+
+        template_id = dph.DynamicPropertiesHelper\
+            .make_id_for_custom_property_value_tag_template(
+                definition_metadata, value)
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=template_id)
+
+        tag_template.display_name = dph.DynamicPropertiesHelper\
+            .make_display_name_for_custom_property_value_tag_template(
+                definition_metadata, value)
+
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
+
+        self._add_primitive_type_field(tag_template, 'created_date',
+                                       self.__TIMESTAMP_TYPE, 'Created date')
+
+        self._add_primitive_type_field(tag_template, 'modified_date',
+                                       self.__TIMESTAMP_TYPE, 'Modified date')
+
+        self._add_primitive_type_field(tag_template, 'modified_by_username',
+                                       self.__STRING_TYPE,
+                                       'Username who modified it')
+
+        self._add_primitive_type_field(tag_template, 'value',
+                                       self.__STRING_TYPE, 'Value')
+
+        self._add_primitive_type_field(tag_template, 'property_definition_id',
+                                       self.__STRING_TYPE,
+                                       'Property Definition Id')
+
+        # According to the Qlik Analytics Platform Architecture Team, there was
+        # no way of searching assets by the Custom Property values using Qlik
+        # when this feature was implemented (Dec, 2020), which means the
+        # catalog search might be helpful to address such a use case. Hence the
+        # 'definition_' part was supressed from this Tag Field Id to turn seach
+        # queries more intuitive, e.g. tag:property_name:<PROPERTY-NAME>.
+        self._add_primitive_type_field(tag_template, 'property_name',
+                                       self.__STRING_TYPE,
+                                       'Property Definition name')
+
+        self._add_primitive_type_field(
+            tag_template, 'property_definition_entry', self.__STRING_TYPE,
+            'Data Catalog Entry for the Property Definition')
 
         self._add_primitive_type_field(tag_template, 'site_url',
                                        self.__STRING_TYPE,

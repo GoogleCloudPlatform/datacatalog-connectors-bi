@@ -2,6 +2,7 @@
 
 Package for ingesting Qlik Sense metadata into Google Cloud Data Catalog,
 currently supporting below asset types:
+- Custom Property Definition
 - Stream
 - App (only the published ones)
 - Sheet (only the published ones)
@@ -37,14 +38,16 @@ currently supporting below asset types:
 - [3. Running the connector](#3-running-the-connector)
   * [3.1. Python entry point](#31-python-entry-point)
   * [3.2. Docker entry point](#32-docker-entry-point)
-- [4. Developer environment](#4-developer-environment)
-  * [4.1. Install and run Yapf formatter](#41-install-and-run-yapf-formatter)
-  * [4.2. Install and run Flake8 linter](#42-install-and-run-flake8-linter)
-  * [4.3. Run Tests](#43-run-tests)
-  * [4.4. Additional resources](#44-additional-resources)
-- [5. Troubleshooting](#5-troubleshooting)
-  * [5.1. Qlik APIs compatibility](#51-qlik-apis-compatibility)
-  * [5.2. Data Catalog quota](#52-data-catalog-quota)
+- [4. Design decisions](#4-design-decisions)
+  * [4.1. Tag Templates for Custom Property Choice Values](#41-tag-templates-for-custom-property-choice-values)
+- [5. Developer environment](#5-developer-environment)
+  * [5.1. Install and run Yapf formatter](#51-install-and-run-yapf-formatter)
+  * [5.2. Install and run Flake8 linter](#52-install-and-run-flake8-linter)
+  * [5.3. Run Tests](#53-run-tests)
+  * [5.4. Additional resources](#54-additional-resources)
+- [6. Troubleshooting](#6-troubleshooting)
+  * [6.1. Qlik APIs compatibility](#61-qlik-apis-compatibility)
+  * [6.2. Data Catalog quota](#62-data-catalog-quota)
 
 <!-- tocstop -->
 
@@ -171,9 +174,29 @@ docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   [--datacatalog-location-id $QLIK2DC_DATACATALOG_LOCATION_ID]
 ```
 
-## 4. Developer environment
+## 4. Design decisions
 
-### 4.1. Install and run Yapf formatter
+### 4.1. Tag Templates for Custom Property Choice Values
+
+The current implementation creates a Tag Template for each Custom Property 
+Choice Value assigned to Streams or Apps in the provided Qlik Sense site. The
+rationale behind this decision comprises allowing the connector to synchronize
+all metadata scraped from each Custom Property, at the same time it enables
+Qlik assets to be easily found by their custom properties — using query strings
+such as `tag:property_name:"<PROPERTY-NAME>"` and `tag:value:"<SOME-VALUE>"`.
+
+Data Catalog accepts attaching only one Tag per Template to a given Entry, so
+there could be metadata loss if the Tag Templates were created in different
+ways, e.g. on a Custom Property Definition basis.
+
+Lastly, this approach may lead to the creation of several Tag Templates if
+there are many Custom Property Values in use in your Qlik Sense site. In case
+you would like to suggest a different approach to tackle this problem, please
+[file a feature request][3]. We will be happy to discuss alternative solutions! 
+
+## 5. Developer environment
+
+### 5.1. Install and run Yapf formatter
 
 ```shell script
 pip install --upgrade yapf
@@ -191,27 +214,27 @@ chmod a+x pre-commit.sh
 mv pre-commit.sh .git/hooks/pre-commit
 ```
 
-### 4.2. Install and run Flake8 linter
+### 5.2. Install and run Flake8 linter
 
 ```shell script
 pip install --upgrade flake8
 flake8 src tests
 ```
 
-### 4.3. Run Tests
+### 5.3. Run Tests
 
 ```shell script
 python setup.py test
 ```
 
-### 4.4. Additional resources
+### 5.4. Additional resources
 
 Please refer to the [Developer Resources
 documentation](docs/developer-resources).
 
-## 5. Troubleshooting
+## 6. Troubleshooting
 
-### 5.1. Qlik APIs compatibility
+### 6.1. Qlik APIs compatibility
 
 The connector may fail during the scrape stage if the Qlik APIs do not return
 metadata in the expected format. As a reference, the below versions were
@@ -229,7 +252,7 @@ already validated:
 | ------------------------ | :-----: |
 | 12.763.4 (September2020) | SUCCESS |
 
-### 5.2. Data Catalog quota
+### 6.2. Data Catalog quota
 
 In case a connector execution hits Data Catalog quota limit, an error will be
 raised and logged with the following details, depending on the performed
@@ -247,3 +270,4 @@ quota docs][2].
 
 [1]: https://virtualenv.pypa.io/en/latest/
 [2]: https://cloud.google.com/data-catalog/docs/resources/quotas
+[3]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues

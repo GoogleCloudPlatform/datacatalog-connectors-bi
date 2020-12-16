@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import unittest
+from unittest import mock
 
 from google.cloud import datacatalog
 
@@ -23,6 +24,9 @@ from google.datacatalog_connectors.qlik.prepare import \
 
 
 class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
+    __PREPARE_PACKAGE = 'google.datacatalog_connectors.qlik.prepare'
+    __FACTORY_MODULE = f'{__PREPARE_PACKAGE}.datacatalog_tag_template_factory'
+
     __BOOL_TYPE = datacatalog.FieldType.PrimitiveType.BOOL
     __DOUBLE_TYPE = datacatalog.FieldType.PrimitiveType.DOUBLE
     __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
@@ -134,6 +138,126 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual(
             'Availability status',
             tag_template.fields['availability_status'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['site_url'].type.primitive_type)
+        self.assertEqual('Qlik Sense site url',
+                         tag_template.fields['site_url'].display_name)
+
+    def test_make_tag_template_for_custom_property_definition(self):
+        tag_template = \
+            self.__factory.make_tag_template_for_custom_property_definition()
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'tagTemplates/qlik_custom_property_definition_metadata',
+            tag_template.name)
+
+        self.assertEqual('Qlik Custom Property Definition Metadata',
+                         tag_template.display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['id'].type.primitive_type)
+        self.assertEqual('Unique Id', tag_template.fields['id'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['modified_by_username'].type.primitive_type)
+        self.assertEqual(
+            'Username who modified it',
+            tag_template.fields['modified_by_username'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['value_type'].type.primitive_type)
+        self.assertEqual('Value type',
+                         tag_template.fields['value_type'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['choice_values'].type.primitive_type)
+        self.assertEqual('Choice values',
+                         tag_template.fields['choice_values'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['object_types'].type.primitive_type)
+        self.assertEqual('Object types',
+                         tag_template.fields['object_types'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['site_url'].type.primitive_type)
+        self.assertEqual('Qlik Sense site url',
+                         tag_template.fields['site_url'].display_name)
+
+    @mock.patch(f'{__FACTORY_MODULE}.dph.DynamicPropertiesHelper')
+    def test_make_tag_template_for_custom_property_value(self, mock_dph):
+        mock_dph.make_display_name_for_custom_property_value_tag_template\
+            .return_value = 'Test definition : Value 1'
+        mock_dph.make_id_for_custom_property_value_tag_template\
+            .return_value = 'a123||value_1'
+
+        definition_metadata = {
+            'id': 'a123-b456',
+            'name': 'Test definition',
+        }
+
+        tag_template = \
+            self.__factory.make_tag_template_for_custom_property_value(
+                definition_metadata, 'Value 1')
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'tagTemplates/a123||value_1', tag_template.name)
+
+        self.assertEqual('Test definition : Value 1',
+                         tag_template.display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['id'].type.primitive_type)
+        self.assertEqual('Unique Id', tag_template.fields['id'].display_name)
+
+        self.assertEqual(
+            self.__TIMESTAMP_TYPE,
+            tag_template.fields['created_date'].type.primitive_type)
+        self.assertEqual('Created date',
+                         tag_template.fields['created_date'].display_name)
+
+        self.assertEqual(
+            self.__TIMESTAMP_TYPE,
+            tag_template.fields['modified_date'].type.primitive_type)
+        self.assertEqual('Modified date',
+                         tag_template.fields['modified_date'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['modified_by_username'].type.primitive_type)
+        self.assertEqual(
+            'Username who modified it',
+            tag_template.fields['modified_by_username'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['value'].type.primitive_type)
+        self.assertEqual('Value', tag_template.fields['value'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['property_definition_id'].type.primitive_type)
+        self.assertEqual(
+            'Property Definition Id',
+            tag_template.fields['property_definition_id'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['property_name'].type.primitive_type)
+        self.assertEqual('Property Definition name',
+                         tag_template.fields['property_name'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE, tag_template.
+            fields['property_definition_entry'].type.primitive_type)
+        self.assertEqual(
+            'Data Catalog Entry for the Property Definition',
+            tag_template.fields['property_definition_entry'].display_name)
 
         self.assertEqual(self.__STRING_TYPE,
                          tag_template.fields['site_url'].type.primitive_type)

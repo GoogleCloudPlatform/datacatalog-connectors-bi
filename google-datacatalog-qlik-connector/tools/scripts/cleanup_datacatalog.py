@@ -66,24 +66,52 @@ def __delete_entries_and_groups(project_ids):
             print(e)
 
 
-def __delete_tag_template(project_id, location_id, tag_template_id):
+def __delete_tag_templates(project_id, location_id):
+    query = 'type=TAG_TEMPLATE name:\"Qlik Custom Property\"'
+
+    scope = datacatalog.SearchCatalogRequest.Scope()
+    scope.include_project_ids.append(project_id)
+
+    request = datacatalog.SearchCatalogRequest()
+    request.scope = scope
+    request.query = query
+    request.page_size = 1000
+
+    search_results = [
+        result for result in __datacatalog.search_catalog(request)
+    ]
+
+    # Add the dynamic Tag Template names
+    template_names = [
+        result.relative_resource_name for result in search_results
+    ]
+
+    # Add the static Tag Template names
+    template_names.append(
+        datacatalog.DataCatalogClient.tag_template_path(
+            project_id, location_id, 'qlik_app_metadata'))
+    template_names.append(
+        datacatalog.DataCatalogClient.tag_template_path(
+            project_id, location_id,
+            'qlik_custom_property_definition_metadata'))
+    template_names.append(
+        datacatalog.DataCatalogClient.tag_template_path(
+            project_id, location_id, 'qlik_sheet_metadata'))
+    template_names.append(
+        datacatalog.DataCatalogClient.tag_template_path(
+            project_id, location_id, 'qlik_stream_metadata'))
+
+    for name in template_names:
+        __delete_tag_template(name)
+
+
+def __delete_tag_template(name):
     try:
-        __datacatalog.delete_tag_template(
-            name=datacatalog.DataCatalogClient.tag_template_path(
-                project=project_id,
-                location=location_id,
-                tag_template=tag_template_id),
-            force=True)
-        print('--> Tag Template deleted: {}'.format(tag_template_id))
+        __datacatalog.delete_tag_template(name=name, force=True)
+        print('--> Tag Template deleted: {}'.format(name))
     except Exception as e:
         print('Exception deleting Tag Template')
         print(e)
-
-
-def __delete_tag_templates(project_id, location_id):
-    __delete_tag_template(project_id, location_id, 'qlik_app_metadata')
-    __delete_tag_template(project_id, location_id, 'qlik_sheet_metadata')
-    __delete_tag_template(project_id, location_id, 'qlik_stream_metadata')
 
 
 def __parse_args():

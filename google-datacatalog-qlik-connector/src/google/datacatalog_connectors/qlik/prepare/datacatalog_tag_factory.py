@@ -19,6 +19,9 @@ from datetime import datetime
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare
 
+from google.datacatalog_connectors.qlik.prepare import \
+    dynamic_properties_helper as dph
+
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
@@ -96,8 +99,74 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         return tag
 
-    def make_tag_for_custom_property_defintion(self, tag_template,
-                                               custom_property_def_metadata):
+    def make_tags_for_custom_properties(self, tag_templates_dict,
+                                        custom_properties):
+
+        tags = []
+
+        if not (tag_templates_dict and custom_properties):
+            return tags
+
+        for property_metadata in custom_properties:
+            definition = property_metadata.get('definition')
+            value = property_metadata.get('value')
+            template_id = dph.DynamicPropertiesHelper\
+                .make_id_for_custom_property_value_tag_template(
+                    definition, value)
+            property_value_tag_template = tag_templates_dict.get(template_id)
+
+            if not property_value_tag_template:
+                continue
+
+            tags.append(
+                self.make_tag_for_custom_property(property_value_tag_template,
+                                                  property_metadata))
+
+        return tags
+
+    def make_tag_for_custom_property(self, tag_template,
+                                     custom_property_metadata):
+
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id', custom_property_metadata.get('id'))
+
+        created_date = custom_property_metadata.get('createdDate')
+        if created_date:
+            self._set_timestamp_field(
+                tag, 'created_date',
+                datetime.strptime(created_date,
+                                  self.__INCOMING_TIMESTAMP_UTC_FORMAT))
+
+        modified_date = custom_property_metadata.get('modifiedDate')
+        if modified_date:
+            self._set_timestamp_field(
+                tag, 'modified_date',
+                datetime.strptime(modified_date,
+                                  self.__INCOMING_TIMESTAMP_UTC_FORMAT))
+
+        self._set_string_field(
+            tag, 'modified_by_username',
+            custom_property_metadata.get('modifiedByUserName'))
+
+        self._set_string_field(tag, 'value',
+                               custom_property_metadata.get('value'))
+
+        definition = custom_property_metadata.get('definition')
+        if definition:
+            self._set_string_field(tag, 'property_definition_id',
+                                   definition.get('id'))
+            self._set_string_field(tag, 'property_name',
+                                   definition.get('name'))
+
+        self._set_string_field(tag, 'site_url', self.__site_url)
+
+        return tag
+
+    def make_tag_for_custom_property_definition(self, tag_template,
+                                                custom_property_def_metadata):
 
         tag = datacatalog.Tag()
 

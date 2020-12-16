@@ -113,6 +113,27 @@ class MetadataSynchronizerTest(unittest.TestCase):
         ingestor = mock_ingestor.return_value
         ingestor.ingest_metadata.assert_called_once()
 
+    @mock.patch(f'{_SYNCR_MODULE}.prepare.DataCatalogTagTemplateFactory'
+                f'.make_tag_template_for_custom_property_value')
+    def test_run_custom_property_def_should_make_template_for_choice_value(
+            self, mock_make_tag_template_for_custom_property_value,
+            mock_mapper, mock_cleaner, mock_ingestor):
+
+        mock_make_tag_template_for_custom_property_value.return_value.name = \
+            'parent/tagTemplates/def__value_1'
+
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+
+        scraper.scrape_all_custom_property_definitions.return_value = [{
+            'id': 'test_def',
+            'choiceValues': ['Value 1']
+        }]
+
+        self.__synchronizer.run()
+
+        mock_make_tag_template_for_custom_property_value.assert_called_once()
+
     def test_run_stream_metadata_should_traverse_main_workflow_steps(
             self, mock_mapper, mock_cleaner, mock_ingestor):
 
