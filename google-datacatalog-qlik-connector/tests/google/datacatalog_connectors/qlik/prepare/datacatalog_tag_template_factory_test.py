@@ -241,21 +241,23 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
 
         self.assertEqual(
             self.__STRING_TYPE,
-            tag_template.fields['definition_id'].type.primitive_type)
-        self.assertEqual('Definition Id',
-                         tag_template.fields['definition_id'].display_name)
+            tag_template.fields['property_definition_id'].type.primitive_type)
+        self.assertEqual(
+            'Property Definition Id',
+            tag_template.fields['property_definition_id'].display_name)
 
         self.assertEqual(
             self.__STRING_TYPE,
-            tag_template.fields['definition_name'].type.primitive_type)
-        self.assertEqual('Definition name',
-                         tag_template.fields['definition_name'].display_name)
+            tag_template.fields['property_name'].type.primitive_type)
+        self.assertEqual('Property Definition name',
+                         tag_template.fields['property_name'].display_name)
 
         self.assertEqual(
-            self.__STRING_TYPE,
-            tag_template.fields['definition_entry'].type.primitive_type)
-        self.assertEqual('Data Catalog Entry for the Definition',
-                         tag_template.fields['definition_entry'].display_name)
+            self.__STRING_TYPE, tag_template.
+            fields['property_definition_entry'].type.primitive_type)
+        self.assertEqual(
+            'Data Catalog Entry for the Property Definition',
+            tag_template.fields['property_definition_entry'].display_name)
 
         self.assertEqual(self.__STRING_TYPE,
                          tag_template.fields['site_url'].type.primitive_type)

@@ -44,8 +44,8 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
         for assembled_entry in app_assembled_entries:
             cls._map_related_entry(assembled_entry,
                                    cls.__CUSTOM_PROPERTY_DEFINITION,
-                                   'definition_id', 'definition_entry',
-                                   id_name_pairs)
+                                   'property_definition_id',
+                                   'property_definition_entry', id_name_pairs)
             cls._map_related_entry(assembled_entry, cls.__STREAM, 'stream_id',
                                    'stream_entry', id_name_pairs)
 
@@ -68,5 +68,5 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
         for assembled_entry in stream_assembled_entries:
             cls._map_related_entry(assembled_entry,
                                    cls.__CUSTOM_PROPERTY_DEFINITION,
-                                   'definition_id', 'definition_entry',
-                                   id_name_pairs)
+                                   'property_definition_id',
+                                   'property_definition_entry', id_name_pairs)

@@ -183,7 +183,7 @@ Choice Value assigned to Streams or Apps in the provided Qlik Sense site. The
 rationale behind this decision comprises allowing the connector to synchronize
 all metadata scraped from each Custom Property, at the same time it enables
 Qlik assets to be easily found by their custom properties — using query strings
-such as `tag:definition_name:<DEFINTION-NAME>` and `tag:value:"<SOME-VALUE>"`.
+such as `tag:property_name:"<PROPERTY-NAME>"` and `tag:value:"<SOME-VALUE>"`.
 
 Data Catalog accepts attaching only one Tag per Template to a given Entry, so
 there could be metadata loss if the Tag Templates were created in different

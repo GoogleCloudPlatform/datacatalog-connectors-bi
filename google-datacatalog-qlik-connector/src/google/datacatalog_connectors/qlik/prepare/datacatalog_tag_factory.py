@@ -156,8 +156,9 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         definition = custom_property_metadata.get('definition')
         if definition:
-            self._set_string_field(tag, 'definition_id', definition.get('id'))
-            self._set_string_field(tag, 'definition_name',
+            self._set_string_field(tag, 'property_definition_id',
+                                   definition.get('id'))
+            self._set_string_field(tag, 'property_name',
                                    definition.get('name'))
 
         self._set_string_field(tag, 'site_url', self.__site_url)

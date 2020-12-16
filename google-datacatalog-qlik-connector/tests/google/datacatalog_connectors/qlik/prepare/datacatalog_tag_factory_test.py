@@ -232,9 +232,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                          tag.fields['modified_by_username'].string_value)
         self.assertEqual('Value 1', tag.fields['value'].string_value)
 
-        self.assertEqual('a123-b456', tag.fields['definition_id'].string_value)
+        self.assertEqual('a123-b456',
+                         tag.fields['property_definition_id'].string_value)
         self.assertEqual('Test definition',
-                         tag.fields['definition_name'].string_value)
+                         tag.fields['property_name'].string_value)
 
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)

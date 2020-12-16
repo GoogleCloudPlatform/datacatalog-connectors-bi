@@ -164,15 +164,23 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self._add_primitive_type_field(tag_template, 'value',
                                        self.__STRING_TYPE, 'Value')
 
-        self._add_primitive_type_field(tag_template, 'definition_id',
-                                       self.__STRING_TYPE, 'Definition Id')
+        self._add_primitive_type_field(tag_template, 'property_definition_id',
+                                       self.__STRING_TYPE,
+                                       'Property Definition Id')
 
-        self._add_primitive_type_field(tag_template, 'definition_name',
-                                       self.__STRING_TYPE, 'Definition name')
+        # According to the Qlik Analytics Platform Architecture Team, there was
+        # no way of searching assets by the Custom Property values using Qlik
+        # when this feature was implemented (Dec, 2020), which means the
+        # catalog search might be helpful to address such a use case. Hence the
+        # 'definition_' part was supressed from this Tag Field Id to turn seach
+        # queries more intuitive, e.g. tag:property_name:<PROPERTY-NAME>.
+        self._add_primitive_type_field(tag_template, 'property_name',
+                                       self.__STRING_TYPE,
+                                       'Property Definition name')
 
         self._add_primitive_type_field(
-            tag_template, 'definition_entry', self.__STRING_TYPE,
-            'Data Catalog Entry for the Definition')
+            tag_template, 'property_definition_entry', self.__STRING_TYPE,
+            'Data Catalog Entry for the Property Definition')
 
         self._add_primitive_type_field(tag_template, 'site_url',
                                        self.__STRING_TYPE,
