@@ -17,21 +17,20 @@
 import logging
 
 from google.datacatalog_connectors.qlik.scrape import \
-    engine_api_helper, repository_services_api_helper
+    engine_api_scraper, repository_services_api_helper
 
 
 class MetadataScraper:
     """A Facade that provides a simplified interface for the Qlik services,
     comprising the interactions between Qlik Sense Proxy Service (QPS), Qlik
     Sense Repository Service (QRS), and Qlik Engine JSON API.
-
     """
 
     def __init__(self, server_address, ad_domain, username, password):
         self.__qrs_api_helper = \
             repository_services_api_helper.RepositoryServicesAPIHelper(
                 server_address, ad_domain, username, password)
-        self.__engine_api_helper = engine_api_helper.EngineAPIHelper(
+        self.__engine_api_scraper = engine_api_scraper.EngineAPIScraper(
             server_address, ad_domain, username, password)
 
     def scrape_all_apps(self):
@@ -72,7 +71,7 @@ class MetadataScraper:
     def scrape_sheets(self, app_metadata):
         self.__log_scrape_start('Scraping Sheets from the "%s" App...',
                                 app_metadata.get('name'))
-        sheets = self.__engine_api_helper.get_sheets(
+        sheets = self.__engine_api_scraper.get_sheets(
             app_metadata.get('id')) or []
 
         logging.info('  %s Sheets found:', len(sheets))
