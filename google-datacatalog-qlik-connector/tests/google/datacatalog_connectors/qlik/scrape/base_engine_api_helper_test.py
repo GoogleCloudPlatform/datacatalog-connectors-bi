@@ -41,7 +41,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
                          attrs['_BaseEngineAPIHelper__base_api_endpoint'])
         self.assertIsNotNone(attrs['_BaseEngineAPIHelper__auth_cookie'])
         self.assertIsNotNone(attrs['_BaseEngineAPIHelper__common_headers'])
-        self.assertEqual(0, attrs['_BaseEngineAPIHelper__request_id'])
+        self.assertEqual(0, attrs['_BaseEngineAPIHelper__requests_counter'])
 
     def test_connect_websocket_should_use_cookie(self, mock_websocket):
 

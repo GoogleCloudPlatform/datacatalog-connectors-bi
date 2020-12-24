@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 import json
 import logging
 
-from google.datacatalog_connectors.qlik.scrape import base_engine_api_helper
+from google.datacatalog_connectors.qlik.scrape import \
+    base_engine_api_helper, stream_responses_manager
 
 
 class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
-    # Keys to be used in the pending reponse ids dict.
+    # Keys to be used in the pending reponse ids lists.
     __DOC_INTERFACES = 'doc_interfaces'
     __SHEETS = 'sheets'
 
@@ -31,22 +31,17 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
     async def __get_sheets(self, app_id):
         async with self._connect_websocket(app_id) as websocket:
-            responses_manager = base_engine_api_helper.StreamResponsesManager()
-            self.__init_pending_response_ids_dict(responses_manager)
-            await self.__start_stream(app_id, websocket, responses_manager)
-            return await self.__get_sheets_stream_handler(
-                websocket, responses_manager)
+            responses_manager = \
+                stream_responses_manager.StreamResponsesManager()
+            self.__init_pending_response_ids_lists(responses_manager)
 
-    async def __get_sheets_stream_handler(self, websocket, responses_manager):
-        # The 'results' array is expected to have two elements. The first one
-        # stores the result of the consumer, which means the sheets to be
-        # returned on a successfull execution. The second one stores the result
-        # of the producer and can be ignored.
-        results = await asyncio.gather(*[
-            self.__get_sheets_stream_consumer(websocket, responses_manager),
-            self.__get_sheets_stream_producer(websocket, responses_manager)
-        ])
-        return results[0]
+            await self.__start_stream(app_id, websocket, responses_manager)
+
+            return await self._handle_stream(
+                self.__get_sheets_stream_consumer(websocket,
+                                                  responses_manager),
+                self.__get_sheets_stream_producer(websocket,
+                                                  responses_manager))
 
     async def __get_sheets_stream_consumer(self, websocket, responses_manager):
         sheets = []
@@ -117,7 +112,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         return request_id
 
     @classmethod
-    def __init_pending_response_ids_dict(cls, responses_manager):
+    def __init_pending_response_ids_lists(cls, responses_manager):
         responses_manager.add_pending_ids_lists(
             [cls.__DOC_INTERFACES, cls.__SHEETS])
 
