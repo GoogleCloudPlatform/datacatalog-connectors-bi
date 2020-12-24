@@ -63,14 +63,11 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
 
-    # TODO Create a mechanism to exit the stream after waiting for the message
-    #  for a longer time.
-    """
     def test_get_sheets_should_return_empty_list_on_no_suitable_response(
             self, mock_websocket):
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
-        websocket_ctx.set_itr_break(0.25)
+        websocket_ctx.set_itr_break(0.5)
         websocket_ctx.set_data([
             {
                 'id': 1,
@@ -80,20 +77,9 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
                     },
                 },
             },
-            {
-                'id': 5,  # The expected id is 2. 5 means an unknown request.
-                'result': {
-                    'qList': [{
-                        'qInfo': {
-                            'qId': 'sheet-id',
-                            'qType': 'sheet',
-                        },
-                    }],
-                },
-            },
         ])
 
-        sheets = self.__helper.get_sheets('app-id')
+        # Timeout happens before receiving the GetSheets response.
+        sheets = self.__helper.get_sheets('app-id', 0.25)
 
         self.assertEqual(0, len(sheets))
-    """

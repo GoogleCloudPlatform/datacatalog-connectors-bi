@@ -18,6 +18,7 @@ import abc
 import asyncio
 import json
 import logging
+import threading
 
 from urllib.parse import urlparse
 import websockets
@@ -26,6 +27,7 @@ from google.datacatalog_connectors.qlik.scrape import constants
 
 
 class BaseEngineAPIHelper(abc.ABC):
+    """The base class for all Engine API Helpers."""
 
     def __init__(self, server_address, auth_cookie):
         # The server address starts with an http/https scheme. The below
@@ -67,9 +69,33 @@ class BaseEngineAPIHelper(abc.ABC):
         return self.__requests_counter
 
     @classmethod
-    def _run_until_complete(cls, future):
+    def _run_until_complete(cls, future, max_seconds_to_wait):
         loop = asyncio.get_event_loop()
-        return loop.run_until_complete(future)
+        timeout_controller = threading.Timer(
+            interval=max_seconds_to_wait,
+            function=cls._handle_event_loop_exec_timeout,
+            args=(loop,))
+        timeout_controller.start()
+        result = loop.run_until_complete(future)
+        timeout_controller.cancel()
+        return result
+
+    @classmethod
+    def _handle_event_loop_exec_timeout(cls, event_loop):
+        logging.warning(
+            'Timeout reached during the websocket communication session.')
+        event_loop.stop()
+
+    @classmethod
+    async def _handle_websocket_communication(cls, consumer_future,
+                                              producer_future):
+
+        # The 'results' array is expected to have two elements. The first one
+        # stores the result of the consumer, which means the object to be
+        # returned on a successfull execution. The second one stores the result
+        # of the producer and can be ignored.
+        results = await asyncio.gather(*[consumer_future, producer_future])
+        return results[0]
 
     async def _send_open_doc_interface_request(self, app_id, websocket):
         """Sends a Open Doc (aka App) Interface request.
@@ -108,15 +134,6 @@ class BaseEngineAPIHelper(abc.ABC):
         return request_id
 
     @classmethod
-    async def _handle_stream(cls, consumer_future, producer_future):
-        # The 'results' array is expected to have two elements. The first one
-        # stores the result of the consumer, which means the object to be
-        # returned on a successfull execution. The second one stores the result
-        # of the producer and can be ignored.
-        results = await asyncio.gather(*[consumer_future, producer_future])
-        return results[0]
-
-    @classmethod
     def _handle_generic_api_response(cls, response):
         cls._handle_error_api_response(response)
 
@@ -125,5 +142,5 @@ class BaseEngineAPIHelper(abc.ABC):
         method = response.get('method')
         if 'OnMaxParallelSessionsExceeded' == method:
             message = response.get('params').get('message')
-            logging.warn(message)
+            logging.warning(message)
             raise Exception(message)

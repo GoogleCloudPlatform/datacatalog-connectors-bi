@@ -17,7 +17,9 @@
 import asyncio
 
 
-class StreamResponsesManager:
+class WebsocketResponsesManager:
+    """Utility class with common features for responses handling over websocket
+    communication sessions."""
 
     def __init__(self):
         self.__pending_response_ids = {}
@@ -56,6 +58,10 @@ class StreamResponsesManager:
             for pending_ids in self.__pending_response_ids.values()
         ])
         return pending_count == 0
+
+    def clear_pending_ids(self):
+        for pending_ids in self.__pending_response_ids.values():
+            pending_ids.clear()
 
     def add_unhandled(self, response):
         self.__unhandled_responses.append(response)
