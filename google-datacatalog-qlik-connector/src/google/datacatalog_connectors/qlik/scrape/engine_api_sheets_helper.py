@@ -28,7 +28,6 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
     def __init__(self, server_address, auth_cookie):
         super().__init__(server_address, auth_cookie)
-        self.__responses_queue = []
 
     def get_sheets(self, app_id):
         return self._run_until_complete(self.__get_sheets(app_id))
@@ -41,24 +40,29 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 websocket, pending_resp_ids)
 
     async def __get_sheets_stream_handler(self, websocket, pending_resp_ids):
-        # Used by the consumer handler to notify the producer on new responses,
-        # so the producer can take actions such as sending follow up requests.
+        responses_queue = []
+
+        # Used by the consumer to notify the producer on new responses, so the
+        # producer can take actions such as sending follow up requests.
         new_response_event = asyncio.Event()
 
         # The 'results' array is expected to have two elements. The first one
-        # stores the result of the consumer handler, which means the sheets to
-        # be returned on a successfull scraping execution. The second one
-        # stores the result of the producer handler and can be ignored.
+        # stores the result of the consumer, which means the sheets to be
+        # returned on a successfull execution. The second one stores the result
+        # of the producer and can be ignored.
         results = await asyncio.gather(*[
-            self.__get_sheets_consumer_handler(websocket, pending_resp_ids,
-                                               new_response_event),
-            self.__get_sheets_producer_handler(websocket, pending_resp_ids,
-                                               new_response_event)
+            self.__get_sheets_stream_consumer(websocket, responses_queue,
+                                              pending_resp_ids,
+                                              new_response_event),
+            self.__get_sheets_stream_producer(websocket, responses_queue,
+                                              pending_resp_ids,
+                                              new_response_event)
         ])
         return results[0]
 
-    async def __get_sheets_consumer_handler(self, websocket, pending_resp_ids,
-                                            new_response_event):
+    async def __get_sheets_stream_consumer(self, websocket, responses_queue,
+                                           pending_resp_ids,
+                                           new_response_event):
 
         sheets = []
         async for message in websocket:
@@ -73,30 +77,30 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 sheets.extend(response.get('result').get('qList'))
                 pending_resp_ids[self.__SHEETS].remove(response_id)
             else:
-                self.__responses_queue.append(response)
+                responses_queue.append(response)
 
             new_response_event.set()
 
             if self._all_responses_received(pending_resp_ids):
                 return sheets
 
-    async def __get_sheets_producer_handler(self, websocket, pending_resp_ids,
-                                            new_response_event):
+    async def __get_sheets_stream_producer(self, websocket, responses_queue,
+                                           pending_resp_ids,
+                                           new_response_event):
 
-        response_queue = self.__responses_queue
         while not self._all_responses_received(pending_resp_ids):
             if not new_response_event.is_set():
                 await new_response_event.wait()
                 new_response_event.clear()
-            for response in response_queue:
+            for response in responses_queue:
                 follow_up_req_id = \
-                    await self.__handle_get_sheets_stream_response(
+                    await self.__send_follow_up_get_sheets_stream_request(
                         websocket, pending_resp_ids, response)
                 if follow_up_req_id:
-                    response_queue.remove(response)
+                    responses_queue.remove(response)
 
-    async def __handle_get_sheets_stream_response(self, websocket,
-                                                  pending_resp_ids, response):
+    async def __send_follow_up_get_sheets_stream_request(
+            self, websocket, pending_resp_ids, response):
 
         response_id = response.get('id')
         follow_up_req_id = None

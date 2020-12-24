@@ -33,10 +33,6 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.__helper = engine_api_sheets_helper.EngineAPISheetsHelper(
             server_address='https://test-server', auth_cookie=mock.MagicMock())
 
-    def test_constructor_should_set_instance_attributes(self, mock_websocket):
-        attrs = self.__helper.__dict__
-        self.assertIsNotNone(attrs['_EngineAPISheetsHelper__responses_queue'])
-
     def test_get_sheets_should_return_list_on_success(self, mock_websocket):
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
         websocket_ctx.set_itr_break(0.25)
