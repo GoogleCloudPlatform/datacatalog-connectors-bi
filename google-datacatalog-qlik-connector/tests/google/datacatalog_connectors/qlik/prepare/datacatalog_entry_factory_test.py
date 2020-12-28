@@ -88,6 +88,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         metadata = {
             'id': 'a123-b456',
+            'name': 'Test app',
             'createdDate': '2019-09-12T16:30:00.005Z',
         }
 
@@ -188,6 +189,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                 'qId': 'a123-b456',
             },
             'qMeta': {
+                'title': 'Test sheet',
                 'createdDate': '2019-09-12T16:30:00.005Z',
             },
             'app': {
@@ -242,6 +244,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         metadata = {
             'id': 'a123-b456',
+            'name': 'Test stream',
             'createdDate': '2019-09-12T16:30:00.005Z',
         }
 
