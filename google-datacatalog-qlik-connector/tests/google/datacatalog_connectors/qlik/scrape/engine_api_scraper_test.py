@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import unittest
 from unittest import mock
 
@@ -23,12 +24,14 @@ from google.datacatalog_connectors.qlik.scrape import \
 from . import scrape_ops_mocks
 
 _SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
+_SCRAPER_MODULE = f'{_SCRAPE_PACKAGE}.engine_api_scraper'
 
 
-@mock.patch(f'{_SCRAPE_PACKAGE}.engine_api_scraper.websockets.connect',
-            new_callable=scrape_ops_mocks.AsyncContextManager)
+@mock.patch(f'{_SCRAPER_MODULE}'
+            f'.engine_api_sheets_helper.EngineAPISheetsHelper.get_sheets',
+            lambda *args: None)
 class EngineAPIScraperTest(unittest.TestCase):
-    __SCRAPER_MODULE = f'{_SCRAPE_PACKAGE}.engine_api_scraper'
+    __SCRAPER_CLASS = f'{_SCRAPER_MODULE}.EngineAPIScraper'
 
     def setUp(self):
         self.__scraper = engine_api_scraper.EngineAPIScraper(
@@ -37,7 +40,7 @@ class EngineAPIScraperTest(unittest.TestCase):
             username='test-username',
             password='test-password')
 
-    def test_constructor_should_set_instance_attributes(self, mock_websocket):
+    def test_constructor_should_set_instance_attributes(self):
         attrs = self.__scraper.__dict__
 
         self.assertEqual('https://test-server',
@@ -50,29 +53,61 @@ class EngineAPIScraperTest(unittest.TestCase):
                          attrs['_EngineAPIScraper__base_api_endpoint'])
         self.assertIsNotNone(attrs['_EngineAPIScraper__common_headers'])
 
-    def test_constructor_should_not_set_auth_related_attributes(
-            self, mock_websocket):
-
+    def test_constructor_should_not_set_auth_related_attributes(self):
         attrs = self.__scraper.__dict__
         self.assertIsNone(attrs['_EngineAPIScraper__auth_cookie'])
 
-    @mock.patch(f'{__SCRAPER_MODULE}'
-                f'.engine_api_sheets_helper.EngineAPISheetsHelper.get_sheets')
-    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator')
-    def test_scrape_operations_should_authenticate_user_beforehand(
-            self, mock_authenticator, mock_get_sheets, mock_websocket):
+    @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
+    def test_get_sheets_should_authenticate_user_beforehand(
+            self, mock_set_up_cookie):
 
-        mock_websocket.return_value.__enter__.return_value.set_data([
-            {
-                'params': {
-                    'loginUri': 'redirect-url'
-                }
-            },
-        ])
+        self.__scraper.get_sheets('app-id')
+        mock_set_up_cookie.assert_called_once()
 
-        mock_get_sheets.return_value = []
-        mock_authenticator.get_qps_session_cookie_windows_auth.return_value = \
-            mock.MagicMock()
+    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+                f'.get_qps_session_cookie_windows_auth')
+    @mock.patch(f'{__SCRAPER_CLASS}'
+                f'._EngineAPIScraper__get_windows_authentication_url',
+                lambda *args: asyncio.sleep(0))
+    def test_set_up_auth_cookie_should_authenticate_and_set_instance_cookie(
+            self, mock_get_qps_session_cookie):
+
+        fake_cookie = scrape_ops_mocks.FakeQPSSessionCookie()
+        mock_get_qps_session_cookie.return_value = fake_cookie
+
+        # Call a public method to trigger the authentication workflow.
+        self.__scraper.get_sheets('app-id')
+
+        mock_get_qps_session_cookie.assert_called_once()
+
+        attrs = self.__scraper.__dict__
+        self.assertEqual(fake_cookie, attrs['_EngineAPIScraper__auth_cookie'])
+
+    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+                f'.get_qps_session_cookie_windows_auth')
+    @mock.patch(f'{__SCRAPER_CLASS}'
+                f'._EngineAPIScraper__get_windows_authentication_url',
+                lambda *args: asyncio.sleep(0))
+    def test_set_up_auth_cookie_should_skip_authentication_on_available_cookie(
+            self, mock_get_qps_session_cookie):
+
+        fake_cookie = scrape_ops_mocks.FakeQPSSessionCookie()
+
+        attrs = self.__scraper.__dict__
+        attrs['_EngineAPIScraper__auth_cookie'] = fake_cookie
+
+        # Call a public method to trigger the authentication workflow.
+        self.__scraper.get_sheets('app-id')
+
+        mock_get_qps_session_cookie.assert_not_called()
+
+    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+                f'.get_qps_session_cookie_windows_auth',
+                lambda *args, **kwargs: None)
+    @mock.patch(f'{_SCRAPE_PACKAGE}.engine_api_scraper.websockets.connect',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_get_windows_authentication_url_should_pass_appropriate_auth_args(
+            self, mock_websocket):
 
         # Call a public method to trigger the authentication workflow.
         self.__scraper.get_sheets('app-id')
@@ -88,12 +123,26 @@ class EngineAPIScraperTest(unittest.TestCase):
         actual_ws_call_args = mock_websocket.call_args_list[0]
         self.assertEqual(expected_ws_call_args, actual_ws_call_args)
 
-        mock_authenticator.get_qps_session_cookie_windows_auth\
-            .assert_called_once()
-        mock_authenticator.get_qps_session_cookie_windows_auth \
-            .assert_called_with(
-                ad_domain='test-domain',
-                username='test-username',
-                password='test-password',
-                auth_url='redirect-url')
-        self.assertIsNotNone(attrs['_EngineAPIScraper__auth_cookie'])
+    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+                f'.get_qps_session_cookie_windows_auth')
+    @mock.patch(f'{_SCRAPE_PACKAGE}.engine_api_scraper.websockets.connect',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_get_windows_authentication_url_should_return_login_uri(
+            self, mock_websocket, mock_get_qps_session_cookie):
+
+        mock_websocket.return_value.__enter__.return_value.set_data([
+            {
+                'params': {
+                    'loginUri': 'redirect-url'
+                }
+            },
+        ])
+
+        # Call a public method to trigger the authentication workflow.
+        self.__scraper.get_sheets('app-id')
+
+        mock_get_qps_session_cookie.assert_called_once_with(
+            ad_domain='test-domain',
+            username='test-username',
+            password='test-password',
+            auth_url='redirect-url')
