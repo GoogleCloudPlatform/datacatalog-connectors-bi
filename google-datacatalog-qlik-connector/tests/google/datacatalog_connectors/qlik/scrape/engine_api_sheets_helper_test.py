@@ -22,30 +22,30 @@ from google.datacatalog_connectors.qlik.scrape import engine_api_sheets_helper
 
 from . import scrape_ops_mocks
 
-_SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
 
-
-@mock.patch(f'{_SCRAPE_PACKAGE}.base_engine_api_helper'
-            f'.BaseEngineAPIHelper._send_open_doc_interface_request',
-            lambda *args: asyncio.sleep(delay=0, result=1))
-@mock.patch(f'{_SCRAPE_PACKAGE}.base_engine_api_helper'
-            f'.BaseEngineAPIHelper._connect_websocket',
-            new_callable=scrape_ops_mocks.AsyncContextManager)
 class EngineAPISheetsHelperTest(unittest.TestCase):
+    __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
+    __BASE_CLASS = f'{__SCRAPE_PACKAGE}.base_engine_api_helper' \
+                   f'.BaseEngineAPIHelper'
+    __HELPER_CLASS = f'{__SCRAPE_PACKAGE}.engine_api_sheets_helper' \
+                     f'.EngineAPISheetsHelper'
 
     def setUp(self):
         self.__helper = engine_api_sheets_helper.EngineAPISheetsHelper(
             server_address='https://test-server', auth_cookie=mock.MagicMock())
 
-    @mock.patch(f'{_SCRAPE_PACKAGE}.base_engine_api_helper'
-                f'.BaseEngineAPIHelper._generate_request_id')
-    def test_get_sheets_should_return_list_on_success(self,
-                                                      mock_generate_request_id,
-                                                      mock_websocket):
+    @mock.patch(f'{__BASE_CLASS}._generate_request_id')
+    @mock.patch(f'{__BASE_CLASS}._send_open_doc_interface_request',
+                lambda *args: asyncio.sleep(delay=0, result=1))
+    @mock.patch(f'{__BASE_CLASS}._connect_websocket',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_get_sheets_should_return_list_on_success(
+            self, mock_websocket, mock_generate_request_id):
 
         mock_generate_request_id.return_value = 2
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_itr_break(0.1)
         websocket_ctx.set_data([
             {
                 'id': 1,
@@ -73,15 +73,12 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
 
-    def test_get_sheets_should_return_empty_list_on_no_suitable_response(
-            self, mock_websocket):
+    @mock.patch(f'{__HELPER_CLASS}._EngineAPISheetsHelper__get_sheets',
+                lambda *args: None)
+    @mock.patch(f'{__BASE_CLASS}._run_until_complete')
+    def test_get_sheets_should_return_empty_list_on_exception(
+            self, mock_run_until_complete):
 
-        websocket_ctx = mock_websocket.return_value.__enter__.return_value
-        websocket_ctx.set_itr_break(0.15)
-        websocket_ctx.set_data([{}])
-
-        # Set a timeout to stop the websocket communication before receiving
-        # the GetSheets response.
-        sheets = self.__helper.get_sheets('app-id', 0.3)
-
+        mock_run_until_complete.side_effect = Exception
+        sheets = self.__helper.get_sheets('app-id')
         self.assertEqual(0, len(sheets))
