@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import unittest
 from unittest import mock
 
@@ -25,6 +26,9 @@ _SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
 
 
 @mock.patch(f'{_SCRAPE_PACKAGE}.base_engine_api_helper'
+            f'.BaseEngineAPIHelper._send_open_doc_interface_request',
+            lambda *args: asyncio.sleep(delay=0, result=1))
+@mock.patch(f'{_SCRAPE_PACKAGE}.base_engine_api_helper'
             f'.BaseEngineAPIHelper._connect_websocket',
             new_callable=scrape_ops_mocks.AsyncContextManager)
 class EngineAPISheetsHelperTest(unittest.TestCase):
@@ -33,9 +37,15 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.__helper = engine_api_sheets_helper.EngineAPISheetsHelper(
             server_address='https://test-server', auth_cookie=mock.MagicMock())
 
-    def test_get_sheets_should_return_list_on_success(self, mock_websocket):
+    @mock.patch(f'{_SCRAPE_PACKAGE}.base_engine_api_helper'
+                f'.BaseEngineAPIHelper._generate_request_id')
+    def test_get_sheets_should_return_list_on_success(self,
+                                                      mock_generate_request_id,
+                                                      mock_websocket):
+
+        mock_generate_request_id.return_value = 2
+
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
-        websocket_ctx.set_itr_break(0.25)
         websocket_ctx.set_data([
             {
                 'id': 1,
@@ -67,19 +77,11 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
             self, mock_websocket):
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
-        websocket_ctx.set_itr_break(0.5)
-        websocket_ctx.set_data([
-            {
-                'id': 1,
-                'result': {
-                    'qReturn': {
-                        'qHandle': 1,
-                    },
-                },
-            },
-        ])
+        websocket_ctx.set_itr_break(0.15)
+        websocket_ctx.set_data([{}])
 
-        # Timeout happens before receiving the GetSheets response.
-        sheets = self.__helper.get_sheets('app-id', 0.25)
+        # Set a timeout to stop the websocket communication before receiving
+        # the GetSheets response.
+        sheets = self.__helper.get_sheets('app-id', 0.3)
 
         self.assertEqual(0, len(sheets))
