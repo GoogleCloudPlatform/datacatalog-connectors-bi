@@ -74,6 +74,13 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
 
         mock_handle_timeout.assert_called_once()
 
+    @classmethod
+    def test_handle_event_loop_exec_timeout_should_stop_loop(cls):
+        mock_event_loop = mock.MagicMock()
+        base_engine_api_helper.BaseEngineAPIHelper\
+            ._handle_event_loop_exec_timeout(mock_event_loop)
+        mock_event_loop.stop.assert_called_once()
+
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
