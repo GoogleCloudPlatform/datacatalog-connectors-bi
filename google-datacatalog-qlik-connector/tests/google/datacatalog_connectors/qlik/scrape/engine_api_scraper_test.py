@@ -67,10 +67,11 @@ class EngineAPIScraperTest(unittest.TestCase):
     @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
                 f'.get_qps_session_cookie_windows_auth')
     @mock.patch(f'{__SCRAPER_CLASS}'
-                f'._EngineAPIScraper__get_windows_authentication_url',
-                lambda *args: asyncio.sleep(0))
+                f'._EngineAPIScraper__get_windows_authentication_url')
     def test_set_up_auth_cookie_should_authenticate_and_set_instance_cookie(
-            self, mock_get_qps_session_cookie):
+            self, mock_get_auth_url, mock_get_qps_session_cookie):
+
+        mock_get_auth_url.return_value = asyncio.sleep(0)
 
         fake_cookie = scrape_ops_mocks.FakeQPSSessionCookie()
         mock_get_qps_session_cookie.return_value = fake_cookie
@@ -86,15 +87,15 @@ class EngineAPIScraperTest(unittest.TestCase):
     @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
                 f'.get_qps_session_cookie_windows_auth')
     @mock.patch(f'{__SCRAPER_CLASS}'
-                f'._EngineAPIScraper__get_windows_authentication_url',
-                lambda *args: asyncio.sleep(0))
+                f'._EngineAPIScraper__get_windows_authentication_url')
     def test_set_up_auth_cookie_should_skip_authentication_on_available_cookie(
-            self, mock_get_qps_session_cookie):
+            self, mock_get_auth_url, mock_get_qps_session_cookie):
 
-        fake_cookie = scrape_ops_mocks.FakeQPSSessionCookie()
+        mock_get_auth_url.return_value = asyncio.sleep(0)
 
         attrs = self.__scraper.__dict__
-        attrs['_EngineAPIScraper__auth_cookie'] = fake_cookie
+        attrs['_EngineAPIScraper__auth_cookie'] = \
+            scrape_ops_mocks.FakeQPSSessionCookie()
 
         # Call a public method to trigger the authentication workflow.
         self.__scraper.get_sheets('app-id')

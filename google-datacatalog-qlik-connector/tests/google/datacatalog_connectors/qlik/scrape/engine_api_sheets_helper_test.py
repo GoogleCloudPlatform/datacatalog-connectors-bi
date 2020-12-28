@@ -34,14 +34,25 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.__helper = engine_api_sheets_helper.EngineAPISheetsHelper(
             server_address='https://test-server', auth_cookie=mock.MagicMock())
 
+    @mock.patch(f'{__HELPER_CLASS}._EngineAPISheetsHelper__get_sheets',
+                lambda *args: None)
+    @mock.patch(f'{__BASE_CLASS}._run_until_complete')
+    def test_get_sheets_should_return_empty_list_on_exception(
+            self, mock_run_until_complete):
+
+        mock_run_until_complete.side_effect = Exception
+        sheets = self.__helper.get_sheets('app-id')
+        self.assertEqual(0, len(sheets))
+
     @mock.patch(f'{__BASE_CLASS}._generate_request_id')
-    @mock.patch(f'{__BASE_CLASS}._send_open_doc_interface_request',
-                lambda *args: asyncio.sleep(delay=0, result=1))
+    @mock.patch(f'{__BASE_CLASS}._send_open_doc_interface_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_sheets_should_return_list_on_success(
-            self, mock_websocket, mock_generate_request_id):
+            self, mock_websocket, mock_send_open_doc,
+            mock_generate_request_id):
 
+        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
         mock_generate_request_id.return_value = 2
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
@@ -73,12 +84,26 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
 
-    @mock.patch(f'{__HELPER_CLASS}._EngineAPISheetsHelper__get_sheets',
-                lambda *args: None)
-    @mock.patch(f'{__BASE_CLASS}._run_until_complete')
-    def test_get_sheets_should_return_empty_list_on_exception(
-            self, mock_run_until_complete):
+    @mock.patch(f'{__BASE_CLASS}._handle_generic_api_response')
+    @mock.patch(f'{__BASE_CLASS}._send_open_doc_interface_request')
+    @mock.patch(f'{__BASE_CLASS}._connect_websocket',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_get_sheets_should_handle_generic_api_response(
+            self, mock_websocket, mock_send_open_doc,
+            mock_handle_generic_response):
 
-        mock_run_until_complete.side_effect = Exception
-        sheets = self.__helper.get_sheets('app-id')
-        self.assertEqual(0, len(sheets))
+        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
+
+        websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_itr_break(0.25)
+        websocket_ctx.set_data([
+            {
+                'method': 'OnTestMethod',
+            },
+        ])
+
+        self.__helper.get_sheets('app-id', 0.5)
+
+        mock_handle_generic_response.assert_called_once_with({
+            'method': 'OnTestMethod',
+        })
