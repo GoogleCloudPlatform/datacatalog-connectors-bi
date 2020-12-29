@@ -69,7 +69,9 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
     def test_run_until_complete_should_stop_on_timeout(self,
                                                        mock_handle_timeout):
 
-        base_engine_api_helper.BaseEngineAPIHelper._run_until_complete(
+        self.assertRaises(
+            asyncio.TimeoutError,
+            base_engine_api_helper.BaseEngineAPIHelper._run_until_complete,
             asyncio.wait_for(asyncio.sleep(0.5), timeout=0.25))
 
         mock_handle_timeout.assert_called_once()

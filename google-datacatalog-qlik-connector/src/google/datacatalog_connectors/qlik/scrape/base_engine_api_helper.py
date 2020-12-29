@@ -77,6 +77,7 @@ class BaseEngineAPIHelper(abc.ABC):
             return event_loop.run_until_complete(future)
         except asyncio.TimeoutError:
             cls._handle_event_loop_exec_timeout(event_loop)
+            raise
 
     @classmethod
     def _handle_event_loop_exec_timeout(cls, event_loop):

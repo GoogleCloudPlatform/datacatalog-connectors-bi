@@ -42,12 +42,12 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
             await self.__start_stream(app_id, websocket, responses_manager)
 
-            consumer_task = self.__get_sheets_msg_consumer
-            producer_task = self.__get_sheets_msg_producer
+            consumer = self.__get_sheets_msg_consumer
+            producer = self.__get_sheets_msg_producer
             return await asyncio.wait_for(
                 self._handle_websocket_communication(
-                    consumer_task(websocket, responses_manager),
-                    producer_task(websocket, responses_manager)), timeout)
+                    consumer(websocket, responses_manager),
+                    producer(websocket, responses_manager)), timeout)
 
     async def __get_sheets_msg_consumer(self, websocket, responses_manager):
         sheets = []
