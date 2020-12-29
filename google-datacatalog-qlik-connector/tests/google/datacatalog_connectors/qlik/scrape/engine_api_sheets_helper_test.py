@@ -45,7 +45,8 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.assertEqual(0, len(sheets))
 
     @mock.patch(f'{__BASE_CLASS}._generate_request_id')
-    @mock.patch(f'{__BASE_CLASS}._send_open_doc_interface_request')
+    @mock.patch(f'{__BASE_CLASS}.'
+                f'_BaseEngineAPIHelper__send_open_doc_interface_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_sheets_should_return_list_on_success(
@@ -84,7 +85,8 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
 
     @mock.patch(f'{__BASE_CLASS}._handle_generic_api_response')
-    @mock.patch(f'{__BASE_CLASS}._send_open_doc_interface_request')
+    @mock.patch(f'{__BASE_CLASS}.'
+                f'_BaseEngineAPIHelper__send_open_doc_interface_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_sheets_should_handle_generic_api_response(

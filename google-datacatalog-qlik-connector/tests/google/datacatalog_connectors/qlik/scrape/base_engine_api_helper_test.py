@@ -83,31 +83,33 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
             ._handle_event_loop_exec_timeout(mock_event_loop)
         mock_event_loop.stop.assert_called_once()
 
+    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
-    def test_send_open_doc_interface_request_should_return_request_id(
-            self, mock_generate_request_id, mock_websocket):
+    def test_start_websocket_communication_should_add_doc_interface_request_id(
+            self, mock_websocket, mock_generate_request_id):
 
         mock_generate_request_id.return_value = 10
-        request_id = base_engine_api_helper.BaseEngineAPIHelper\
-            ._run_until_complete(
-                self.__helper._send_open_doc_interface_request(
-                    'app-id', mock_websocket))
+        mock_responses_manager = mock.MagicMock()
+
+        base_engine_api_helper.BaseEngineAPIHelper._run_until_complete(
+            self.__helper._start_websocket_communication(
+                mock_websocket, 'app-id', mock_responses_manager))
 
         mock_generate_request_id.assert_called_once()
-        self.assertEqual(10, request_id)
+        mock_responses_manager.add_pending_id.assert_called_once_with(
+            10, 'doc_interfaces')
 
+    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
     def test_send_get_all_infos_request_should_return_request_id(
-            self, mock_generate_request_id, mock_websocket):
+            self, mock_websocket, mock_generate_request_id):
 
         mock_generate_request_id.return_value = 10
         request_id = base_engine_api_helper.BaseEngineAPIHelper\
             ._run_until_complete(
-                self.__helper._send_get_all_infos_request(1, mock_websocket))
+                self.__helper._send_get_all_infos_request(mock_websocket, 1))
 
         mock_generate_request_id.assert_called_once()
         self.assertEqual(10, request_id)

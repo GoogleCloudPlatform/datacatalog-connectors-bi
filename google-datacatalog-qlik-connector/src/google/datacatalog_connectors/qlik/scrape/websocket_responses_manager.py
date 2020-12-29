@@ -27,6 +27,7 @@ class WebsocketResponsesManager:
         # Used by the consumer to notify the producer on new responses, so the
         # producer can take actions such as sending follow up requests.
         self.__new_response_event = asyncio.Event()
+        self.__interface_handles = {}
 
     def init_pending_ids_holder(self, key):
         if not key:
@@ -43,6 +44,9 @@ class WebsocketResponsesManager:
 
     def add_pending_id(self, response_id, list_key):
         self.__pending_response_ids[list_key].append(response_id)
+
+    def add_pending_ids(self, response_ids, list_key):
+        self.__pending_response_ids[list_key].extend(response_ids)
 
     def remove_pending_id(self, response_id):
         for pending_ids in self.__pending_response_ids.values():
@@ -79,3 +83,9 @@ class WebsocketResponsesManager:
 
     def clear_response_notifications(self):
         self.__new_response_event.clear()
+
+    def set_handle(self, value, handle_key):
+        self.__interface_handles[handle_key] = value
+
+    def get_handle(self, handle_key):
+        return self.__interface_handles[handle_key]

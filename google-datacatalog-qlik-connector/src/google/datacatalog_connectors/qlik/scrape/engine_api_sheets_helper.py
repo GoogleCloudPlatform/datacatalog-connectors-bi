@@ -38,9 +38,10 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         async with self._connect_websocket(app_id) as websocket:
             responses_manager = \
                 websocket_responses_manager.WebsocketResponsesManager()
-            self.__init_pending_response_ids_lists(responses_manager)
+            self.__init_pending_response_ids_holders(responses_manager)
 
-            await self.__start_stream(app_id, websocket, responses_manager)
+            await self._start_websocket_communication(websocket, app_id,
+                                                      responses_manager)
 
             consumer = self.__get_sheets_msg_consumer
             producer = self.__get_sheets_msg_producer
@@ -66,35 +67,42 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 responses_manager.add_unhandled(response)
 
             responses_manager.notify_new_response()
-            if responses_manager.were_all_received():
-                return sheets
+
+        return sheets
 
     async def __get_sheets_msg_producer(self, websocket, responses_manager):
-
         while not responses_manager.were_all_received():
             if not responses_manager.is_there_response_notification():
                 await responses_manager.wait_for_responses()
                 responses_manager.clear_response_notifications()
             for response in responses_manager.get_all_unhandled():
-                follow_up_req_id = \
-                    await self.__send_follow_up_get_sheets_msg(
-                        websocket, responses_manager, response)
-                if follow_up_req_id:
-                    responses_manager.remove_unhandled(response)
+                await self.__send_follow_up_msg_get_sheets(
+                    websocket, responses_manager, response)
 
-    async def __send_follow_up_get_sheets_msg(self, websocket,
+        await websocket.close()
+
+    async def __send_follow_up_msg_get_sheets(self, websocket,
                                               responses_manager, response):
 
         response_id = response.get('id')
-        follow_up_req_id = None
+        response_handled = False
         if responses_manager.is_pending(response_id, self.__DOC_INTERFACES):
             doc_handle = response.get('result').get('qReturn').get('qHandle')
-            follow_up_req_id = await self.__send_get_sheets_request(
-                websocket, doc_handle)
-            responses_manager.add_pending_id(follow_up_req_id, self.__SHEETS)
-            responses_manager.remove_pending_id(response_id)
+            await self.__handle_open_doc_response(websocket, responses_manager,
+                                                  response)
+            response_handled = True
 
-        return follow_up_req_id
+        if response_handled:
+            responses_manager.remove_pending_id(response_id)
+            responses_manager.remove_unhandled(response)
+
+    async def __handle_open_doc_response(self, websocket, responses_manager,
+                                         response):
+
+        doc_handle = response.get('result').get('qReturn').get('qHandle')
+        follow_up_req_id = await self.__send_get_sheets_request(
+            websocket, doc_handle)
+        responses_manager.add_pending_id(follow_up_req_id, self.__SHEETS)
 
     async def __send_get_sheets_request(self, websocket, doc_handle):
         """Sends a Get Objects request for the sheet type.
@@ -119,11 +127,6 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         return request_id
 
     @classmethod
-    def __init_pending_response_ids_lists(cls, responses_manager):
+    def __init_pending_response_ids_holders(cls, responses_manager):
         responses_manager.init_pending_ids_holders(
             [cls.__DOC_INTERFACES, cls.__SHEETS])
-
-    async def __start_stream(self, app_id, websocket, responses_manager):
-        request_id = await self._send_open_doc_interface_request(
-            app_id, websocket)
-        responses_manager.add_pending_id(request_id, self.__DOC_INTERFACES)

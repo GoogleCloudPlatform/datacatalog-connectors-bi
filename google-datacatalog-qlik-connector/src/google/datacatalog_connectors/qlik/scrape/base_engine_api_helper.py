@@ -29,6 +29,9 @@ from google.datacatalog_connectors.qlik.scrape import constants
 class BaseEngineAPIHelper(abc.ABC):
     """The base class for all Engine API Helpers."""
 
+    # Keys to be used in the pending reponse ids dict.
+    _DOC_INTERFACES = 'doc_interfaces'
+
     def __init__(self, server_address, auth_cookie):
         # The server address starts with an http/https scheme. The below
         # statement replaces the original scheme with 'wss', which is used for
@@ -87,6 +90,13 @@ class BaseEngineAPIHelper(abc.ABC):
             task.cancel()
         event_loop.stop()
 
+    async def _start_websocket_communication(self, websocket, app_id,
+                                             responses_manager):
+
+        request_id = \
+            await self.__send_open_doc_interface_request(websocket, app_id)
+        responses_manager.add_pending_id(request_id, self._DOC_INTERFACES)
+
     @classmethod
     async def _handle_websocket_communication(cls, consumer_future,
                                               producer_future):
@@ -98,7 +108,7 @@ class BaseEngineAPIHelper(abc.ABC):
         results = await asyncio.gather(*[consumer_future, producer_future])
         return results[0]
 
-    async def _send_open_doc_interface_request(self, app_id, websocket):
+    async def __send_open_doc_interface_request(self, websocket, app_id):
         """Sends a Open Doc (aka App) Interface request.
 
         Returns:
@@ -116,7 +126,7 @@ class BaseEngineAPIHelper(abc.ABC):
         logging.debug('Open Doc Interface request sent: %d', request_id)
         return request_id
 
-    async def _send_get_all_infos_request(self, doc_handle, websocket):
+    async def _send_get_all_infos_request(self, websocket, doc_handle):
         """Sends a Get All Infos request.
 
         Returns:
