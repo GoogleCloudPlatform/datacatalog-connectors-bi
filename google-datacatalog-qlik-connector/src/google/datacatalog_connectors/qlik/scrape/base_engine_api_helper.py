@@ -39,6 +39,7 @@ class BaseEngineAPIHelper(abc.ABC):
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
         self.__requests_counter = 0
+        self.__requests_counter_thread_lock = threading.Lock()
 
     def _connect_websocket(self, app_id):
         """Opens a websocket connection.
@@ -65,25 +66,24 @@ class BaseEngineAPIHelper(abc.ABC):
         return websockets.connect(uri=uri, extra_headers=headers)
 
     def _generate_request_id(self):
-        self.__requests_counter += 1
-        return self.__requests_counter
+        with self.__requests_counter_thread_lock:
+            self.__requests_counter += 1
+            return self.__requests_counter
 
     @classmethod
-    def _run_until_complete(cls, future, max_seconds_to_wait):
-        loop = asyncio.get_event_loop()
-        timeout_controller = threading.Timer(
-            interval=max_seconds_to_wait,
-            function=cls._handle_event_loop_exec_timeout,
-            args=(loop,))
-        timeout_controller.start()
-        result = loop.run_until_complete(future)
-        timeout_controller.cancel()
-        return result
+    def _run_until_complete(cls, future):
+        event_loop = asyncio.new_event_loop()
+        try:
+            return event_loop.run_until_complete(future)
+        except asyncio.TimeoutError:
+            cls._handle_event_loop_exec_timeout(event_loop)
 
     @classmethod
     def _handle_event_loop_exec_timeout(cls, event_loop):
         logging.warning(
             'Timeout reached during the websocket communication session.')
+        for task in asyncio.Task.all_tasks(loop=event_loop):
+            task.cancel()
         event_loop.stop()
 
     @classmethod

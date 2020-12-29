@@ -70,7 +70,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
                                                        mock_handle_timeout):
 
         base_engine_api_helper.BaseEngineAPIHelper._run_until_complete(
-            future=asyncio.sleep(0.5), max_seconds_to_wait=0.25)
+            asyncio.wait_for(asyncio.sleep(0.5), timeout=0.25))
 
         mock_handle_timeout.assert_called_once()
 
@@ -90,8 +90,8 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         mock_generate_request_id.return_value = 10
         request_id = base_engine_api_helper.BaseEngineAPIHelper\
             ._run_until_complete(
-                future=self.__helper._send_open_doc_interface_request(
-                    'app-id', mock_websocket), max_seconds_to_wait=5)
+                self.__helper._send_open_doc_interface_request(
+                    'app-id', mock_websocket))
 
         mock_generate_request_id.assert_called_once()
         self.assertEqual(10, request_id)
@@ -105,8 +105,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         mock_generate_request_id.return_value = 10
         request_id = base_engine_api_helper.BaseEngineAPIHelper\
             ._run_until_complete(
-                future=self.__helper._send_get_all_infos_request(
-                    1, mock_websocket), max_seconds_to_wait=5)
+                self.__helper._send_get_all_infos_request(1, mock_websocket))
 
         mock_generate_request_id.assert_called_once()
         self.assertEqual(10, request_id)

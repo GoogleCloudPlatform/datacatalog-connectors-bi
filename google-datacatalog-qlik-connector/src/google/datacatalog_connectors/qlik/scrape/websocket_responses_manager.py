@@ -28,18 +28,18 @@ class WebsocketResponsesManager:
         # producer can take actions such as sending follow up requests.
         self.__new_response_event = asyncio.Event()
 
-    def add_pending_ids_list(self, key):
+    def init_pending_ids_holder(self, key):
         if not key:
             return
 
         self.__pending_response_ids[key] = []
 
-    def add_pending_ids_lists(self, keys):
+    def init_pending_ids_holders(self, keys):
         if not keys:
             return
 
         for key in keys:
-            self.add_pending_ids_list(key)
+            self.init_pending_ids_holder(key)
 
     def add_pending_id(self, response_id, list_key):
         self.__pending_response_ids[list_key].append(response_id)

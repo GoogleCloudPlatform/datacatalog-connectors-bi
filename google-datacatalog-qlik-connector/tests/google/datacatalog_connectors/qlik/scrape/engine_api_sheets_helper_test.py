@@ -56,7 +56,6 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         mock_generate_request_id.return_value = 2
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
-        websocket_ctx.set_itr_break(0.1)
         websocket_ctx.set_data([
             {
                 'id': 1,

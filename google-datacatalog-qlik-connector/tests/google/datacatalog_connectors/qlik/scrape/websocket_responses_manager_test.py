@@ -26,15 +26,15 @@ class WebsocketResponsesManagerTest(unittest.TestCase):
         self.__manager = \
             websocket_responses_manager.WebsocketResponsesManager()
 
-    def test_add_pending_ids_list_should_ignore_empty_list_key(self):
-        self.__manager.add_pending_ids_list('')
+    def test_init_pending_ids_holder_should_ignore_empty_holder_key(self):
+        self.__manager.init_pending_ids_holder('')
 
         attrs = self.__manager.__dict__
         self.assertEqual(
             0, len(attrs['_WebsocketResponsesManager__pending_response_ids']))
 
-    def test_add_pending_ids_lists_should_ignore_empty_list_keys(self):
-        self.__manager.add_pending_ids_lists([])
+    def test_init_pending_ids_holders_should_ignore_empty_holder_keys(self):
+        self.__manager.init_pending_ids_holders([])
 
         attrs = self.__manager.__dict__
         self.assertEqual(

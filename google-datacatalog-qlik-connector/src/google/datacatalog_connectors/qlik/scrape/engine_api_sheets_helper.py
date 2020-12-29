@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import json
 import logging
 
@@ -26,23 +27,27 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
     __DOC_INTERFACES = 'doc_interfaces'
     __SHEETS = 'sheets'
 
-    def get_sheets(self, app_id, max_seconds_to_wait=60):
+    def get_sheets(self, app_id, timeout=60):
         try:
-            return self._run_until_complete(self.__get_sheets(app_id),
-                                            max_seconds_to_wait)
-        except Exception as e:
-            logging.warning(e)
+            return self._run_until_complete(self.__get_sheets(app_id, timeout))
+        except Exception:
+            logging.getLogger().warning("error on get_sheets:", exc_info=True)
             return []
 
-    async def __get_sheets(self, app_id):
+    async def __get_sheets(self, app_id, timeout):
         async with self._connect_websocket(app_id) as websocket:
             responses_manager = \
                 websocket_responses_manager.WebsocketResponsesManager()
             self.__init_pending_response_ids_lists(responses_manager)
+
             await self.__start_stream(app_id, websocket, responses_manager)
-            return await self._handle_websocket_communication(
-                self.__get_sheets_msg_consumer(websocket, responses_manager),
-                self.__get_sheets_msg_producer(websocket, responses_manager))
+
+            consumer_task = self.__get_sheets_msg_consumer
+            producer_task = self.__get_sheets_msg_producer
+            return await asyncio.wait_for(
+                self._handle_websocket_communication(
+                    consumer_task(websocket, responses_manager),
+                    producer_task(websocket, responses_manager)), timeout)
 
     async def __get_sheets_msg_consumer(self, websocket, responses_manager):
         sheets = []
@@ -65,6 +70,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 return sheets
 
     async def __get_sheets_msg_producer(self, websocket, responses_manager):
+
         while not responses_manager.were_all_received():
             if not responses_manager.is_there_response_notification():
                 await responses_manager.wait_for_responses()
@@ -114,7 +120,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
     @classmethod
     def __init_pending_response_ids_lists(cls, responses_manager):
-        responses_manager.add_pending_ids_lists(
+        responses_manager.init_pending_ids_holders(
             [cls.__DOC_INTERFACES, cls.__SHEETS])
 
     async def __start_stream(self, app_id, websocket, responses_manager):

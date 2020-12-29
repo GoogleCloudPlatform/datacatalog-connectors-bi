@@ -37,6 +37,7 @@ class EngineAPIScraper:
     methods from this class are intended to be called synchronously to keep
     consistency with the overall scrape > prepare > ingest  workflow. The
     public methods take care of handling the async API calls for their clients.
+
     Most private coroutines (async def) rely on 'async with' statements.
     They work with an asynchronous context manager and the connection is closed
     when exiting the context.
