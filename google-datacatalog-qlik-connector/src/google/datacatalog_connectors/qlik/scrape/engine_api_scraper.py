@@ -17,15 +17,15 @@
 import asyncio
 import json
 import logging
-import random
 
 from urllib.parse import urlparse
 import websockets
 
-from google.datacatalog_connectors.qlik.scrape import authenticator, constants
+from google.datacatalog_connectors.qlik.scrape import \
+    authenticator, constants, engine_api_sheets_helper
 
 
-class EngineAPIHelper:
+class EngineAPIScraper:
     """Wraps requests to the Qlik Engine JSON API.
 
     The Qlik Engine JSON API is a WebSocket protocol that uses JSON to pass
@@ -44,7 +44,6 @@ class EngineAPIHelper:
 
     Attributes:
         __auth_cookie: An HTTP cookie used to authorize the requests.
-
     """
 
     def __init__(self, server_address, ad_domain, username, password):
@@ -64,47 +63,20 @@ class EngineAPIHelper:
         self.__auth_cookie = None
 
     def get_sheets(self, app_id):
-        """Get the list of Sheets that belong to a given App.
+        """Gets the Sheets that belong to the given App.
 
         Returns:
-            A list of sheets.
+            A list of [NxContainerEntry](https://help.qlik.com/en-US/sense-developer/September2020/APIs/EngineAPI/definitions-NxContainerEntry.html).  # noqa E501
         """
         self.__set_up_auth_cookie()
-        return self.__run_until_complete(self.__get_sheets(app_id))
-
-    @classmethod
-    def __run_until_complete(cls, async_method_call):
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(async_method_call)
-
-    async def __get_sheets(self, app_id):
-        async with self.__connect_websocket(app_id) as websocket:
-            open_doc_return = await self.__open_doc(app_id, websocket)
-
-            request_id = self.__generate_request_id()
-            await websocket.send(
-                json.dumps({
-                    'handle': open_doc_return.get('qHandle'),
-                    'method': 'GetObjects',
-                    'params': {
-                        'qOptions': {
-                            'qTypes': ['sheet'],
-                        },
-                    },
-                    'id': request_id,
-                }))
-
-            async for message in websocket:
-                json_message = json.loads(message)
-                response_id = json_message.get('id')
-                if request_id == response_id:
-                    return json_message.get('result').get('qList')
+        return engine_api_sheets_helper.EngineAPISheetsHelper(
+            self.__server_address, self.__auth_cookie).get_sheets(app_id)
 
     def __set_up_auth_cookie(self):
         if self.__auth_cookie:
             return
 
-        windows_auth_url = self.__run_until_complete(
+        windows_auth_url = asyncio.get_event_loop().run_until_complete(
             self.__get_windows_authentication_url())
         self.__auth_cookie = authenticator.Authenticator\
             .get_qps_session_cookie_windows_auth(
@@ -116,12 +88,11 @@ class EngineAPIHelper:
                       self.__auth_cookie)
 
     async def __get_windows_authentication_url(self):
-        """Get a Windows Authentication url.
+        """Gets a Windows Authentication url.
 
         This method sends an unauthenticated request to a well known endpoint
         of the Qlik Engine JSON API. The expected response has a `loginUri`
         param, which is the Windows Authentication url.
-
         P.S. The endpoint was manually captured from the Engine API Explorer's
         Execution Logs (https://<qlik-site>/dev-hub/engine-api-explorer).
 
@@ -145,54 +116,3 @@ class EngineAPIHelper:
                 params = json_message.get('params')
                 if params:
                     return params.get('loginUri')
-
-    def __connect_websocket(self, app_id):
-        """Open websocket connection.
-
-        Args:
-            app_id:
-              An App ID to be appended to the Engine API URLs when making
-              websocket connections and then get an isolated Qlik Engine
-              session for each Qlik App (see [Connecting to the Qlik Engine
-              JSON API](https://help.qlik.com/en-US/sense-developer/September2020/Subsystems/EngineAPI/Content/Sense_EngineAPI/GettingStarted/connecting-to-engine-api.htm)).  # noqa E510
-
-        Returns:
-            An awaiting function that yields a :class:`WebSocketClientProtocol`
-            which can then be used to send and receive messages.
-        """
-        uri = f'{self.__base_api_endpoint}/app/{app_id}' \
-              f'?Xrfkey={constants.XRFKEY}'
-
-        headers = self.__common_headers.copy()
-        # Format the header value as <key>=<value> string.
-        headers['Cookie'] = \
-            f'{self.__auth_cookie.name}={self.__auth_cookie.value}'
-
-        return websockets.connect(uri=uri, extra_headers=headers)
-
-    @classmethod
-    async def __open_doc(cls, app_id, websocket):
-        """Open an App (aka Doc) to enable calling subsequent methods of it,
-        e.g. `GetObjects`.
-
-        Returns:
-            An [ObjectInterface](https://help.qlik.com/en-US/sense-developer/September2020/APIs/EngineAPI/definitions-ObjectInterface.html).  # noqa E501
-        """
-        request_id = cls.__generate_request_id()
-        await websocket.send(
-            json.dumps({
-                'handle': -1,
-                'method': 'OpenDoc',
-                'params': [app_id],
-                'id': request_id
-            }))
-
-        async for message in websocket:
-            json_message = json.loads(message)
-            response_id = json_message.get('id')
-            if request_id == response_id:
-                return json_message.get('result').get('qReturn')
-
-    @classmethod
-    def __generate_request_id(cls):
-        return random.randint(1, 9999)

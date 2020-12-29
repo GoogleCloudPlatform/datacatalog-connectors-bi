@@ -24,10 +24,10 @@ class MetadataScraperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
     __SCRAPER_MODULE = f'{__SCRAPE_PACKAGE}.metadata_scraper'
 
-    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_helper.EngineAPIHelper')
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_scraper.EngineAPIScraper')
     @mock.patch(f'{__SCRAPER_MODULE}.repository_services_api_helper'
                 f'.RepositoryServicesAPIHelper')
-    def setUp(self, mock_qrs_api_helper, mock_engine_api_helper):
+    def setUp(self, mock_qrs_api_helper, mock_engine_api_scraper):
         self.__scraper = scrape.MetadataScraper(server_address='test-server',
                                                 ad_domain='test-domain',
                                                 username='test-username',
@@ -36,7 +36,7 @@ class MetadataScraperTest(unittest.TestCase):
     def test_constructor_should_set_instance_attributes(self):
         attrs = self.__scraper.__dict__
         self.assertIsNotNone(attrs['_MetadataScraper__qrs_api_helper'])
-        self.assertIsNotNone(attrs['_MetadataScraper__engine_api_helper'])
+        self.assertIsNotNone(attrs['_MetadataScraper__engine_api_scraper'])
 
     def test_scrape_all_apps_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
@@ -46,7 +46,6 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'app-id',
         }]
 
-        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
         qrs_api_helper.get_full_app_list.return_value = apps_metadata
 
         apps = self.__scraper.scrape_all_apps()
@@ -65,7 +64,6 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'custom-property-definition-id',
         }]
 
-        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
         qrs_api_helper.get_full_custom_property_definition_list\
             .return_value = custom_property_defs_metadata
 
@@ -86,7 +84,6 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'stream-id',
         }]
 
-        attrs['_MetadataScraper__qrs_api_session'] = mock.MagicMock()
         qrs_api_helper.get_full_stream_list.return_value = streams_metadata
 
         streams = self.__scraper.scrape_all_streams()
@@ -97,7 +94,7 @@ class MetadataScraperTest(unittest.TestCase):
 
     def test_scrape_sheets_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
-        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
 
         sheets_metadata = [
             {
@@ -109,25 +106,23 @@ class MetadataScraperTest(unittest.TestCase):
             },
         ]
 
-        attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
-        engine_api_helper.get_sheets.return_value = sheets_metadata
+        engine_api_scraper.get_sheets.return_value = sheets_metadata
 
         sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
 
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
-        engine_api_helper.get_sheets.assert_called_once()
+        engine_api_scraper.get_sheets.assert_called_once()
 
     def test_scrape_sheets_should_return_empty_list_on_no_server_response(
             self):
 
         attrs = self.__scraper.__dict__
-        engine_api_helper = attrs['_MetadataScraper__engine_api_helper']
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
 
-        attrs['_MetadataScraper__engine_api_auth_cookie'] = mock.MagicMock()
-        engine_api_helper.get_sheets.return_value = None
+        engine_api_scraper.get_sheets.return_value = None
 
         sheets = self.__scraper.scrape_sheets({'id': 'app-id'})
 
         self.assertEqual(0, len(sheets))
-        engine_api_helper.get_sheets.assert_called_once()
+        engine_api_scraper.get_sheets.assert_called_once()

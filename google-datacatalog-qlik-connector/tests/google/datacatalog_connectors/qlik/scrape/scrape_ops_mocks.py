@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import json
 from unittest import mock
 
@@ -73,8 +74,9 @@ class AsyncContextManager(mock.MagicMock):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data = []
-        self.itr_index = -1
+        self.__data = []
+        self.__itr_index = -1
+        self.__itr_break = 0
 
     async def __aenter__(self, *args, **kwargs):
         return self.__enter__(*args, **kwargs)
@@ -86,14 +88,18 @@ class AsyncContextManager(mock.MagicMock):
         return self
 
     async def __anext__(self):
-        self.itr_index = self.itr_index + 1
-        if self.itr_index >= len(self.data):
+        await asyncio.sleep(self.__itr_break)
+        self.__itr_index = self.__itr_index + 1
+        if self.__itr_index >= len(self.__data):
             raise StopAsyncIteration
-        return self.data[self.itr_index]
+        return self.__data[self.__itr_index]
 
     def set_data(self, data):
-        self.data.extend([json.dumps(json_object) for json_object in data])
-        self.itr_index = -1
+        self.__data = [json.dumps(element) for element in data]
+        self.__itr_index = -1
+
+    def set_itr_break(self, itr_break):
+        self.__itr_break = itr_break
 
     async def send(self, *args, **kwargs):
         pass
