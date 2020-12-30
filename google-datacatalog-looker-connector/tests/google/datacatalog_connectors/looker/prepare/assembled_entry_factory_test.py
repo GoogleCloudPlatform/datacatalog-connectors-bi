@@ -90,8 +90,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         dashboard_data = {
             'id': 'test_dashboard',
         }
-        dashboard = serialize.deserialize(json.dumps(dashboard_data),
-                                          models.Dashboard)
+        dashboard = serialize.deserialize31(data=json.dumps(dashboard_data),
+                                            structure=models.Dashboard)
 
         tag_templates_dict = {
             'looker_dashboard_metadata': {
@@ -135,8 +135,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
                 'id': 194,
             }],
         }
-        dashboard = serialize.deserialize(json.dumps(dashboard_data),
-                                          models.Dashboard)
+        dashboard = serialize.deserialize31(data=json.dumps(dashboard_data),
+                                            structure=models.Dashboard)
         folder = self.__make_fake_folder()
         folder.dashboards = [dashboard]
 
@@ -178,8 +178,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
                 'id': 194,
             }],
         }
-        dashboard = serialize.deserialize(json.dumps(dashboard_data),
-                                          models.Dashboard)
+        dashboard = serialize.deserialize31(data=json.dumps(dashboard_data),
+                                            structure=models.Dashboard)
         folder = self.__make_fake_folder()
         folder.dashboards = [dashboard]
 
@@ -201,7 +201,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         look_data = {
             'id': 10,
         }
-        look = serialize.deserialize(json.dumps(look_data), models.Look)
+        look = serialize.deserialize31(data=json.dumps(look_data),
+                                       structure=models.Look)
 
         tag_templates_dict = {
             'looker_look_metadata': {
@@ -273,7 +274,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             'dashboards': [dashboard_data] if dashboard_data else None,
             'looks': [look_data] if look_data else None,
         }
-        return serialize.deserialize(json.dumps(folder_data), models.Folder)
+        return serialize.deserialize31(data=json.dumps(folder_data),
+                                       structure=models.Folder)
 
     @classmethod
     def __make_fake_query(cls):
@@ -282,7 +284,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             'model': '',
             'view': '',
         }
-        return serialize.deserialize(json.dumps(query_data), models.Query)
+        return serialize.deserialize31(data=json.dumps(query_data),
+                                       structure=models.Query)
 
     @classmethod
     def __mock_make_entry(cls, asset):

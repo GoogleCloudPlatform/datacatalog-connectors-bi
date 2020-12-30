@@ -66,8 +66,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_dashboard(
             tag_template,
-            serialize.deserialize(json.dumps(dashboard_data),
-                                  models.Dashboard))
+            serialize.deserialize31(data=json.dumps(dashboard_data),
+                                    structure=models.Dashboard))
 
         self.assertEqual(tag_template.name, tag.template)
 
@@ -123,10 +123,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_dashboard_element(
             tag_template,
-            serialize.deserialize(json.dumps(dashboard_element_data),
-                                  models.DashboardElement),
-            serialize.deserialize(json.dumps(dashboard_data),
-                                  models.Dashboard))
+            serialize.deserialize31(data=json.dumps(dashboard_element_data),
+                                    structure=models.DashboardElement),
+            serialize.deserialize31(data=json.dumps(dashboard_data),
+                                    structure=models.Dashboard))
 
         self.assertEqual(tag_template.name, tag.template)
 
@@ -158,8 +158,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_dashboard_element(
             tag_template,
-            serialize.deserialize(json.dumps(dashboard_element_data),
-                                  models.DashboardElement), None)
+            serialize.deserialize31(data=json.dumps(dashboard_element_data),
+                                    structure=models.DashboardElement), None)
 
         self.assertEqual(837, tag.fields['query_id'].double_value)
 
@@ -178,7 +178,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_folder(
             tag_template,
-            serialize.deserialize(json.dumps(folder_data), models.Folder))
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder))
 
         self.assertEqual(tag_template.name, tag.template)
 
@@ -209,7 +210,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_folder(
             tag_template,
-            serialize.deserialize(json.dumps(folder_data), models.Folder))
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder))
 
         self.assertEqual(False, tag.fields['has_children'].bool_value)
         self.assertEqual(0, tag.fields['children_count'].double_value)
@@ -248,7 +250,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_look(
             tag_template,
-            serialize.deserialize(json.dumps(look_data), models.Look))
+            serialize.deserialize31(data=json.dumps(look_data),
+                                    structure=models.Look))
 
         self.assertEqual(tag_template.name, tag.template)
 
@@ -303,7 +306,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_look(
             tag_template,
-            serialize.deserialize(json.dumps(look_data), models.LookWithQuery))
+            serialize.deserialize31(data=json.dumps(look_data),
+                                    structure=models.LookWithQuery))
 
         self.assertEqual('test/url', tag.fields['url'].string_value)
 
@@ -345,12 +349,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         assembled_metadata = entities.AssembledQueryMetadata(
-            serialize.deserialize(json.dumps(query_data), models.Query),
-            'select *',
-            serialize.deserialize(json.dumps(explore_data),
-                                  models.LookmlModelExplore),
-            serialize.deserialize(json.dumps(connection_data),
-                                  models.DBConnection))
+            serialize.deserialize31(data=json.dumps(query_data),
+                                    structure=models.Query), 'select *',
+            serialize.deserialize31(data=json.dumps(explore_data),
+                                    structure=models.LookmlModelExplore),
+            serialize.deserialize31(data=json.dumps(connection_data),
+                                    structure=models.DBConnection))
 
         tag = self.__factory.make_tag_for_query(tag_template,
                                                 assembled_metadata)
@@ -397,8 +401,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         assembled_metadata = entities.AssembledQueryMetadata(
-            serialize.deserialize(json.dumps(query_data), models.Query),
-            'select *', None, None)
+            serialize.deserialize31(data=json.dumps(query_data),
+                                    structure=models.Query), 'select *', None,
+            None)
 
         tag = self.__factory.make_tag_for_query(tag_template,
                                                 assembled_metadata)
@@ -420,7 +425,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         tag = self.__factory.make_tag_for_folder(
             tag_template,
-            serialize.deserialize(json.dumps(folder_data), models.Folder))
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder))
 
         self.assertFalse('parent_id' in tag.fields)
 

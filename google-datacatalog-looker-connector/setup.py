@@ -37,7 +37,7 @@ setuptools.setup(
         ],
     },
     include_package_data=True,
-    install_requires=('looker_sdk == 0.1.3b7',
+    install_requires=('looker_sdk == 0.1.3b20',
                       'google-datacatalog-connectors-commons >= 0.6.0'),
     setup_requires=('pytest-runner',),
     tests_require=('pytest-cov',),

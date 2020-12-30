@@ -17,7 +17,7 @@
 from functools import lru_cache
 import logging
 
-from looker_sdk import client, error
+from looker_sdk import init31, error
 
 
 class MetadataScraper:
@@ -33,7 +33,7 @@ class MetadataScraper:
                     'last_viewed_at,deleted,deleter_id'
 
     def __init__(self, looker_credentials_file):
-        self.__sdk = client.setup(looker_credentials_file)
+        self.__sdk = init31(looker_credentials_file)
 
     def scrape_dashboard(self, dashboard_id):
         self.__log_scrape_start('Scraping dashboard by id: %s...',
