@@ -54,8 +54,9 @@ class EngineAPIDimensionsHelperTest(unittest.TestCase):
             self, mock_websocket, mock_send_open_doc, mock_send_get_all_infos,
             mock_generate_request_id):
 
-        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
-        mock_send_get_all_infos.return_value = asyncio.sleep(delay=0, result=2)
+        mock_send_open_doc.return_value = asyncio.sleep(delay=0.15, result=1)
+        mock_send_get_all_infos.return_value = asyncio.sleep(delay=0.15,
+                                                             result=2)
         mock_generate_request_id.side_effect = [3, 4]
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
@@ -102,3 +103,36 @@ class EngineAPIDimensionsHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(dimensions))
         self.assertEqual('dimension-id', dimensions[0].get('qInfo').get('qId'))
+
+    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
+    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
+    @mock.patch(f'{__BASE_CLASS}._connect_websocket',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_get_dimensions_should_return_empty_list_on_none_available(
+            self, mock_websocket, mock_send_open_doc, mock_send_get_all_infos):
+
+        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
+        mock_send_get_all_infos.return_value = asyncio.sleep(delay=0, result=2)
+
+        websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_itr_break(0.25)
+        websocket_ctx.set_data([
+            {
+                'id': 1,
+                'result': {
+                    'qReturn': {
+                        'qHandle': 1,
+                    },
+                },
+            },
+            {
+                'id': 2,
+                'result': {
+                    'qInfos': [],
+                },
+            },
+        ])
+
+        dimensions = self.__helper.get_dimensions('app-id')
+
+        self.assertEqual(0, len(dimensions))

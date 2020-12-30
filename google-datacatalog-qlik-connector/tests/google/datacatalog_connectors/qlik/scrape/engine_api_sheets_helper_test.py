@@ -82,3 +82,37 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
+
+    @mock.patch(f'{__BASE_CLASS}._generate_request_id')
+    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
+    @mock.patch(f'{__BASE_CLASS}._connect_websocket',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_get_sheets_should_return_empty_list_on_none_available(
+            self, mock_websocket, mock_send_open_doc,
+            mock_generate_request_id):
+
+        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
+        mock_generate_request_id.return_value = 2
+
+        websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_itr_break(0.25)
+        websocket_ctx.set_data([
+            {
+                'id': 1,
+                'result': {
+                    'qReturn': {
+                        'qHandle': 1,
+                    },
+                },
+            },
+            {
+                'id': 2,
+                'result': {
+                    'qList': [],
+                },
+            },
+        ])
+
+        sheets = self.__helper.get_sheets('app-id')
+
+        self.assertEqual(0, len(sheets))
