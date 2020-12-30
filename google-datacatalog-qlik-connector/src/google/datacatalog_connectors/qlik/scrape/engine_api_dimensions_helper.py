@@ -116,7 +116,7 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         responses_manager.set_handle(doc_handle, self.__DOC_HANDLE)
         follow_up_req_id = await self._send_get_all_infos_request(
             websocket, doc_handle)
-        responses_manager.add_pending_id(follow_up_req_id, self.__ALL_INFOS)
+        responses_manager.add_pending_id(follow_up_req_id, self._GET_ALL_INFOS)
 
     async def __handle_get_all_infos_response(self, websocket,
                                               responses_manager, response):

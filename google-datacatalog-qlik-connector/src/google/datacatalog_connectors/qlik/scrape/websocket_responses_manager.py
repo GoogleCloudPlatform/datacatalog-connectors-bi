@@ -19,20 +19,39 @@ import asyncio
 
 class WebsocketResponsesManager:
     """Utility class with common features for responses handling over websocket
-    communication sessions."""
+    communication sessions.
+
+    Attributes:
+        __pending_ids:
+            A ``list`` containing the ids of the pending responses, which means
+            the requests identified by them were sent but not answered yet.
+        __api_calls_history:
+            A ``dict`` containing a full history of the API calls known by a
+            given ``WebsocketResponsesManager`` instance, represented as
+            ``reponse-id: method`` items. It is automatically fulfilled when
+            pending ids are added to ``__pending_ids``.
+        __unhandled_responses:
+            A ``list`` containing all response objects that were received but
+            not handled yet.
+        __new_response_event:
+            A signal used by the consumer to notify the producer on the arrival
+            of new responses, so the producer can take actions such as sending
+            follow up requests.
+        __interface_handles:
+            A ``dict`` containing the keys and values of the interface handles
+            required by a given communication session.
+    """
 
     def __init__(self):
         self.__pending_ids = []
-        self.__methods_history = {}
+        self.__api_calls_history = {}
         self.__unhandled_responses = []
-        # Used by the consumer to notify the producer on new responses, so the
-        # producer can take actions such as sending follow up requests.
         self.__new_response_event = asyncio.Event()
         self.__interface_handles = {}
 
     def add_pending_id(self, response_id, method):
         self.__pending_ids.append(response_id)
-        self.__methods_history[response_id] = method
+        self.__api_calls_history[response_id] = method
 
     def add_pending_ids(self, response_ids, method):
         for response_id in response_ids:
@@ -46,7 +65,7 @@ class WebsocketResponsesManager:
             response_id, method)
 
     def is_method(self, response_id, method):
-        return method == self.__methods_history.get(response_id)
+        return method == self.__api_calls_history.get(response_id)
 
     def add_unhandled(self, response):
         self.__unhandled_responses.append(response)
