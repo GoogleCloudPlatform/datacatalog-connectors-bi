@@ -41,12 +41,12 @@ class WebsocketResponsesManager:
     def remove_pending_id(self, response_id):
         self.__pending_ids.remove(response_id)
 
-    def is_method(self, response_id, method):
-        return method == self.__methods_history.get(response_id)
-
-    def is_pending_and_method(self, response_id, method):
+    def is_pending(self, response_id, method):
         return response_id in self.__pending_ids and self.is_method(
             response_id, method)
+
+    def is_method(self, response_id, method):
+        return method == self.__methods_history.get(response_id)
 
     def add_unhandled(self, response):
         self.__unhandled_responses.append(response)

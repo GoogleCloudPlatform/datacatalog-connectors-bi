@@ -66,8 +66,8 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 continue
 
             logging.debug('Response received: %d', response_id)
-            if responses_manager.is_pending_and_method(response_id,
-                                                       self.__GET_PROPERTIES):
+            if responses_manager.is_pending(response_id,
+                                            self.__GET_PROPERTIES):
                 dimensions.append(response.get('result').get('qProp'))
             else:
                 responses_manager.add_unhandled(response)

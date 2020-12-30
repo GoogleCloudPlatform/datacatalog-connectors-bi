@@ -58,8 +58,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 continue
 
             logging.debug('Response received: %d', response_id)
-            if responses_manager.is_pending_and_method(response_id,
-                                                       self.__GET_OBJECTS):
+            if responses_manager.is_pending(response_id, self.__GET_OBJECTS):
                 sheets.extend(response.get('result').get('qList'))
             else:
                 responses_manager.add_unhandled(response)
