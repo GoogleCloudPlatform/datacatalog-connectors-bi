@@ -82,27 +82,3 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
-
-    @mock.patch(f'{__BASE_CLASS}._handle_generic_api_response')
-    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
-    @mock.patch(f'{__BASE_CLASS}._connect_websocket',
-                new_callable=scrape_ops_mocks.AsyncContextManager)
-    def test_get_sheets_should_handle_generic_api_response(
-            self, mock_websocket, mock_send_open_doc,
-            mock_handle_generic_response):
-
-        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
-
-        websocket_ctx = mock_websocket.return_value.__enter__.return_value
-        websocket_ctx.set_itr_break(0.25)
-        websocket_ctx.set_data([
-            {
-                'method': 'OnTestMethod',
-            },
-        ])
-
-        self.__helper.get_sheets('app-id', 0.5)
-
-        mock_handle_generic_response.assert_called_once_with({
-            'method': 'OnTestMethod',
-        })
