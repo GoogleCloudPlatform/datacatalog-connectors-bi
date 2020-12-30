@@ -29,8 +29,9 @@ from google.datacatalog_connectors.qlik.scrape import constants
 class BaseEngineAPIHelper(abc.ABC):
     """The base class for all Engine API Helpers."""
 
-    # Keys to be used in the pending reponse ids dict.
-    _DOC_INTERFACES = 'doc_interfaces'
+    # Methods to be used in the requests.
+    _GET_ALL_INFOS = 'GetAllInfos'
+    _OPEN_DOC = 'OpenDoc'
 
     def __init__(self, server_address, auth_cookie):
         # The server address starts with an http/https scheme. The below
@@ -94,8 +95,8 @@ class BaseEngineAPIHelper(abc.ABC):
                                              responses_manager):
 
         request_id = \
-            await self.__send_open_doc_interface_request(websocket, app_id)
-        responses_manager.add_pending_id(request_id, self._DOC_INTERFACES)
+            await self.__send_open_doc_request(websocket, app_id)
+        responses_manager.add_pending_id(request_id, self._OPEN_DOC)
 
     @classmethod
     async def _handle_websocket_communication(cls, consumer_future,
@@ -108,7 +109,7 @@ class BaseEngineAPIHelper(abc.ABC):
         results = await asyncio.gather(*[consumer_future, producer_future])
         return results[0]
 
-    async def __send_open_doc_interface_request(self, websocket, app_id):
+    async def __send_open_doc_request(self, websocket, app_id):
         """Sends a Open Doc (aka App) Interface request.
 
         Returns:
@@ -118,7 +119,7 @@ class BaseEngineAPIHelper(abc.ABC):
         await websocket.send(
             json.dumps({
                 'handle': -1,
-                'method': 'OpenDoc',
+                'method': self._OPEN_DOC,
                 'params': [app_id],
                 'id': request_id
             }))
@@ -136,7 +137,7 @@ class BaseEngineAPIHelper(abc.ABC):
         await websocket.send(
             json.dumps({
                 'handle': doc_handle,
-                'method': 'GetAllInfos',
+                'method': self._GET_ALL_INFOS,
                 'params': {},
                 'id': request_id,
             }))

@@ -23,9 +23,8 @@ from google.datacatalog_connectors.qlik.scrape import \
 
 
 class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
-    # Keys to be used in the pending reponse ids lists.
-    __DOC_INTERFACES = 'doc_interfaces'
-    __SHEETS = 'sheets'
+    # Methods to be used in the requests.
+    __GET_OBJECTS = 'GetObjects'
 
     def get_sheets(self, app_id, timeout=60):
         try:
@@ -38,7 +37,6 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         async with self._connect_websocket(app_id) as websocket:
             responses_manager = \
                 websocket_responses_manager.WebsocketResponsesManager()
-            self.__init_pending_response_ids_holders(responses_manager)
 
             await self._start_websocket_communication(websocket, app_id,
                                                       responses_manager)
@@ -60,18 +58,19 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 continue
 
             logging.debug('Response received: %d', response_id)
-            if responses_manager.is_pending(response_id, self.__SHEETS):
+            if responses_manager.is_pending_and_method(response_id,
+                                                       self.__GET_OBJECTS):
                 sheets.extend(response.get('result').get('qList'))
-                responses_manager.remove_pending_id(response_id)
             else:
                 responses_manager.add_unhandled(response)
 
             responses_manager.notify_new_response()
+            responses_manager.remove_pending_id(response_id)
 
         return sheets
 
     async def __get_sheets_msg_producer(self, websocket, responses_manager):
-        while not responses_manager.were_all_received():
+        while not responses_manager.were_all_precessed():
             if not responses_manager.is_there_response_notification():
                 await responses_manager.wait_for_responses()
                 responses_manager.clear_response_notifications()
@@ -85,15 +84,9 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                                               responses_manager, response):
 
         response_id = response.get('id')
-        response_handled = False
-        if responses_manager.is_pending(response_id, self.__DOC_INTERFACES):
-            doc_handle = response.get('result').get('qReturn').get('qHandle')
+        if responses_manager.is_method(response_id, self._OPEN_DOC):
             await self.__handle_open_doc_response(websocket, responses_manager,
                                                   response)
-            response_handled = True
-
-        if response_handled:
-            responses_manager.remove_pending_id(response_id)
             responses_manager.remove_unhandled(response)
 
     async def __handle_open_doc_response(self, websocket, responses_manager,
@@ -102,7 +95,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         doc_handle = response.get('result').get('qReturn').get('qHandle')
         follow_up_req_id = await self.__send_get_sheets_request(
             websocket, doc_handle)
-        responses_manager.add_pending_id(follow_up_req_id, self.__SHEETS)
+        responses_manager.add_pending_id(follow_up_req_id, self.__GET_OBJECTS)
 
     async def __send_get_sheets_request(self, websocket, doc_handle):
         """Sends a Get Objects request for the sheet type.
@@ -114,7 +107,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         await websocket.send(
             json.dumps({
                 'handle': doc_handle,
-                'method': 'GetObjects',
+                'method': self.__GET_OBJECTS,
                 'params': {
                     'qOptions': {
                         'qTypes': ['sheet'],
@@ -125,8 +118,3 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
         logging.debug('Get Objects (type=sheet) request sent: %d', request_id)
         return request_id
-
-    @classmethod
-    def __init_pending_response_ids_holders(cls, responses_manager):
-        responses_manager.init_pending_ids_holders(
-            [cls.__DOC_INTERFACES, cls.__SHEETS])

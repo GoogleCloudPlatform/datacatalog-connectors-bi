@@ -23,14 +23,12 @@ from google.datacatalog_connectors.qlik.scrape import \
 
 
 class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
-    # Keys to be used in the handles dict.
-    __DOC_HANDLE = 'doc_handle'
+    # Keys to identify the handles.
+    __DOC_HANDLE = 'doc-handle'
 
-    # Keys to be used in the pending reponse ids dict.
-    __ALL_INFOS = 'all_infos'
-    __DIM_INTERFACES = 'dim_interfaces'
-    __DIM_PROPERTIES = 'dim_properties'
-    __DOC_INTERFACES = 'doc_interfaces'
+    # Methods to be used in the requests.
+    __GET_DIMENSION = 'GetDimension'
+    __GET_PROPERTIES = 'GetProperties'
 
     def get_dimensions(self, app_id, timeout=60):
         try:
@@ -45,7 +43,6 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         async with self._connect_websocket(app_id) as websocket:
             responses_manager = \
                 websocket_responses_manager.WebsocketResponsesManager()
-            self.__init_pending_response_ids_holders(responses_manager)
 
             await self._start_websocket_communication(websocket, app_id,
                                                       responses_manager)
@@ -69,21 +66,21 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 continue
 
             logging.debug('Response received: %d', response_id)
-            if responses_manager.is_pending(response_id,
-                                            self.__DIM_PROPERTIES):
+            if responses_manager.is_pending_and_method(response_id,
+                                                       self.__GET_PROPERTIES):
                 dimensions.append(response.get('result').get('qProp'))
-                responses_manager.remove_pending_id(response_id)
             else:
                 responses_manager.add_unhandled(response)
 
             responses_manager.notify_new_response()
+            responses_manager.remove_pending_id(response_id)
 
         return dimensions
 
     async def __get_dimensions_msg_producer(self, websocket,
                                             responses_manager):
 
-        while not responses_manager.were_all_received():
+        while not responses_manager.were_all_precessed():
             if not responses_manager.is_there_response_notification():
                 await responses_manager.wait_for_responses()
                 responses_manager.clear_response_notifications()
@@ -97,23 +94,19 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                                                   responses_manager, response):
 
         response_id = response.get('id')
-        response_handled = False
-        if responses_manager.is_pending(response_id, self.__DOC_INTERFACES):
+        if responses_manager.is_method(response_id, self._OPEN_DOC):
             await self.__handle_open_doc_response(websocket, responses_manager,
                                                   response)
-            response_handled = True
-        elif responses_manager.is_pending(response_id, self.__ALL_INFOS):
+            responses_manager.remove_unhandled(response)
+        elif responses_manager.is_method(response_id, self._GET_ALL_INFOS):
             await self.__handle_get_all_infos_response(websocket,
                                                        responses_manager,
                                                        response)
-            response_handled = True
-        elif responses_manager.is_pending(response_id, self.__DIM_INTERFACES):
-            await self.__handle_open_dimension_response(
-                websocket, responses_manager, response)
-            response_handled = True
-
-        if response_handled:
-            responses_manager.remove_pending_id(response_id)
+            responses_manager.remove_unhandled(response)
+        elif responses_manager.is_method(response_id, self.__GET_DIMENSION):
+            await self.__handle_get_dimension_response(websocket,
+                                                       responses_manager,
+                                                       response)
             responses_manager.remove_unhandled(response)
 
     async def __handle_open_doc_response(self, websocket, responses_manager,
@@ -136,23 +129,23 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
             if 'dimension' == info.get('qType')
         ]
         follow_up_req_ids = await asyncio.gather(*[
-            self.__send_get_dimension_interface_request(
-                websocket, doc_handle, dim_id) for dim_id in dim_ids
+            self.__send_get_dimension_request(websocket, doc_handle, dim_id)
+            for dim_id in dim_ids
         ])
         responses_manager.add_pending_ids(follow_up_req_ids,
-                                          self.__DIM_INTERFACES)
+                                          self.__GET_DIMENSION)
 
-    async def __handle_open_dimension_response(self, websocket,
-                                               responses_manager, response):
+    async def __handle_get_dimension_response(self, websocket,
+                                              responses_manager, response):
 
         dim_handle = response.get('result').get('qReturn').get('qHandle')
-        follow_up_req_id = await self.__send_get_dimension_properties_request(
+        follow_up_req_id = await self.__send_get_properties_request(
             websocket, dim_handle)
         responses_manager.add_pending_id(follow_up_req_id,
-                                         self.__DIM_PROPERTIES)
+                                         self.__GET_PROPERTIES)
 
-    async def __send_get_dimension_interface_request(self, websocket,
-                                                     doc_handle, dimension_id):
+    async def __send_get_dimension_request(self, websocket, doc_handle,
+                                           dimension_id):
         """Sends a Get Dimension Interface request.
 
         Returns:
@@ -162,7 +155,7 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         await websocket.send(
             json.dumps({
                 'handle': doc_handle,
-                'method': 'GetDimension',
+                'method': self.__GET_DIMENSION,
                 'params': {
                     'qId': dimension_id,
                 },
@@ -172,8 +165,7 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         logging.debug('Get Dimension Interface request sent: %d', request_id)
         return request_id
 
-    async def __send_get_dimension_properties_request(self, websocket,
-                                                      dimension_handle):
+    async def __send_get_properties_request(self, websocket, dimension_handle):
         """Sends a Get Dimension Properties request.
 
         Returns:
@@ -183,17 +175,10 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         await websocket.send(
             json.dumps({
                 'handle': dimension_handle,
-                'method': 'GetProperties',
+                'method': self.__GET_PROPERTIES,
                 'params': {},
                 'id': request_id,
             }))
 
         logging.debug('Get Dimension Properties request sent: %d', request_id)
         return request_id
-
-    @classmethod
-    def __init_pending_response_ids_holders(cls, responses_manager):
-        responses_manager.init_pending_ids_holders([
-            cls.__DOC_INTERFACES, cls.__ALL_INFOS, cls.__DIM_INTERFACES,
-            cls.__DIM_PROPERTIES
-        ])

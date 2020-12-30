@@ -98,7 +98,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
 
         mock_generate_request_id.assert_called_once()
         mock_responses_manager.add_pending_id.assert_called_once_with(
-            10, 'doc_interfaces')
+            10, 'OpenDoc')
 
     @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
