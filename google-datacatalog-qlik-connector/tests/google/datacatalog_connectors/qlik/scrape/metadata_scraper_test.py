@@ -92,6 +92,40 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual('stream-id', streams[0].get('id'))
         qrs_api_helper.get_full_stream_list.assert_called_once()
 
+    def test_scrape_dimensions_should_return_list_on_success(self):
+        attrs = self.__scraper.__dict__
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
+
+        dimensions_metadata = [
+            {
+                'qInfo': {
+                    'qId': 'dimension-id',
+                },
+                'qMetaDef': {},
+            },
+        ]
+
+        engine_api_scraper.get_dimensions.return_value = dimensions_metadata
+
+        dimensions = self.__scraper.scrape_dimensions({'id': 'app-id'})
+
+        self.assertEqual(1, len(dimensions))
+        self.assertEqual('dimension-id', dimensions[0].get('qInfo').get('qId'))
+        engine_api_scraper.get_dimensions.assert_called_once()
+
+    def test_scrape_dimensions_should_return_empty_list_on_no_server_response(
+            self):
+
+        attrs = self.__scraper.__dict__
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
+
+        engine_api_scraper.get_dimensions.return_value = None
+
+        dimensions = self.__scraper.scrape_dimensions({'id': 'app-id'})
+
+        self.assertEqual(0, len(dimensions))
+        engine_api_scraper.get_dimensions.assert_called_once()
+
     def test_scrape_sheets_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
         engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
@@ -100,7 +134,6 @@ class MetadataScraperTest(unittest.TestCase):
             {
                 'qInfo': {
                     'qId': 'sheet-id',
-                    'qType': 'sheet',
                 },
                 'qMeta': {},
             },
