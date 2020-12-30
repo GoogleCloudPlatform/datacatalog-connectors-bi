@@ -58,6 +58,13 @@ class EngineAPIScraperTest(unittest.TestCase):
         self.assertIsNone(attrs['_EngineAPIScraper__auth_cookie'])
 
     @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
+    def test_get_dimensions_should_authenticate_user_beforehand(
+            self, mock_set_up_cookie):
+
+        self.__scraper.get_dimensions('app-id')
+        mock_set_up_cookie.assert_called_once()
+
+    @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
     def test_get_sheets_should_authenticate_user_beforehand(
             self, mock_set_up_cookie):
 

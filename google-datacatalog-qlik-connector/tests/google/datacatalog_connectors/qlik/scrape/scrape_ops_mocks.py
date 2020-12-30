@@ -103,3 +103,6 @@ class AsyncContextManager(mock.MagicMock):
 
     async def send(self, *args, **kwargs):
         pass
+
+    async def close(self, *args, **kwargs):
+        pass

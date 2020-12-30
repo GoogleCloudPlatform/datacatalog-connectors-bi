@@ -65,67 +65,137 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         self.assertEqual(2, self.__helper._generate_request_id())
         self.assertEqual(3, self.__helper._generate_request_id())
 
-    @mock.patch(f'{__HELPER_CLASS}._handle_event_loop_exec_timeout')
-    def test_run_until_complete_should_stop_on_timeout(self,
-                                                       mock_handle_timeout):
+    def test_run_until_complete_should_stop_on_timeout(self):
 
         self.assertRaises(
             asyncio.TimeoutError,
             base_engine_api_helper.BaseEngineAPIHelper._run_until_complete,
             asyncio.wait_for(asyncio.sleep(0.5), timeout=0.25))
 
-        mock_handle_timeout.assert_called_once()
-
-    @classmethod
-    def test_handle_event_loop_exec_timeout_should_stop_loop(cls):
-        mock_event_loop = mock.MagicMock()
-        base_engine_api_helper.BaseEngineAPIHelper\
-            ._handle_event_loop_exec_timeout(mock_event_loop)
-        mock_event_loop.stop.assert_called_once()
-
+    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
-    def test_send_open_doc_interface_request_should_return_request_id(
-            self, mock_generate_request_id, mock_websocket):
+    def test_start_websocket_communication_should_record_open_doc_request_id(
+            self, mock_websocket, mock_generate_request_id):
 
         mock_generate_request_id.return_value = 10
-        request_id = base_engine_api_helper.BaseEngineAPIHelper\
-            ._run_until_complete(
-                self.__helper._send_open_doc_interface_request(
-                    'app-id', mock_websocket))
+        mock_responses_manager = mock.MagicMock()
+
+        base_engine_api_helper.BaseEngineAPIHelper._run_until_complete(
+            self.__helper._start_websocket_communication(
+                mock_websocket, 'app-id', mock_responses_manager))
 
         mock_generate_request_id.assert_called_once()
-        self.assertEqual(10, request_id)
+        mock_responses_manager.add_pending_id.assert_called_once_with(
+            10, 'OpenDoc')
 
-    @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
+    @mock.patch(f'{__HELPER_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
-    def test_send_get_all_infos_request_should_return_request_id(
-            self, mock_generate_request_id, mock_websocket):
+    def test_consume_messages_should_process_lists(self, mock_websocket):
+        mock_responses_manager = mock.MagicMock()
+        mock_responses_manager.is_pending.return_value = True
 
-        mock_generate_request_id.return_value = 10
-        request_id = base_engine_api_helper.BaseEngineAPIHelper\
-            ._run_until_complete(
-                self.__helper._send_get_all_infos_request(1, mock_websocket))
+        websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_data([
+            {
+                'id': 1,
+                'result': {
+                    'list': [{
+                        'id': 'test-id',
+                    }],
+                },
+            },
+        ])
 
-        mock_generate_request_id.assert_called_once()
-        self.assertEqual(10, request_id)
+        helper = base_engine_api_helper.BaseEngineAPIHelper
+        results = helper._run_until_complete(
+            helper._consume_messages(websocket_ctx, mock_responses_manager,
+                                     'Test', 'result.list'))
 
-    @mock.patch(f'{__HELPER_CLASS}._handle_error_api_response')
-    def test_handle_generic_api_response_should_handle_errors(
-            self, mock_handle_error):
+        self.assertEqual(1, len(results))
+        self.assertEqual('test-id', results[0]['id'])
 
-        base_engine_api_helper.BaseEngineAPIHelper\
-            ._handle_generic_api_response({})
-        mock_handle_error.assert_called_once()
+    @mock.patch(f'{__HELPER_CLASS}._connect_websocket',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_consume_messages_should_process_single_objects(
+            self, mock_websocket):
 
-    def test_handle_error_api_response_should_raise_on_max_parallel_sessions(
-            self):
+        mock_responses_manager = mock.MagicMock()
+        mock_responses_manager.is_pending.return_value = True
 
-        self.assertRaises(
-            Exception, base_engine_api_helper.BaseEngineAPIHelper.
-            _handle_error_api_response, {
+        websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_data([
+            {
+                'id': 1,
+                'result': {
+                    'id': 'test-id',
+                },
+            },
+        ])
+
+        helper = base_engine_api_helper.BaseEngineAPIHelper
+        results = helper._run_until_complete(
+            helper._consume_messages(websocket_ctx, mock_responses_manager,
+                                     'Test', 'result'))
+
+        self.assertEqual(1, len(results))
+        self.assertEqual('test-id', results[0]['id'])
+
+    @mock.patch(f'{__HELPER_CLASS}'
+                f'._BaseEngineAPIHelper__handle_generic_api_response')
+    @mock.patch(f'{__HELPER_CLASS}._connect_websocket',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_consume_messages_should_handle_generic_api_response(
+            self, mock_websocket, mock_handle_response):
+
+        websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_data([
+            {
+                'method': 'OnTestMethod',
+            },
+        ])
+
+        helper = base_engine_api_helper.BaseEngineAPIHelper
+        helper._run_until_complete(
+            helper._consume_messages(websocket_ctx, mock.MagicMock(), 'Test',
+                                     'result.test'))
+
+        mock_handle_response.assert_called_once_with(
+            {'method': 'OnTestMethod'})
+
+    @mock.patch(f'{__HELPER_CLASS}._connect_websocket',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_consume_messages_should_handle_error_api_response(
+            self, mock_websocket):
+
+        websocket_ctx = mock_websocket.return_value.__enter__.return_value
+        websocket_ctx.set_data([
+            {
                 'method': 'OnMaxParallelSessionsExceeded',
-                'params': {},
-            })
+                'params': {
+                    'message': 'Test message',
+                },
+            },
+        ])
+
+        helper = base_engine_api_helper.BaseEngineAPIHelper
+        try:
+            helper._run_until_complete(
+                helper._consume_messages(websocket_ctx, mock.MagicMock(),
+                                         'Test', 'result.test'))
+        except Exception as e:
+            self.assertEqual('Test message', str(e))
+
+    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
+    @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
+                new_callable=scrape_ops_mocks.AsyncContextManager)
+    def test_send_get_all_infos_request_should_return_request_id(
+            self, mock_websocket, mock_generate_request_id):
+
+        mock_generate_request_id.return_value = 10
+        request_id = base_engine_api_helper.BaseEngineAPIHelper\
+            ._run_until_complete(
+                self.__helper._send_get_all_infos_request(mock_websocket, 1))
+
+        mock_generate_request_id.assert_called_once()
+        self.assertEqual(10, request_id)

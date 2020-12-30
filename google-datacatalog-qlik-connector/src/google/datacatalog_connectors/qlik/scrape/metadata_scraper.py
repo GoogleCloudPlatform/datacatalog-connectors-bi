@@ -68,6 +68,21 @@ class MetadataScraper:
 
         return streams
 
+    def scrape_dimensions(self, app_metadata):
+        self.__log_scrape_start(
+            'Scraping Dimensions (Master Items) from the'
+            ' "%s" App...', app_metadata.get('name'))
+        dimensions = self.__engine_api_scraper.get_dimensions(
+            app_metadata.get('id')) or []
+
+        logging.info('  %s Dimensions found:', len(dimensions))
+        for dimension in dimensions:
+            q_meta_def = dimension.get('qMetaDef')
+            logging.info('    - %s [%s]', q_meta_def.get('title'),
+                         dimension.get('qInfo').get('qId'))
+
+        return dimensions
+
     def scrape_sheets(self, app_metadata):
         self.__log_scrape_start('Scraping Sheets from the "%s" App...',
                                 app_metadata.get('name'))

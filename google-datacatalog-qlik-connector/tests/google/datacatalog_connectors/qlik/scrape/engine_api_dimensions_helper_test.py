@@ -18,42 +18,46 @@ import asyncio
 import unittest
 from unittest import mock
 
-from google.datacatalog_connectors.qlik.scrape import engine_api_sheets_helper
+from google.datacatalog_connectors.qlik.scrape import \
+    engine_api_dimensions_helper
 
 from . import scrape_ops_mocks
 
 
-class EngineAPISheetsHelperTest(unittest.TestCase):
+class EngineAPIDimensionsHelperTest(unittest.TestCase):
     __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
     __BASE_CLASS = f'{__SCRAPE_PACKAGE}.base_engine_api_helper' \
                    f'.BaseEngineAPIHelper'
-    __HELPER_CLASS = f'{__SCRAPE_PACKAGE}.engine_api_sheets_helper' \
-                     f'.EngineAPISheetsHelper'
+    __HELPER_CLASS = f'{__SCRAPE_PACKAGE}.engine_api_dimensions_helper' \
+                     f'.EngineAPIDimensionsHelper'
 
     def setUp(self):
-        self.__helper = engine_api_sheets_helper.EngineAPISheetsHelper(
+        self.__helper = engine_api_dimensions_helper.EngineAPIDimensionsHelper(
             server_address='https://test-server', auth_cookie=mock.MagicMock())
 
-    @mock.patch(f'{__HELPER_CLASS}._EngineAPISheetsHelper__get_sheets',
+    @mock.patch(f'{__HELPER_CLASS}._EngineAPIDimensionsHelper__get_dimensions',
                 lambda *args: None)
     @mock.patch(f'{__BASE_CLASS}._run_until_complete')
-    def test_get_sheets_should_return_empty_list_on_exception(
+    def test_get_dimensions_should_return_empty_list_on_exception(
             self, mock_run_until_complete):
 
         mock_run_until_complete.side_effect = Exception
-        sheets = self.__helper.get_sheets('app-id')
-        self.assertEqual(0, len(sheets))
+        dimensions = self.__helper.get_dimensions('app-id')
+        self.assertEqual(0, len(dimensions))
 
     @mock.patch(f'{__BASE_CLASS}._generate_request_id')
+    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    def test_get_sheets_should_return_list_on_success(
-            self, mock_websocket, mock_send_open_doc,
+    def test_get_dimensions_should_return_list_on_success(
+            self, mock_websocket, mock_send_open_doc, mock_send_get_all_infos,
             mock_generate_request_id):
 
-        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
-        mock_generate_request_id.return_value = 2
+        mock_send_open_doc.return_value = asyncio.sleep(delay=0.15, result=1)
+        mock_send_get_all_infos.return_value = asyncio.sleep(delay=0.15,
+                                                             result=2)
+        mock_generate_request_id.side_effect = [3, 4]
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
         websocket_ctx.set_itr_break(0.25)
@@ -69,30 +73,46 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
             {
                 'id': 2,
                 'result': {
-                    'qList': [{
+                    'qInfos': [{
+                        'qId': 'dimension-id',
+                        'qType': 'dimension'
+                    }],
+                },
+            },
+            {
+                'id': 3,
+                'result': {
+                    'qReturn': {
+                        'qHandle': 2,
+                    },
+                },
+            },
+            {
+                'id': 4,
+                'result': {
+                    'qProp': [{
                         'qInfo': {
-                            'qId': 'sheet-id',
+                            'qId': 'dimension-id',
                         },
                     }],
                 },
             },
         ])
 
-        sheets = self.__helper.get_sheets('app-id')
+        dimensions = self.__helper.get_dimensions('app-id')
 
-        self.assertEqual(1, len(sheets))
-        self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
+        self.assertEqual(1, len(dimensions))
+        self.assertEqual('dimension-id', dimensions[0].get('qInfo').get('qId'))
 
-    @mock.patch(f'{__BASE_CLASS}._generate_request_id')
+    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    def test_get_sheets_should_return_empty_list_on_none_available(
-            self, mock_websocket, mock_send_open_doc,
-            mock_generate_request_id):
+    def test_get_dimensions_should_return_empty_list_on_none_available(
+            self, mock_websocket, mock_send_open_doc, mock_send_get_all_infos):
 
         mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
-        mock_generate_request_id.return_value = 2
+        mock_send_get_all_infos.return_value = asyncio.sleep(delay=0, result=2)
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
         websocket_ctx.set_itr_break(0.25)
@@ -108,11 +128,11 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
             {
                 'id': 2,
                 'result': {
-                    'qList': [],
+                    'qInfos': [],
                 },
             },
         ])
 
-        sheets = self.__helper.get_sheets('app-id')
+        dimensions = self.__helper.get_dimensions('app-id')
 
-        self.assertEqual(0, len(sheets))
+        self.assertEqual(0, len(dimensions))
