@@ -82,6 +82,7 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
+        mock_send_open_doc.assert_called_once()
 
     @mock.patch(f'{__BASE_CLASS}._generate_request_id')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
@@ -116,3 +117,5 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         sheets = self.__helper.get_sheets('app-id')
 
         self.assertEqual(0, len(sheets))
+        mock_send_open_doc.assert_called_once()
+        mock_generate_request_id.assert_called_once()

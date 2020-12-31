@@ -54,9 +54,8 @@ class EngineAPIDimensionsHelperTest(unittest.TestCase):
             self, mock_websocket, mock_send_open_doc, mock_send_get_all_infos,
             mock_generate_request_id):
 
-        mock_send_open_doc.return_value = asyncio.sleep(delay=0.15, result=1)
-        mock_send_get_all_infos.return_value = asyncio.sleep(delay=0.15,
-                                                             result=2)
+        mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
+        mock_send_get_all_infos.return_value = asyncio.sleep(delay=0, result=2)
         mock_generate_request_id.side_effect = [3, 4]
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
@@ -103,6 +102,8 @@ class EngineAPIDimensionsHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(dimensions))
         self.assertEqual('dimension-id', dimensions[0].get('qInfo').get('qId'))
+        mock_send_open_doc.assert_called_once()
+        mock_send_get_all_infos.assert_called_once()
 
     @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
@@ -136,3 +137,5 @@ class EngineAPIDimensionsHelperTest(unittest.TestCase):
         dimensions = self.__helper.get_dimensions('app-id')
 
         self.assertEqual(0, len(dimensions))
+        mock_send_open_doc.assert_called_once()
+        mock_send_get_all_infos.assert_called_once()

@@ -105,7 +105,8 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
                     }],
                 },
             },
-        ])
+        ],
+                               stop_itr_on_no_data=True)
 
         helper = base_engine_api_helper.BaseEngineAPIHelper
         results = helper._run_until_complete(
@@ -131,7 +132,8 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
                     'id': 'test-id',
                 },
             },
-        ])
+        ],
+                               stop_itr_on_no_data=True)
 
         helper = base_engine_api_helper.BaseEngineAPIHelper
         results = helper._run_until_complete(
@@ -153,7 +155,8 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
             {
                 'method': 'OnTestMethod',
             },
-        ])
+        ],
+                               stop_itr_on_no_data=True)
 
         helper = base_engine_api_helper.BaseEngineAPIHelper
         helper._run_until_complete(
@@ -176,7 +179,8 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
                     'message': 'Test message',
                 },
             },
-        ])
+        ],
+                               stop_itr_on_no_data=True)
 
         helper = base_engine_api_helper.BaseEngineAPIHelper
         try:
