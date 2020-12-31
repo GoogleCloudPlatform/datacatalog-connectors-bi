@@ -44,6 +44,9 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         sheets = self.__helper.get_sheets('app-id')
         self.assertEqual(0, len(sheets))
 
+    # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
+    # mocked in test case in order to simulate an end-to-end scenario with
+    # responses that represent an App with Sheets.
     @mock.patch(f'{__BASE_CLASS}._generate_request_id')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
@@ -82,7 +85,11 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
 
         self.assertEqual(1, len(sheets))
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
+        mock_send_open_doc.assert_called_once()
 
+    # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
+    # mocked in test case in order to simulate an end-to-end scenario with
+    # responses that represent an App with no Sheets.
     @mock.patch(f'{__BASE_CLASS}._generate_request_id')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
@@ -116,3 +123,5 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         sheets = self.__helper.get_sheets('app-id')
 
         self.assertEqual(0, len(sheets))
+        mock_send_open_doc.assert_called_once()
+        mock_generate_request_id.assert_called_once()

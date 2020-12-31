@@ -75,6 +75,7 @@ class AsyncContextManager(mock.MagicMock):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__data = []
+        self.__stop_itr_on_no_data = False
         self.__itr_index = -1
         self.__itr_break = 0
 
@@ -90,12 +91,16 @@ class AsyncContextManager(mock.MagicMock):
     async def __anext__(self):
         await asyncio.sleep(self.__itr_break)
         self.__itr_index = self.__itr_index + 1
-        if self.__itr_index >= len(self.__data):
+        if self.__itr_index < len(self.__data):
+            return self.__data[self.__itr_index]
+        if self.__stop_itr_on_no_data:
             raise StopAsyncIteration
-        return self.__data[self.__itr_index]
+        else:
+            return '{}'
 
-    def set_data(self, data):
+    def set_data(self, data, stop_itr_on_no_data=False):
         self.__data = [json.dumps(element) for element in data]
+        self.__stop_itr_on_no_data = stop_itr_on_no_data
         self.__itr_index = -1
 
     def set_itr_break(self, itr_break):
@@ -104,5 +109,5 @@ class AsyncContextManager(mock.MagicMock):
     async def send(self, *args, **kwargs):
         pass
 
-    async def close(self, *args, **kwargs):
-        pass
+    async def close(self):
+        self.__stop_itr_on_no_data = True

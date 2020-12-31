@@ -117,6 +117,9 @@ class EngineAPIScraperTest(unittest.TestCase):
     def test_get_windows_authentication_url_should_pass_appropriate_auth_args(
             self, mock_websocket):
 
+        mock_websocket.return_value.__enter__.return_value.set_data(
+            [], stop_itr_on_no_data=True)
+
         # Call a public method to trigger the authentication workflow.
         self.__scraper.get_sheets('app-id')
 
