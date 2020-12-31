@@ -280,7 +280,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
             'parent_id': parent_data['id'] if parent_data else '',
             'child_count': 1 if parent else 0,
         }
-        return serialize.deserialize(json.dumps(folder_data), models.Folder)
+        return serialize.deserialize31(data=json.dumps(folder_data),
+                                       structure=models.Folder)
 
     @classmethod
     def __make_fake_dashboard(cls, folder):
@@ -289,8 +290,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
             'space': json.loads(serialize.serialize(folder)),
             'dashboard_elements': [],
         }
-        return serialize.deserialize(json.dumps(dashboard_data),
-                                     models.Dashboard)
+        return serialize.deserialize31(data=json.dumps(dashboard_data),
+                                       structure=models.Dashboard)
 
     @classmethod
     def __make_fake_look(cls, folder):
@@ -298,4 +299,5 @@ class MetadataSynchronizerTest(unittest.TestCase):
             'id': 123,
             'space': json.loads(serialize.serialize(folder)),
         }
-        return serialize.deserialize(json.dumps(look_data), models.Look)
+        return serialize.deserialize31(data=json.dumps(look_data),
+                                       structure=models.Look)

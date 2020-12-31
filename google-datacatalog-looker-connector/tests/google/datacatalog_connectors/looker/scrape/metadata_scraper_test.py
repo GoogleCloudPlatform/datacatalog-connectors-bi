@@ -27,7 +27,7 @@ from google.datacatalog_connectors.looker import scrape
 class MetadataScraperTest(unittest.TestCase):
 
     @mock.patch('google.datacatalog_connectors.looker.scrape'
-                '.metadata_scraper.client.setup')
+                '.metadata_scraper.init31')
     def setUp(self, mock_client):
         self.__scraper = scrape.MetadataScraper('looker-credentials-file.ini')
 
@@ -41,8 +41,8 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 'dashboard-id',
         }
 
-        sdk.dashboard.return_value = serialize.deserialize(
-            json.dumps(dashboard_data), models.Dashboard)
+        sdk.dashboard.return_value = serialize.deserialize31(
+            data=json.dumps(dashboard_data), structure=models.Dashboard)
 
         dashboard = self.__scraper.scrape_dashboard('dashboard-id')
 
@@ -72,7 +72,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         sdk.search_dashboards.return_value = [
-            serialize.deserialize(json.dumps(dashboard_data), models.Dashboard)
+            serialize.deserialize31(data=json.dumps(dashboard_data),
+                                    structure=models.Dashboard)
         ]
 
         dashboards = self.__scraper.scrape_all_dashboards()
@@ -94,7 +95,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         sdk.search_dashboards.return_value = [
-            serialize.deserialize(json.dumps(dashboard_data), models.Dashboard)
+            serialize.deserialize31(data=json.dumps(dashboard_data),
+                                    structure=models.Dashboard)
         ]
 
         folder_data = {
@@ -104,7 +106,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         dashboards = self.__scraper.scrape_dashboards_from_folder(
-            serialize.deserialize(json.dumps(folder_data), models.Folder))
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder))
 
         self.assertEqual(1, len(dashboards))
         self.assertEqual('dashboard-id', dashboards[0].id)
@@ -124,8 +127,8 @@ class MetadataScraperTest(unittest.TestCase):
             'parent_id': '',
         }
 
-        sdk.folder.return_value = serialize.deserialize(
-            json.dumps(folder_data), models.Folder)
+        sdk.folder.return_value = serialize.deserialize31(
+            data=json.dumps(folder_data), structure=models.Folder)
 
         folder = self.__scraper.scrape_folder('folder-id')
 
@@ -145,7 +148,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         sdk.search_folders.return_value = [
-            serialize.deserialize(json.dumps(folder_data), models.Folder)
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder)
         ]
 
         folders = self.__scraper.scrape_all_folders()
@@ -166,7 +170,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         sdk.search_folders.return_value = [
-            serialize.deserialize(json.dumps(folder_data), models.Folder)
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder)
         ]
 
         folders = self.__scraper.scrape_top_level_folders()
@@ -188,7 +193,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         sdk.folder_children.return_value = [
-            serialize.deserialize(json.dumps(folder_data), models.Folder)
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder)
         ]
 
         parent_data = {
@@ -198,7 +204,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         folders = self.__scraper.scrape_child_folders(
-            serialize.deserialize(json.dumps(parent_data), models.Folder))
+            serialize.deserialize31(data=json.dumps(parent_data),
+                                    structure=models.Folder))
 
         self.assertEqual(1, len(folders))
         self.assertEqual('folder-id', folders[0].id)
@@ -214,8 +221,8 @@ class MetadataScraperTest(unittest.TestCase):
             'id': 123,
         }
 
-        sdk.look.return_value = serialize.deserialize(json.dumps(look_data),
-                                                      models.Look)
+        sdk.look.return_value = serialize.deserialize31(
+            data=json.dumps(look_data), structure=models.Look)
 
         look = self.__scraper.scrape_look(123)
 
@@ -236,7 +243,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         sdk.search_looks.return_value = [
-            serialize.deserialize(json.dumps(look_data), models.Look)
+            serialize.deserialize31(data=json.dumps(look_data),
+                                    structure=models.Look)
         ]
 
         looks = self.__scraper.scrape_all_looks()
@@ -260,7 +268,8 @@ class MetadataScraperTest(unittest.TestCase):
         }
 
         sdk.search_looks.return_value = [
-            serialize.deserialize(json.dumps(look_data), models.Look)
+            serialize.deserialize31(data=json.dumps(look_data),
+                                    structure=models.Look)
         ]
 
         folder_data = {
@@ -269,7 +278,8 @@ class MetadataScraperTest(unittest.TestCase):
             'parent_id': '',
         }
         looks = self.__scraper.scrape_looks_from_folder(
-            serialize.deserialize(json.dumps(folder_data), models.Folder))
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder))
 
         self.assertEqual(1, len(looks))
         self.assertEqual(123, looks[0].id)
@@ -291,8 +301,8 @@ class MetadataScraperTest(unittest.TestCase):
             'view': '',
         }
 
-        sdk.query.return_value = serialize.deserialize(json.dumps(query_data),
-                                                       models.Query)
+        sdk.query.return_value = serialize.deserialize31(
+            data=json.dumps(query_data), structure=models.Query)
 
         query = self.__scraper.scrape_query(123)
 
@@ -318,8 +328,9 @@ class MetadataScraperTest(unittest.TestCase):
             'connection_name': 'test-connection',
         }
 
-        sdk.lookml_model_explore.return_value = serialize.deserialize(
-            json.dumps(model_explore_data), models.LookmlModelExplore)
+        sdk.lookml_model_explore.return_value = serialize.deserialize31(
+            data=json.dumps(model_explore_data),
+            structure=models.LookmlModelExplore)
 
         model = self.__scraper.scrape_lookml_model_explore(
             'test-model', 'test-view')
@@ -347,8 +358,8 @@ class MetadataScraperTest(unittest.TestCase):
             'name': 'test-connection',
         }
 
-        sdk.connection.return_value = serialize.deserialize(
-            json.dumps(connection_data), models.DBConnection)
+        sdk.connection.return_value = serialize.deserialize31(
+            data=json.dumps(connection_data), structure=models.DBConnection)
 
         connection = self.__scraper.scrape_connection('test-connection')
 

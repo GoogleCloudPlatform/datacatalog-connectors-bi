@@ -58,8 +58,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_dashboard(
-            serialize.deserialize(json.dumps(dashboard_data),
-                                  models.Dashboard))
+            serialize.deserialize31(data=json.dumps(dashboard_data),
+                                    structure=models.Dashboard))
         self.assertEqual('lkr_test_server_com_db_a123_b456', entry_id)
 
         self.assertEqual(
@@ -87,8 +87,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_dashboard(
-            serialize.deserialize(json.dumps(dashboard_data),
-                                  models.Dashboard))
+            serialize.deserialize31(data=json.dumps(dashboard_data),
+                                    structure=models.Dashboard))
 
         self.assertIsNone(entry.source_system_timestamps.create_time)
         self.assertIsNone(entry.source_system_timestamps.update_time)
@@ -100,8 +100,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_dashboard_element(
-            serialize.deserialize(json.dumps(dashboard_element_data),
-                                  models.DashboardElement))
+            serialize.deserialize31(data=json.dumps(dashboard_element_data),
+                                    structure=models.DashboardElement))
         self.assertEqual('lkr_test_server_com_de_196', entry_id)
 
         self.assertEqual(
@@ -120,8 +120,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_dashboard_element(
-            serialize.deserialize(json.dumps(dashboard_element_data),
-                                  models.DashboardElement))
+            serialize.deserialize31(data=json.dumps(dashboard_element_data),
+                                    structure=models.DashboardElement))
         self.assertEqual('Test Name', entry.display_name)
 
     def test_make_entry_for_dashboard_tile_should_skip_empty_titles(self):
@@ -130,9 +130,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_dashboard_element(
-            serialize.deserialize(json.dumps(dashboard_element_data),
-                                  models.DashboardElement))
-
+            serialize.deserialize31(data=json.dumps(dashboard_element_data),
+                                    structure=models.DashboardElement))
         self.assertIsNone(entry_id)
         self.assertIsNone(entry)
 
@@ -144,7 +143,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_folder(
-            serialize.deserialize(json.dumps(folder_data), models.Folder))
+            serialize.deserialize31(data=json.dumps(folder_data),
+                                    structure=models.Folder))
         self.assertEqual('lkr_test_server_com_fd_a123_b456', entry_id)
 
         self.assertEqual(
@@ -166,7 +166,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_look(
-            serialize.deserialize(json.dumps(look_data), models.Look))
+            serialize.deserialize31(data=json.dumps(look_data),
+                                    structure=models.Look))
         self.assertEqual('lkr_test_server_com_lk_123', entry_id)
 
         self.assertEqual(
@@ -196,8 +197,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_look(
-            serialize.deserialize(json.dumps(look_data), models.Look))
-
+            serialize.deserialize31(data=json.dumps(look_data),
+                                    structure=models.Look))
         created_datetime = self.__parse_datetime('2019-09-12T16:30:00+0000')
         self.assertEqual(
             created_datetime.timestamp(),
@@ -215,7 +216,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         entry_id, entry = self.__factory.make_entry_for_query(
-            serialize.deserialize(json.dumps(query_data), models.Query))
+            serialize.deserialize31(data=json.dumps(query_data),
+                                    structure=models.Query))
         self.assertEqual('lkr_test_server_com_qr_837', entry_id)
 
         self.assertEqual(

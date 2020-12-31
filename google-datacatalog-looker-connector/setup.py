@@ -23,7 +23,7 @@ with open('README.md') as readme_file:
 
 setuptools.setup(
     name='google-datacatalog-looker-connector',
-    version='0.6.0',
+    version='0.6.1',
     author='Google LLC',
     description='Package for ingesting Looker metadata'
     ' into Google Cloud Data Catalog',
@@ -37,8 +37,8 @@ setuptools.setup(
         ],
     },
     include_package_data=True,
-    install_requires=('looker_sdk == 0.1.3b7',
-                      'google-datacatalog-connectors-commons >= 0.6.0'),
+    install_requires=('looker_sdk == 0.1.3b20',
+                      'google-datacatalog-connectors-commons ~= 0.6.6'),
     setup_requires=('pytest-runner',),
     tests_require=('pytest-cov',),
     classifiers=[

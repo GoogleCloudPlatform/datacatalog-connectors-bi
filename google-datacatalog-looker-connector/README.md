@@ -46,6 +46,8 @@ supporting below asset types:
   * [4.3. Run Tests](#43-run-tests)
   * [4.4. Additional resources](#44-additional-resources)
 - [5. Troubleshooting](#5-troubleshooting)
+  * [5.1. Looker APIs compatibility](#51-looker-apis-compatibility)
+  * [5.2. Data Catalog quota](#52-data-catalog-quota)
 
 <!-- tocstop -->
 
@@ -207,6 +209,19 @@ documentation](docs/developer-resources).
 
 ## 5. Troubleshooting
 
+### 5.1. Looker APIs compatibility
+
+The connector may fail during the scrape stage if the Looker APIs do not return
+metadata in the expected format. The code base uses the `init31` looker_sdk client.  
+As a reference, the below versions were already validated:
+
+| VERSION                 | RESULT  |
+| ----------------------- | :-----: |
+| [Looker API 3.1][10]    | SUCCESS |
+
+
+### 5.2. Data Catalog quota
+
 In the case a connector execution hits Data Catalog quota limit, an error will
 be raised and logged with the following detailment, depending on the performed
 operation READ/WRITE/SEARCH: 
@@ -230,3 +245,4 @@ quota docs][2].
 [7]: https://img.shields.io/github/license/GoogleCloudPlatform/datacatalog-connectors-bi.svg
 [8]: https://img.shields.io/github/issues/GoogleCloudPlatform/datacatalog-connectors-bi.svg
 [9]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues
+[10]: https://docs.looker.com/reference/api-and-integration/api-reference/v3.1
