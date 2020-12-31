@@ -17,7 +17,7 @@
 from functools import lru_cache
 import logging
 
-from looker_sdk import init31, error
+from looker_sdk import error, init31
 
 
 class MetadataScraper:

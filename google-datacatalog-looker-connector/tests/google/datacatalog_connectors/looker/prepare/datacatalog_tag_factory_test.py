@@ -400,10 +400,15 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'view': 'test-view',
         }
 
+        # yapf: disable
         assembled_metadata = entities.AssembledQueryMetadata(
-            serialize.deserialize31(data=json.dumps(query_data),
-                                    structure=models.Query), 'select *', None,
+            serialize.deserialize31(
+                data=json.dumps(query_data),
+                structure=models.Query),
+            'select *',
+            None,
             None)
+        # yapf: enable
 
         tag = self.__factory.make_tag_for_query(tag_template,
                                                 assembled_metadata)
