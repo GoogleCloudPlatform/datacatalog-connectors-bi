@@ -81,7 +81,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         mock_generate_request_id.return_value = 10
         mock_responses_manager = mock.MagicMock()
 
-        base_engine_api_helper.BaseEngineAPIHelper._run_until_complete(
+        asyncio.new_event_loop().run_until_complete(
             self.__helper._start_websocket_communication(
                 mock_websocket, 'app-id', mock_responses_manager))
 
@@ -108,10 +108,9 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         ],
                                stop_itr_on_no_data=True)
 
-        helper = base_engine_api_helper.BaseEngineAPIHelper
-        results = helper._run_until_complete(
-            helper._consume_messages(websocket_ctx, mock_responses_manager,
-                                     'Test', 'result.list'))
+        results = asyncio.new_event_loop().run_until_complete(
+            base_engine_api_helper.BaseEngineAPIHelper._consume_messages(
+                websocket_ctx, mock_responses_manager, 'Test', 'result.list'))
 
         self.assertEqual(1, len(results))
         self.assertEqual('test-id', results[0]['id'])
@@ -135,10 +134,9 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         ],
                                stop_itr_on_no_data=True)
 
-        helper = base_engine_api_helper.BaseEngineAPIHelper
-        results = helper._run_until_complete(
-            helper._consume_messages(websocket_ctx, mock_responses_manager,
-                                     'Test', 'result'))
+        results = asyncio.new_event_loop().run_until_complete(
+            base_engine_api_helper.BaseEngineAPIHelper._consume_messages(
+                websocket_ctx, mock_responses_manager, 'Test', 'result'))
 
         self.assertEqual(1, len(results))
         self.assertEqual('test-id', results[0]['id'])
@@ -158,10 +156,9 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         ],
                                stop_itr_on_no_data=True)
 
-        helper = base_engine_api_helper.BaseEngineAPIHelper
-        helper._run_until_complete(
-            helper._consume_messages(websocket_ctx, mock.MagicMock(), 'Test',
-                                     'result.test'))
+        asyncio.new_event_loop().run_until_complete(
+            base_engine_api_helper.BaseEngineAPIHelper._consume_messages(
+                websocket_ctx, mock.MagicMock(), 'Test', 'result.test'))
 
         mock_handle_response.assert_called_once_with(
             {'method': 'OnTestMethod'})
@@ -182,11 +179,10 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         ],
                                stop_itr_on_no_data=True)
 
-        helper = base_engine_api_helper.BaseEngineAPIHelper
         try:
-            helper._run_until_complete(
-                helper._consume_messages(websocket_ctx, mock.MagicMock(),
-                                         'Test', 'result.test'))
+            asyncio.new_event_loop().run_until_complete(
+                base_engine_api_helper.BaseEngineAPIHelper._consume_messages(
+                    websocket_ctx, mock.MagicMock(), 'Test', 'result.test'))
         except Exception as e:
             self.assertEqual('Test message', str(e))
 
@@ -197,9 +193,8 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
             self, mock_websocket, mock_generate_request_id):
 
         mock_generate_request_id.return_value = 10
-        request_id = base_engine_api_helper.BaseEngineAPIHelper\
-            ._run_until_complete(
-                self.__helper._send_get_all_infos_request(mock_websocket, 1))
+        request_id = asyncio.new_event_loop().run_until_complete(
+            self.__helper._send_get_all_infos_request(mock_websocket, 1))
 
         mock_generate_request_id.assert_called_once()
         self.assertEqual(10, request_id)

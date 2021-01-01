@@ -30,7 +30,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         try:
             return self._run_until_complete(self.__get_sheets(app_id, timeout))
         except Exception:
-            logging.getLogger().warning("error on get_sheets:", exc_info=True)
+            logging.warning("error on get_sheets:", exc_info=True)
             return []
 
     async def __get_sheets(self, app_id, timeout):
