@@ -2,14 +2,14 @@
 #
 # Copyright 2020 Google LLC
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -48,8 +48,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_type = constants.USER_SPECIFIED_TYPE_APP
 
         entry.display_name = self._format_display_name(
-            app_metadata.get("name"))
-        entry.description = app_metadata.get("description")
+            app_metadata.get('name'))
+        entry.description = app_metadata.get('description')
 
         entry.linked_resource = f'{self.__site_url}' \
                                 f'/sense/app/{app_metadata.get("id")}'
@@ -89,8 +89,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             constants.USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION
 
         entry.display_name = self._format_display_name(
-            custom_property_def_metadata.get("name"))
-        entry.description = custom_property_def_metadata.get("description")
+            custom_property_def_metadata.get('name'))
+        entry.description = custom_property_def_metadata.get('description')
 
         # The linked_resource field is not fulfilled because there is no way to
         # jump directly to an 'edit' page in the QlikView Management Console
@@ -119,6 +119,36 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         return generated_id, entry
 
+    def make_entry_for_dimension(self, dimension_metadata):
+        entry = datacatalog.Entry()
+
+        app_metadata = dimension_metadata.get('app')
+
+        # The Dimension ID is usually a 7 letters string, so the App ID is
+        # prepended to prevent overlaping.
+        generated_id = self.__format_id(
+            constants.ENTRY_ID_PART_DIMENSION, f'{app_metadata.get("id")}'
+            f'_{dimension_metadata.get("qInfo").get("qId")}')
+        entry.name = datacatalog.DataCatalogClient.entry_path(
+            self.__project_id, self.__location_id, self.__entry_group_id,
+            generated_id)
+
+        entry.user_specified_system = self.__user_specified_system
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_DIMENSION
+
+        q_meta_def = dimension_metadata.get('qMetaDef')
+
+        entry.display_name = self._format_display_name(q_meta_def.get('title'))
+        entry.description = q_meta_def.get('description')
+
+        # The linked_resource field is not fulfilled because there is no way to
+        # jump directly to a Dimension 'edit' page in Qlik Sense.
+
+        # The create_time and update_time fields are not fulfilled because
+        # there is no such info in the Dimension properties.
+
+        return generated_id, entry
+
     def make_entry_for_sheet(self, sheet_metadata):
         entry = datacatalog.Entry()
 
@@ -133,8 +163,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_type = constants.USER_SPECIFIED_TYPE_SHEET
 
         q_meta = sheet_metadata.get('qMeta')
-        entry.display_name = self._format_display_name(q_meta.get("title"))
-        entry.description = q_meta.get("description")
+        entry.display_name = self._format_display_name(q_meta.get('title'))
+        entry.description = q_meta.get('description')
 
         entry.linked_resource = f'{self.__site_url}' \
                                 f'/sense/app/' \
@@ -170,7 +200,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.user_specified_type = constants.USER_SPECIFIED_TYPE_STREAM
 
         entry.display_name = self._format_display_name(
-            stream_metadata.get("name"))
+            stream_metadata.get('name'))
 
         entry.linked_resource = f'{self.__site_url}' \
                                 f'/hub/stream/{stream_metadata.get("id")}'

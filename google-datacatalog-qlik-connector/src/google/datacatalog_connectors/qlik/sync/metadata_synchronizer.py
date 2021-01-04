@@ -63,7 +63,8 @@ class MetadataSynchronizer:
         custom_property_defs = self.__scrape_custom_property_definitions()
 
         logging.info('')
-        logging.info('Objects to be scraped: Streams, Apps, and Sheets')
+        logging.info('Objects to be scraped:'
+                     ' Streams, Apps, Master Items, and Sheets')
         streams = self.__scrape_streams()
         logging.info('==== DONE ========================================')
 
@@ -122,15 +123,34 @@ class MetadataSynchronizer:
         published_apps = [app for app in all_apps if app.get('published')]
 
         for app in published_apps:
-            # The 'sheets' field is not available in the scrape apps API
-            # response, so it is injected into the returned metadata object to
-            # turn further processing more efficient.
+            # The below fields are not available in the scrape apps API
+            # response, so they are injected into the returned metadata object
+            # to turn further processing more efficient.
+            app['dimensions'] = self.__scrape_dimensions(app)
             app['sheets'] = self.__scrape_published_sheets(app)
 
         self.__assemble_streams_metadata_from_flat_lists(
             all_streams, published_apps)
 
         return all_streams
+
+    def __scrape_dimensions(self, app):
+        """Scrape metadata from the Dimensions the current user has access to
+        within the given App.
+
+        :return: A ``list`` of dimension metadata.
+        """
+        dimensions = self.__metadata_scraper.scrape_dimensions(app)
+        # The 'app' field is not available in the scrape dimensions API
+        # response, so it is injected into the returned metadata object to turn
+        # further processing more efficient.
+        for dimension in dimensions:
+            dimension['app'] = {
+                'id': app.get('id'),
+                'name': app.get('name'),
+            }
+
+        return dimensions
 
     def __scrape_published_sheets(self, app):
         """Scrape metadata from all the published Sheets the current user has
@@ -189,6 +209,9 @@ class MetadataSynchronizer:
             templates_dict,
             self.__tag_template_factory.
             make_tag_template_for_custom_property_definition())
+        self.__add_template_to_dict(
+            templates_dict,
+            self.__tag_template_factory.make_tag_template_for_dimension())
         self.__add_template_to_dict(
             templates_dict,
             self.__tag_template_factory.make_tag_template_for_sheet())

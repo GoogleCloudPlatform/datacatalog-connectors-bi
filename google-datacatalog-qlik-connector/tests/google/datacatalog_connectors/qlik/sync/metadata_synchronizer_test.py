@@ -205,6 +205,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
         scraper.scrape_sheets.return_value = []
+        scraper.scrape_dimensions.return_value = []
 
         self.__synchronizer.run()
 
@@ -218,6 +219,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                     'id': 'test_stream'
                 },
                 'sheets': [],
+                'dimensions': [],
             }]
         }
 
@@ -267,6 +269,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_sheets.return_value = [
             self.__make_fake_published_sheet()
         ]
+        scraper.scrape_dimensions.return_value = []
 
         self.__synchronizer.run()
 
@@ -274,10 +277,8 @@ class MetadataSynchronizerTest(unittest.TestCase):
             'id':
                 'test_stream',
             'apps': [{
-                'id':
-                    'test_app',
-                'published':
-                    True,
+                'id': 'test_app',
+                'published': True,
                 'stream': {
                     'id': 'test_stream'
                 },
@@ -293,6 +294,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                         'name': None
                     },
                 }],
+                'dimensions': [],
             }]
         }
 
@@ -313,6 +315,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
         scraper.scrape_sheets.return_value = [self.__make_fake_wip_sheet()]
+        scraper.scrape_dimensions.return_value = []
 
         self.__synchronizer.run()
 
@@ -326,6 +329,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                     'id': 'test_stream'
                 },
                 'sheets': [],
+                'dimensions': [],
             }]
         }
 

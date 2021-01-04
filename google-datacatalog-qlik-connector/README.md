@@ -5,6 +5,7 @@ currently supporting below asset types:
 - Custom Property Definition
 - Stream
 - App (only the published ones)
+- Master Items: Dimension  
 - Sheet (only the published ones)
 
 **Disclaimer: This is not an officially supported Google product.**
