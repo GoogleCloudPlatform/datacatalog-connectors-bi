@@ -46,8 +46,11 @@ class EngineAPIDimensionsHelperTest(unittest.TestCase):
         self.assertEqual(0, len(dimensions))
 
     # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
-    # mocked in test case in order to simulate an end-to-end scenario with
-    # responses that represent an App with Dimensions.
+    # mocked in this test case in order to simulate a full produce/consume
+    # scenario with responses that represent an App with Dimensions. Maybe it's
+    # worth refactoring it in the future to mock that method, and the private
+    # async ones from EngineAPIDimensionsHelper as well, thus testing in a more
+    # granular way.
     @mock.patch(f'{__BASE_CLASS}._generate_request_id')
     @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
@@ -109,8 +112,11 @@ class EngineAPIDimensionsHelperTest(unittest.TestCase):
         mock_send_get_all_infos.assert_called_once()
 
     # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
-    # mocked in test case in order to simulate an end-to-end scenario with
-    # responses that represent an App with no Dimensions.
+    # mocked in this test case in order to simulate a full produce/consume
+    # scenario with responses that represent an App with no Dimensions. Maybe
+    # it's worth refactoring it in the future to mock that method, and the
+    # private async ones from EngineAPIDimensionsHelper as well, thus testing
+    # in a more granular way.
     @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
