@@ -20,6 +20,7 @@ ENTRY_ID_MAX_LENGTH = 64
 # ENTRY_ID_PREFIX when generating Qlik Entry IDs.
 ENTRY_ID_PART_APP = 'app_'
 ENTRY_ID_PART_CUSTOM_PROPERTY_DEFINITION = 'cpd_'
+ENTRY_ID_PART_DIMENSION = 'dim_'
 ENTRY_ID_PART_SHEET = 'sht_'
 ENTRY_ID_PART_STREAM = 'str_'
 # This is the common prefix for all Qlik Entries.
@@ -37,6 +38,9 @@ TAG_TEMPLATE_ID_APP = 'qlik_app_metadata'
 # Custom Property Definition related Entries.
 TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION = \
     'qlik_custom_property_definition_metadata'
+# The ID of the Tag Template created to store additional metadata for the
+# Dimension-related Entries.
+TAG_TEMPLATE_ID_DIMENSION = 'qlik_dimension_metadata'
 # Prefix for IDs of the Tag Templates created to tag Entries with their
 # Custom Properties.
 TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY = 'qlik_cp__'
@@ -51,7 +55,18 @@ TAG_TEMPLATE_ID_STREAM = 'qlik_stream_metadata'
 USER_SPECIFIED_TYPE_APP = 'app'
 # The user specified type of the Custom Property Definition related Entries.
 USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION = 'custom_property_definition'
+# The user specified type of the Dimension-related Entries.
+USER_SPECIFIED_TYPE_DIMENSION = 'dimension'
 # The user specified type of the Sheet-related Entries.
 USER_SPECIFIED_TYPE_SHEET = 'sheet'
 # The user specified type of the Stream-related Entries.
 USER_SPECIFIED_TYPE_STREAM = 'stream'
+
+# The value of the Tag Field that represents a 'Drill down' Dimension.
+DIMENSION_GROUPING_DRILL_DOWN_TAG_FIELD = 'Drill down'
+# The value of the incoming metadata that represents a 'Drill down' Dimension.
+DIMENSION_GROUPING_DRILL_DOWN_QLIK = 'H'
+# The value of the Tag Field that represents a 'Single' Dimension.
+DIMENSION_GROUPING_SINGLE_TAG_FIELD = 'Single'
+# The value of the incoming metadata that represents a 'Single' Dimension.
+DIMENSION_GROUPING_SINGLE_QLIK = 'N'

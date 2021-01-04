@@ -275,6 +275,54 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)
 
+    def test_make_tag_for_dimension_should_set_all_available_fields(self):
+        tag_template = \
+            self.__tag_template_factory.make_tag_template_for_dimension()
+
+        metadata = {
+            'qInfo': {
+                'qId': 'c987-d654',
+            },
+            'qDim': {
+                'qGrouping': 'H',
+                'qFieldDefs': [
+                    'FIELD_1',
+                    'FIELD_2',
+                ],
+                'qFieldLabels': [
+                    'Field 1',
+                    'Field 2',
+                ],
+            },
+            'qMetaDef': {
+                'tags': [
+                    'tag 1',
+                    'tag 2',
+                ],
+            },
+            'app': {
+                'id': 'a123-b456',
+                'name': 'Test app',
+            },
+        }
+
+        tag = self.__factory.make_tag_for_dimension(tag_template, metadata)
+
+        self.assertEqual('c987-d654', tag.fields['id'].string_value)
+
+        self.assertEqual('Drill down',
+                         tag.fields['grouping'].enum_value.display_name)
+        self.assertEqual('FIELD_1, FIELD_2', tag.fields['fields'].string_value)
+        self.assertEqual('Field 1, Field 2',
+                         tag.fields['field_labels'].string_value)
+        self.assertEqual('tag 1, tag 2', tag.fields['tags'].string_value)
+
+        self.assertEqual('a123-b456', tag.fields['app_id'].string_value)
+        self.assertEqual('Test app', tag.fields['app_name'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
+
     def test_make_tag_for_sheet_should_set_all_available_fields(self):
         tag_template = \
             self.__tag_template_factory.make_tag_template_for_sheet()

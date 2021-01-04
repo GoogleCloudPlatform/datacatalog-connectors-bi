@@ -99,6 +99,11 @@ class AssembledEntryFactory:
             assembled_entries.append(
                 self.__make_assembled_entry_for_app(app_metadata,
                                                     tag_templates_dict))
+
+            assembled_entries.extend(
+                self.__make_assembled_entries_for_dimensions(
+                    app_metadata.get('dimensions'), tag_templates_dict))
+
             assembled_entries.extend(
                 self.__make_assembled_entries_for_sheets(
                     app_metadata.get('sheets'), tag_templates_dict))
@@ -121,6 +126,33 @@ class AssembledEntryFactory:
         tags.extend(
             self.__datacatalog_tag_factory.make_tags_for_custom_properties(
                 tag_templates_dict, app_metadata.get('customProperties')))
+
+        return prepare.AssembledEntryData(entry_id, entry, tags)
+
+    def __make_assembled_entries_for_dimensions(self, dimensions_metadata,
+                                                tag_templates_dict):
+
+        return [
+            self.__make_assembled_entry_for_dimension(dimension_metadata,
+                                                      tag_templates_dict)
+            for dimension_metadata in dimensions_metadata
+        ] if dimensions_metadata else []
+
+    def __make_assembled_entry_for_dimension(self, dimension_metadata,
+                                             tag_templates_dict):
+
+        entry_id, entry = \
+            self.__datacatalog_entry_factory.make_entry_for_dimension(
+                dimension_metadata)
+
+        tag_template = tag_templates_dict.get(
+            constants.TAG_TEMPLATE_ID_DIMENSION)
+
+        tags = []
+        if tag_template:
+            tags.append(
+                self.__datacatalog_tag_factory.make_tag_for_dimension(
+                    tag_template, dimension_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
 

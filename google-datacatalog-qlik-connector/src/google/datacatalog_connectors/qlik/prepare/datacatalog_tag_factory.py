@@ -20,11 +20,17 @@ from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare
 
 from google.datacatalog_connectors.qlik.prepare import \
-    dynamic_properties_helper as dph
+    constants, dynamic_properties_helper as dph
 
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+    __QLIK_TO_DC_DIM_MAPPING = {
+        constants.DIMENSION_GROUPING_SINGLE_QLIK:
+            constants.DIMENSION_GROUPING_SINGLE_TAG_FIELD,
+        constants.DIMENSION_GROUPING_DRILL_DOWN_QLIK:
+            constants.DIMENSION_GROUPING_DRILL_DOWN_TAG_FIELD,
+    }
 
     def __init__(self, site_url):
         self.__site_url = site_url
@@ -192,6 +198,35 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         return tag
 
+    def make_tag_for_dimension(self, tag_template, dimension_metadata):
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id',
+                               dimension_metadata.get('qInfo').get('qId'))
+
+        q_dim = dimension_metadata.get('qDim')
+        grouping = self.__QLIK_TO_DC_DIM_MAPPING.get(q_dim.get('qGrouping'))
+        self.__set_enum_field(tag, 'grouping', grouping)
+
+        self._set_string_field(tag, 'fields',
+                               ', '.join(q_dim.get('qFieldDefs')))
+        self._set_string_field(tag, 'field_labels',
+                               ', '.join(q_dim.get('qFieldLabels')))
+
+        q_meta_def = dimension_metadata.get('qMetaDef')
+        self._set_string_field(tag, 'tags', ', '.join(q_meta_def.get('tags')))
+
+        app_metadata = dimension_metadata.get('app')
+        if app_metadata:
+            self._set_string_field(tag, 'app_id', app_metadata.get('id'))
+            self._set_string_field(tag, 'app_name', app_metadata.get('name'))
+
+        self._set_string_field(tag, 'site_url', self.__site_url)
+
+        return tag
+
     def make_tag_for_sheet(self, tag_template, sheet_metadata):
         tag = datacatalog.Tag()
 
@@ -279,3 +314,10 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
                 return human_readable_space
             size_val = size_val / 1024.0
         return f'{round(size_val, 2)} TB'
+
+    @classmethod
+    def __set_enum_field(cls, tag, field_id, value):
+        if value is not None:
+            enum_field = datacatalog.TagField()
+            enum_field.enum_value.display_name = value
+            tag.fields[field_id] = enum_field
