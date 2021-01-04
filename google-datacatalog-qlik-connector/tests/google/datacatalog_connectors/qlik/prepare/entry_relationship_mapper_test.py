@@ -76,12 +76,35 @@ class EntryRelationshipMapperTest(unittest.TestCase):
             'fake_entries/test_stream',
             app_tag.fields['stream_entry'].string_value)
 
+    def test_fulfill_tag_fields_should_resolve_dimension_app_mapping(self):
+        app_id = 'test_app'
+        app_entry = self.__make_fake_entry(app_id, 'app')
+        app_tag = self.__make_fake_tag(string_fields=(('id', app_id),))
+
+        dimension_id = 'test_dimension'
+        dimension_entry = self.__make_fake_entry(dimension_id, 'dimension')
+        string_fields = ('id', dimension_id), ('app_id', app_id)
+        dimension_tag = self.__make_fake_tag(string_fields=string_fields)
+
+        app_assembled_entry = commons_prepare.AssembledEntryData(
+            app_id, app_entry, [app_tag])
+        sheet_assembled_entry = commons_prepare.AssembledEntryData(
+            dimension_id, dimension_entry, [dimension_tag])
+
+        prepare.EntryRelationshipMapper().fulfill_tag_fields(
+            [app_assembled_entry, sheet_assembled_entry])
+
+        self.assertEqual(
+            'https://console.cloud.google.com/datacatalog/'
+            'fake_entries/test_app',
+            dimension_tag.fields['app_entry'].string_value)
+
     def test_fulfill_tag_fields_should_resolve_sheet_app_mapping(self):
         app_id = 'test_app'
         app_entry = self.__make_fake_entry(app_id, 'app')
         app_tag = self.__make_fake_tag(string_fields=(('id', app_id),))
 
-        sheet_id = 'test_app'
+        sheet_id = 'test_sheet'
         sheet_entry = self.__make_fake_entry(sheet_id, 'sheet')
         string_fields = ('id', sheet_id), ('app_id', app_id)
         sheet_tag = self.__make_fake_tag(string_fields=string_fields)
