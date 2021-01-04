@@ -137,6 +137,38 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             updated_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+    def test_make_entry_for_dimension_should_set_all_available_fields(self):
+        metadata = {
+            'qInfo': {
+                'qId': 'a123-b456',
+            },
+            'qMetaDef': {
+                'title': 'Test dimension',
+                'description': 'Description of the Test dimension',
+            },
+            'app': {
+                'id': 'app-id'
+            },
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_dimension(metadata)
+
+        self.assertEqual('qlik_dim_app_id_a123_b456', entry_id)
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'entryGroups/test-entry-group/entries/'
+            'qlik_dim_app_id_a123_b456', entry.name)
+        self.assertEqual('test-system', entry.user_specified_system)
+        self.assertEqual('dimension', entry.user_specified_type)
+        self.assertEqual('Test dimension', entry.display_name)
+        self.assertEqual('Description of the Test dimension',
+                         entry.description)
+
+        self.assertEqual('', entry.linked_resource)
+        self.assertIsNone(entry.source_system_timestamps.create_time)
+        self.assertIsNone(entry.source_system_timestamps.update_time)
+
     def test_make_entry_for_sheet_should_set_all_available_fields(self):
         metadata = {
             'qInfo': {
