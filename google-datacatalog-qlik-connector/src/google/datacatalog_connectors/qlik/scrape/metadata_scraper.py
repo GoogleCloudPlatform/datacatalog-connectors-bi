@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -82,6 +82,21 @@ class MetadataScraper:
                          dimension.get('qInfo').get('qId'))
 
         return dimensions
+
+    def scrape_measures(self, app_metadata):
+        self.__log_scrape_start(
+            'Scraping Measures (Master Items) from the'
+            ' "%s" App...', app_metadata.get('name'))
+        measures = self.__engine_api_scraper.get_measures(
+            app_metadata.get('id')) or []
+
+        logging.info('  %s Measures found:', len(measures))
+        for measure in measures:
+            q_meta_def = measure.get('qMetaDef')
+            logging.info('    - %s [%s]', q_meta_def.get('title'),
+                         measure.get('qInfo').get('qId'))
+
+        return measures
 
     def scrape_sheets(self, app_metadata):
         self.__log_scrape_start('Scraping Sheets from the "%s" App...',

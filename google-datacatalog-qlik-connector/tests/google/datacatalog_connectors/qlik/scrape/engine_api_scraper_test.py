@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,6 +62,13 @@ class EngineAPIScraperTest(unittest.TestCase):
             self, mock_set_up_cookie):
 
         self.__scraper.get_dimensions('app-id')
+        mock_set_up_cookie.assert_called_once()
+
+    @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
+    def test_get_measures_should_authenticate_user_beforehand(
+            self, mock_set_up_cookie):
+
+        self.__scraper.get_measures('app-id')
         mock_set_up_cookie.assert_called_once()
 
     @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
