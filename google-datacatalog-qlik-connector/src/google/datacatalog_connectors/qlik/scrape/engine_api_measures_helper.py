@@ -35,7 +35,7 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
             return self._run_until_complete(
                 self.__get_measures(app_id, timeout))
         except Exception:
-            logging.warning("error on get_measure:", exc_info=True)
+            logging.warning("error on get_measures:", exc_info=True)
             return []
 
     async def __get_measures(self, app_id, timeout):
