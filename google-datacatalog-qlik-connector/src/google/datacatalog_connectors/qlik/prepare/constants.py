@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ ENTRY_ID_MAX_LENGTH = 64
 ENTRY_ID_PART_APP = 'app_'
 ENTRY_ID_PART_CUSTOM_PROPERTY_DEFINITION = 'cpd_'
 ENTRY_ID_PART_DIMENSION = 'dim_'
+ENTRY_ID_PART_MEASURE = 'msr_'
 ENTRY_ID_PART_SHEET = 'sht_'
 ENTRY_ID_PART_STREAM = 'str_'
 # This is the common prefix for all Qlik Entries.
@@ -38,12 +39,15 @@ TAG_TEMPLATE_ID_APP = 'qlik_app_metadata'
 # Custom Property Definition related Entries.
 TAG_TEMPLATE_ID_CUSTOM_PROPERTY_DEFINITION = \
     'qlik_custom_property_definition_metadata'
-# The ID of the Tag Template created to store additional metadata for the
-# Dimension-related Entries.
-TAG_TEMPLATE_ID_DIMENSION = 'qlik_dimension_metadata'
 # Prefix for IDs of the Tag Templates created to tag Entries with their
 # Custom Properties.
 TAG_TEMPLATE_ID_PREFIX_CUSTOM_PROPERTY = 'qlik_cp__'
+# The ID of the Tag Template created to store additional metadata for the
+# Dimension-related Entries.
+TAG_TEMPLATE_ID_DIMENSION = 'qlik_dimension_metadata'
+# The ID of the Tag Template created to store additional metadata for the
+# Measure-related Entries.
+TAG_TEMPLATE_ID_MEASURE = 'qlik_measure_metadata'
 # The ID of the Tag Template created to store additional metadata for the
 # Sheet-related Entries.
 TAG_TEMPLATE_ID_SHEET = 'qlik_sheet_metadata'
@@ -57,6 +61,8 @@ USER_SPECIFIED_TYPE_APP = 'app'
 USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION = 'custom_property_definition'
 # The user specified type of the Dimension-related Entries.
 USER_SPECIFIED_TYPE_DIMENSION = 'dimension'
+# The user specified type of the Measure-related Entries.
+USER_SPECIFIED_TYPE_MEASURE = 'measure'
 # The user specified type of the Sheet-related Entries.
 USER_SPECIFIED_TYPE_SHEET = 'sheet'
 # The user specified type of the Stream-related Entries.

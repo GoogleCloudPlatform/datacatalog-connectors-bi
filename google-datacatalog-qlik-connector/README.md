@@ -6,6 +6,7 @@ currently supporting below asset types:
 - Stream
 - App (only the published ones)
 - Master Items: Dimension  
+- Master Items: Measure  
 - Sheet (only the published ones)
 
 **Disclaimer: This is not an officially supported Google product.**

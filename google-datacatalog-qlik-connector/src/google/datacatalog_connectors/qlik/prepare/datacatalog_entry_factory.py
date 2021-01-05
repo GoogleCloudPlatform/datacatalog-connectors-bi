@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -145,7 +145,37 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         # jump directly to a Dimension 'edit' page in Qlik Sense.
 
         # The create_time and update_time fields are not fulfilled because
-        # there is no such info in the Dimension properties.
+        # there is no such info in the Dimension metadata.
+
+        return generated_id, entry
+
+    def make_entry_for_measure(self, measure_metadata):
+        entry = datacatalog.Entry()
+
+        app_metadata = measure_metadata.get('app')
+
+        # The Measure ID is usually a 7 letters string, so the App ID is
+        # prepended to prevent overlaping.
+        generated_id = self.__format_id(
+            constants.ENTRY_ID_PART_MEASURE, f'{app_metadata.get("id")}'
+            f'_{measure_metadata.get("qInfo").get("qId")}')
+        entry.name = datacatalog.DataCatalogClient.entry_path(
+            self.__project_id, self.__location_id, self.__entry_group_id,
+            generated_id)
+
+        entry.user_specified_system = self.__user_specified_system
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_MEASURE
+
+        q_meta_def = measure_metadata.get('qMetaDef')
+
+        entry.display_name = self._format_display_name(q_meta_def.get('title'))
+        entry.description = q_meta_def.get('description')
+
+        # The linked_resource field is not fulfilled because there is no way to
+        # jump directly to a Measure 'edit' page in Qlik Sense.
+
+        # The create_time and update_time fields are not fulfilled because
+        # there is no such info in the Measure metadata.
 
         return generated_id, entry
 

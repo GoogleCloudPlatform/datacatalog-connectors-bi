@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,16 +88,39 @@ class EntryRelationshipMapperTest(unittest.TestCase):
 
         app_assembled_entry = commons_prepare.AssembledEntryData(
             app_id, app_entry, [app_tag])
-        sheet_assembled_entry = commons_prepare.AssembledEntryData(
+        dimension_assembled_entry = commons_prepare.AssembledEntryData(
             dimension_id, dimension_entry, [dimension_tag])
 
         prepare.EntryRelationshipMapper().fulfill_tag_fields(
-            [app_assembled_entry, sheet_assembled_entry])
+            [app_assembled_entry, dimension_assembled_entry])
 
         self.assertEqual(
             'https://console.cloud.google.com/datacatalog/'
             'fake_entries/test_app',
             dimension_tag.fields['app_entry'].string_value)
+
+    def test_fulfill_tag_fields_should_resolve_measure_app_mapping(self):
+        app_id = 'test_app'
+        app_entry = self.__make_fake_entry(app_id, 'app')
+        app_tag = self.__make_fake_tag(string_fields=(('id', app_id),))
+
+        measure_id = 'test_measure'
+        measure_entry = self.__make_fake_entry(measure_id, 'measure')
+        string_fields = ('id', measure_id), ('app_id', app_id)
+        measure_tag = self.__make_fake_tag(string_fields=string_fields)
+
+        app_assembled_entry = commons_prepare.AssembledEntryData(
+            app_id, app_entry, [app_tag])
+        measure_assembled_entry = commons_prepare.AssembledEntryData(
+            measure_id, measure_entry, [measure_tag])
+
+        prepare.EntryRelationshipMapper().fulfill_tag_fields(
+            [app_assembled_entry, measure_assembled_entry])
+
+        self.assertEqual(
+            'https://console.cloud.google.com/datacatalog/'
+            'fake_entries/test_app',
+            measure_tag.fields['app_entry'].string_value)
 
     def test_fulfill_tag_fields_should_resolve_sheet_app_mapping(self):
         app_id = 'test_app'
