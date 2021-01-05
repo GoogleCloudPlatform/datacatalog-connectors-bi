@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -315,6 +315,47 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('FIELD_1, FIELD_2', tag.fields['fields'].string_value)
         self.assertEqual('Field 1, Field 2',
                          tag.fields['field_labels'].string_value)
+        self.assertEqual('tag 1, tag 2', tag.fields['tags'].string_value)
+
+        self.assertEqual('a123-b456', tag.fields['app_id'].string_value)
+        self.assertEqual('Test app', tag.fields['app_name'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)
+
+    def test_make_tag_for_measure_should_set_all_available_fields(self):
+        tag_template = \
+            self.__tag_template_factory.make_tag_template_for_measure()
+
+        metadata = {
+            'qInfo': {
+                'qId': 'c987-d654',
+            },
+            'qMeasure': {
+                'qDef': 'Sum(TEST_FIELD)',
+                'qLabelExpression': 'Test label',
+                'isCustomFormatted': True,
+            },
+            'qMetaDef': {
+                'tags': [
+                    'tag 1',
+                    'tag 2',
+                ],
+            },
+            'app': {
+                'id': 'a123-b456',
+                'name': 'Test app',
+            },
+        }
+
+        tag = self.__factory.make_tag_for_measure(tag_template, metadata)
+
+        self.assertEqual('c987-d654', tag.fields['id'].string_value)
+
+        self.assertEqual('Sum(TEST_FIELD)',
+                         tag.fields['expression'].string_value)
+        self.assertEqual('Test label',
+                         tag.fields['label_expression'].string_value)
         self.assertEqual('tag 1, tag 2', tag.fields['tags'].string_value)
 
         self.assertEqual('a123-b456', tag.fields['app_id'].string_value)

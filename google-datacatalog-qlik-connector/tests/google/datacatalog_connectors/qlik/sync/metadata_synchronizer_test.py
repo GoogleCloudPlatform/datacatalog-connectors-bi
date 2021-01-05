@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,18 +88,18 @@ class MetadataSynchronizerTest(unittest.TestCase):
             '_MetadataSynchronizer__assembled_entry_factory']
 
         scraper.scrape_all_custom_property_definitions.return_value = [{
-            'id': 'test_def',
+            'id': 'test-def',
         }]
         assembled_entry_factory.make_assembled_entry_for_custom_property_def\
             .return_value = prepare.AssembledEntryData(
-                'test_def',
+                'test-def',
                 self.__make_fake_entry('custom_property_definition'),
                 [])
 
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
-            'id': 'test_def',
+            'id': 'test-def',
         }
 
         actual_call_args = assembled_entry_factory\
@@ -134,7 +134,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper = attrs['_MetadataSynchronizer__metadata_scraper']
 
         scraper.scrape_all_custom_property_definitions.return_value = [{
-            'id': 'test_def',
+            'id': 'test-def',
             'choiceValues': ['Value 1']
         }]
 
@@ -156,12 +156,12 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         assembled_entry_factory.make_assembled_entries_for_stream\
             .return_value = [prepare.AssembledEntryData(
-                'test_stream', self.__make_fake_entry('stream'), [])]
+                'test-stream', self.__make_fake_entry('stream'), [])]
 
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
-            'id': 'test_stream',
+            'id': 'test-stream',
         }
 
         actual_call_args = assembled_entry_factory\
@@ -198,7 +198,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                                         '/tagTemplates/qlik_stream_metadata')
         assembled_entry_factory.make_assembled_entries_for_stream\
             .return_value = [prepare.AssembledEntryData(
-                'test_stream', fake_entry, [fake_tag])]
+                'test-stream', fake_entry, [fake_tag])]
 
         self.__synchronizer.run()
 
@@ -224,22 +224,24 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
-        scraper.scrape_sheets.return_value = []
         scraper.scrape_dimensions.return_value = []
+        scraper.scrape_measures.return_value = []
+        scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
             'id':
-                'test_stream',
+                'test-stream',
             'apps': [{
-                'id': 'test_app',
+                'id': 'test-app',
                 'published': True,
                 'stream': {
-                    'id': 'test_stream'
+                    'id': 'test-stream'
                 },
-                'sheets': [],
                 'dimensions': [],
+                'measures': [],
+                'sheets': [],
             }]
         }
 
@@ -265,13 +267,13 @@ class MetadataSynchronizerTest(unittest.TestCase):
         assembled_entry_factory.make_assembled_entries_for_stream\
             .return_value = [
                 prepare.AssembledEntryData(
-                    'test_stream', self.__make_fake_entry('stream'), [])
+                    'test-stream', self.__make_fake_entry('stream'), [])
             ]
 
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
-            'id': 'test_stream',
+            'id': 'test-stream',
         }
 
         actual_call_args = assembled_entry_factory\
@@ -294,34 +296,85 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
-        scraper.scrape_sheets.return_value = []
         scraper.scrape_dimensions.return_value = [self.__make_fake_dimension()]
+        scraper.scrape_measures.return_value = []
+        scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
             'id':
-                'test_stream',
+                'test-stream',
             'apps': [{
-                'id':
-                    'test_app',
-                'published':
-                    True,
+                'id': 'test-app',
+                'published': True,
                 'stream': {
-                    'id': 'test_stream'
+                    'id': 'test-stream'
                 },
-                'sheets': [],
                 'dimensions': [{
                     'qInfo': {
-                        'qId': 'test_dimension',
+                        'qId': 'test-dimension',
                     },
                     'qDim': {},
                     'qMetaDef': {},
                     'app': {
-                        'id': 'test_app',
+                        'id': 'test-app',
                         'name': None
                     },
                 }],
+                'measures': [],
+                'sheets': [],
+            }]
+        }
+
+        actual_call_args = assembled_entry_factory\
+            .make_assembled_entries_for_stream.call_args[0]
+        self.assertEqual(expected_make_assembled_entries_call_arg,
+                         actual_call_args[0])
+
+    @mock.patch(f'{__SYNCR_MODULE}.ingest.DataCatalogMetadataIngestor',
+                lambda *args: mock.MagicMock())
+    @mock.patch(f'{__SYNCR_MODULE}.cleanup.DataCatalogMetadataCleaner',
+                lambda *args: mock.MagicMock())
+    @mock.patch(f'{__SYNCR_MODULE}.prepare.EntryRelationshipMapper',
+                lambda *args: mock.MagicMock())
+    def test_run_measure_should_properly_ask_assembled_entries(self):
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
+            '_MetadataSynchronizer__assembled_entry_factory']
+
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_apps.return_value = \
+            [self.__make_fake_published_app()]
+        scraper.scrape_dimensions.return_value = []
+        scraper.scrape_measures.return_value = [self.__make_fake_measure()]
+        scraper.scrape_sheets.return_value = []
+
+        self.__synchronizer.run()
+
+        expected_make_assembled_entries_call_arg = {
+            'id':
+                'test-stream',
+            'apps': [{
+                'id': 'test-app',
+                'published': True,
+                'stream': {
+                    'id': 'test-stream'
+                },
+                'dimensions': [],
+                'measures': [{
+                    'qInfo': {
+                        'qId': 'test-measure',
+                    },
+                    'qMeasure': {},
+                    'qMetaDef': {},
+                    'app': {
+                        'id': 'test-app',
+                        'name': None
+                    },
+                }],
+                'sheets': [],
             }]
         }
 
@@ -345,35 +398,39 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
+        scraper.scrape_dimensions.return_value = []
+        scraper.scrape_measures.return_value = []
         scraper.scrape_sheets.return_value = [
             self.__make_fake_published_sheet()
         ]
-        scraper.scrape_dimensions.return_value = []
 
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
             'id':
-                'test_stream',
+                'test-stream',
             'apps': [{
-                'id': 'test_app',
-                'published': True,
+                'id':
+                    'test-app',
+                'published':
+                    True,
                 'stream': {
-                    'id': 'test_stream'
+                    'id': 'test-stream'
                 },
+                'dimensions': [],
+                'measures': [],
                 'sheets': [{
                     'qInfo': {
-                        'qId': 'test_sheet',
+                        'qId': 'test-sheet',
                     },
                     'qMeta': {
                         'published': True,
                     },
                     'app': {
-                        'id': 'test_app',
+                        'id': 'test-app',
                         'name': None
                     },
                 }],
-                'dimensions': [],
             }]
         }
 
@@ -399,22 +456,24 @@ class MetadataSynchronizerTest(unittest.TestCase):
         scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
         scraper.scrape_all_apps.return_value = \
             [self.__make_fake_published_app()]
-        scraper.scrape_sheets.return_value = [self.__make_fake_wip_sheet()]
         scraper.scrape_dimensions.return_value = []
+        scraper.scrape_measures.return_value = []
+        scraper.scrape_sheets.return_value = [self.__make_fake_wip_sheet()]
 
         self.__synchronizer.run()
 
         expected_make_assembled_entries_call_arg = {
             'id':
-                'test_stream',
+                'test-stream',
             'apps': [{
-                'id': 'test_app',
+                'id': 'test-app',
                 'published': True,
                 'stream': {
-                    'id': 'test_stream'
+                    'id': 'test-stream'
                 },
-                'sheets': [],
                 'dimensions': [],
+                'measures': [],
+                'sheets': [],
             }]
         }
 
@@ -426,13 +485,13 @@ class MetadataSynchronizerTest(unittest.TestCase):
     @classmethod
     def __make_fake_stream(cls):
         return {
-            'id': 'test_stream',
+            'id': 'test-stream',
         }
 
     @classmethod
     def __make_fake_published_app(cls):
         return {
-            'id': 'test_app',
+            'id': 'test-app',
             'published': True,
             'stream': cls.__make_fake_stream(),
         }
@@ -440,7 +499,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
     @classmethod
     def __make_fake_wip_app(cls):
         return {
-            'id': 'test_app',
+            'id': 'test-app',
             'published': False,
         }
 
@@ -448,9 +507,19 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def __make_fake_dimension(cls):
         return {
             'qInfo': {
-                'qId': 'test_dimension',
+                'qId': 'test-dimension',
             },
             'qDim': {},
+            'qMetaDef': {},
+        }
+
+    @classmethod
+    def __make_fake_measure(cls):
+        return {
+            'qInfo': {
+                'qId': 'test-measure',
+            },
+            'qMeasure': {},
             'qMetaDef': {},
         }
 
@@ -458,7 +527,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def __make_fake_sheet(cls):
         return {
             'qInfo': {
-                'qId': 'test_sheet',
+                'qId': 'test-sheet',
             },
             'qMeta': {},
         }

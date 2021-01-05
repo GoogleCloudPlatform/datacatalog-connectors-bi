@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from google.datacatalog_connectors.qlik.prepare import \
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
-    __QLIK_TO_DC_DIM_MAPPING = {
+    __QLIK_TO_DC_DIM_GROUPING_MAPPING = {
         constants.DIMENSION_GROUPING_SINGLE_QLIK:
             constants.DIMENSION_GROUPING_SINGLE_TAG_FIELD,
         constants.DIMENSION_GROUPING_DRILL_DOWN_QLIK:
@@ -207,7 +207,8 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
                                dimension_metadata.get('qInfo').get('qId'))
 
         q_dim = dimension_metadata.get('qDim')
-        grouping = self.__QLIK_TO_DC_DIM_MAPPING.get(q_dim.get('qGrouping'))
+        grouping = self.__QLIK_TO_DC_DIM_GROUPING_MAPPING.get(
+            q_dim.get('qGrouping'))
         self.__set_enum_field(tag, 'grouping', grouping)
 
         self._set_string_field(tag, 'fields',
@@ -219,6 +220,34 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'tags', ', '.join(q_meta_def.get('tags')))
 
         app_metadata = dimension_metadata.get('app')
+        if app_metadata:
+            self._set_string_field(tag, 'app_id', app_metadata.get('id'))
+            self._set_string_field(tag, 'app_name', app_metadata.get('name'))
+
+        self._set_string_field(tag, 'site_url', self.__site_url)
+
+        return tag
+
+    def make_tag_for_measure(self, tag_template, measure_metadata):
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id',
+                               measure_metadata.get('qInfo').get('qId'))
+
+        q_measure = measure_metadata.get('qMeasure')
+
+        self._set_string_field(tag, 'expression', q_measure.get('qDef'))
+        self._set_string_field(tag, 'label_expression',
+                               q_measure.get('qLabelExpression'))
+        self._set_bool_field(tag, 'is_custom_formatted',
+                             q_measure.get('isCustomFormatted'))
+
+        q_meta_def = measure_metadata.get('qMetaDef')
+        self._set_string_field(tag, 'tags', ', '.join(q_meta_def.get('tags')))
+
+        app_metadata = measure_metadata.get('app')
         if app_metadata:
             self._set_string_field(tag, 'app_id', app_metadata.get('id'))
             self._set_string_field(tag, 'app_name', app_metadata.get('name'))

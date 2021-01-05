@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -211,6 +211,47 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         self._add_primitive_type_field(tag_template, 'field_labels',
                                        self.__STRING_TYPE, 'Field labels')
+
+        self._add_primitive_type_field(tag_template, 'tags',
+                                       self.__STRING_TYPE, 'Qlik Tags')
+
+        self._add_primitive_type_field(tag_template, 'app_id',
+                                       self.__STRING_TYPE, 'App Id')
+
+        self._add_primitive_type_field(tag_template, 'app_name',
+                                       self.__STRING_TYPE, 'App name')
+
+        self._add_primitive_type_field(tag_template, 'app_entry',
+                                       self.__STRING_TYPE,
+                                       'Data Catalog Entry for the App')
+
+        self._add_primitive_type_field(tag_template, 'site_url',
+                                       self.__STRING_TYPE,
+                                       'Qlik Sense site url')
+
+        return tag_template
+
+    def make_tag_template_for_measure(self):
+        tag_template = datacatalog.TagTemplate()
+
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=constants.TAG_TEMPLATE_ID_MEASURE)
+
+        tag_template.display_name = 'Qlik Measure Metadata'
+
+        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
+                                       'Unique Id')
+
+        self._add_primitive_type_field(tag_template, 'expression',
+                                       self.__STRING_TYPE, 'Expression')
+
+        self._add_primitive_type_field(tag_template, 'label_expression',
+                                       self.__STRING_TYPE, 'Label expression')
+
+        self._add_primitive_type_field(tag_template, 'is_custom_formatted',
+                                       self.__BOOL_TYPE, 'Is custom formatted')
 
         self._add_primitive_type_field(tag_template, 'tags',
                                        self.__STRING_TYPE, 'Qlik Tags')

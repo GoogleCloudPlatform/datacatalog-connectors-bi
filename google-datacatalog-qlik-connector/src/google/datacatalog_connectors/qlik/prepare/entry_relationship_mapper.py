@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
     __CUSTOM_PROPERTY_DEFINITION = \
         constants.USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION
     __DIMENSION = constants.USER_SPECIFIED_TYPE_DIMENSION
+    __MEASURE = constants.USER_SPECIFIED_TYPE_MEASURE
     __SHEET = constants.USER_SPECIFIED_TYPE_SHEET
     __STREAM = constants.USER_SPECIFIED_TYPE_STREAM
 
@@ -31,6 +32,7 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
         resolvers = (
             self.__resolve_app_mappings,
             self.__resolve_dimension_mappings,
+            self.__resolve_measure_mappings,
             self.__resolve_sheet_mappings,
             self.__resolve_stream_mappings,
         )
@@ -58,6 +60,16 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
             if assembled_entry.entry.user_specified_type == cls.__DIMENSION
         ]
         for assembled_entry in dimension_assembled_entries:
+            cls._map_related_entry(assembled_entry, cls.__APP, 'app_id',
+                                   'app_entry', id_name_pairs)
+
+    @classmethod
+    def __resolve_measure_mappings(cls, assembled_entries, id_name_pairs):
+        measure_assembled_entries = [
+            assembled_entry for assembled_entry in assembled_entries
+            if assembled_entry.entry.user_specified_type == cls.__MEASURE
+        ]
+        for assembled_entry in measure_assembled_entries:
             cls._map_related_entry(assembled_entry, cls.__APP, 'app_id',
                                    'app_entry', id_name_pairs)
 

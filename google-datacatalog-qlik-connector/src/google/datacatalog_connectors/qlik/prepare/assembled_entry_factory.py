@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -105,6 +105,10 @@ class AssembledEntryFactory:
                     app_metadata.get('dimensions'), tag_templates_dict))
 
             assembled_entries.extend(
+                self.__make_assembled_entries_for_measures(
+                    app_metadata.get('measures'), tag_templates_dict))
+
+            assembled_entries.extend(
                 self.__make_assembled_entries_for_sheets(
                     app_metadata.get('sheets'), tag_templates_dict))
 
@@ -153,6 +157,33 @@ class AssembledEntryFactory:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_dimension(
                     tag_template, dimension_metadata))
+
+        return prepare.AssembledEntryData(entry_id, entry, tags)
+
+    def __make_assembled_entries_for_measures(self, measures_metadata,
+                                              tag_templates_dict):
+
+        return [
+            self.__make_assembled_entry_for_measure(measure_metadata,
+                                                    tag_templates_dict)
+            for measure_metadata in measures_metadata
+        ] if measures_metadata else []
+
+    def __make_assembled_entry_for_measure(self, measure_metadata,
+                                           tag_templates_dict):
+
+        entry_id, entry = \
+            self.__datacatalog_entry_factory.make_entry_for_measure(
+                measure_metadata)
+
+        tag_template = tag_templates_dict.get(
+            constants.TAG_TEMPLATE_ID_MEASURE)
+
+        tags = []
+        if tag_template:
+            tags.append(
+                self.__datacatalog_tag_factory.make_tag_for_measure(
+                    tag_template, measure_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
 
