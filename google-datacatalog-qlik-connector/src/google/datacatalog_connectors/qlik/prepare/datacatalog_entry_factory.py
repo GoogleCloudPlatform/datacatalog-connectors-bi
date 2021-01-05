@@ -125,7 +125,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         app_metadata = dimension_metadata.get('app')
 
         # The Dimension ID is usually a 7 letters string, so the App ID is
-        # prepended to prevent overlaping.
+        # prepended to prevent overlapping.
         generated_id = self.__format_id(
             constants.ENTRY_ID_PART_DIMENSION, f'{app_metadata.get("id")}'
             f'_{dimension_metadata.get("qInfo").get("qId")}')
@@ -155,7 +155,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         app_metadata = measure_metadata.get('app')
 
         # The Measure ID is usually a 7 letters string, so the App ID is
-        # prepended to prevent overlaping.
+        # prepended to prevent overlapping.
         generated_id = self.__format_id(
             constants.ENTRY_ID_PART_MEASURE, f'{app_metadata.get("id")}'
             f'_{measure_metadata.get("qInfo").get("qId")}')
