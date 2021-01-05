@@ -38,7 +38,7 @@ setuptools.setup(
     },
     include_package_data=True,
     install_requires=(
-        'google-datacatalog-connectors-commons ~= 0.6.5',
+        'google-datacatalog-connectors-commons ~= 0.6.6',
         'jmespath ~= 0.10.0',
         'requests_ntlm ~= 1.1.0',
         'websockets ~= 8.1',

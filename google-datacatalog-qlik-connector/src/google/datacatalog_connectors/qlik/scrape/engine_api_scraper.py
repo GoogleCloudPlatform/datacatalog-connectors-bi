@@ -23,7 +23,7 @@ import websockets
 
 from google.datacatalog_connectors.qlik.scrape import \
     authenticator, constants, engine_api_dimensions_helper, \
-    engine_api_sheets_helper
+    engine_api_measures_helper, engine_api_sheets_helper
 
 
 class EngineAPIScraper:
@@ -64,7 +64,7 @@ class EngineAPIScraper:
         self.__auth_cookie = None
 
     def get_dimensions(self, app_id):
-        """Get the Dimensions (Master Items) set up to a given App.
+        """Gets the Dimensions (Master Items) set up to a given App.
 
         Returns:
             A list of [GenericDimensionProperties](https://help.qlik.com/en-US/sense-developer/September2020/APIs/EngineAPI/definitions-GenericDimensionProperties.html).  # noqa E501
@@ -72,6 +72,16 @@ class EngineAPIScraper:
         self.__set_up_auth_cookie()
         return engine_api_dimensions_helper.EngineAPIDimensionsHelper(
             self.__server_address, self.__auth_cookie).get_dimensions(app_id)
+
+    def get_measures(self, app_id):
+        """Gets the Measures (Master Items) set up to a given App.
+
+        Returns:
+            A list of [GenericMeasureProperties](https://help.qlik.com/en-US/sense-developer/September2020/APIs/EngineAPI/definitions-GenericMeasureProperties.html).  # noqa E501
+        """
+        self.__set_up_auth_cookie()
+        return engine_api_measures_helper.EngineAPIMeasuresHelper(
+            self.__server_address, self.__auth_cookie).get_measures(app_id)
 
     def get_sheets(self, app_id):
         """Gets the Sheets that belong to the given App.

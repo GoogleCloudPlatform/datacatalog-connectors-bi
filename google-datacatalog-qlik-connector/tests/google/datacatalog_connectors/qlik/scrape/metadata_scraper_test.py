@@ -126,6 +126,40 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(0, len(dimensions))
         engine_api_scraper.get_dimensions.assert_called_once()
 
+    def test_scrape_measures_should_return_list_on_success(self):
+        attrs = self.__scraper.__dict__
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
+
+        measures_metadata = [
+            {
+                'qInfo': {
+                    'qId': 'measure-id',
+                },
+                'qMetaDef': {},
+            },
+        ]
+
+        engine_api_scraper.get_measures.return_value = measures_metadata
+
+        measures = self.__scraper.scrape_measures({'id': 'app-id'})
+
+        self.assertEqual(1, len(measures))
+        self.assertEqual('measure-id', measures[0].get('qInfo').get('qId'))
+        engine_api_scraper.get_measures.assert_called_once()
+
+    def test_scrape_measures_should_return_empty_list_on_no_server_response(
+            self):
+
+        attrs = self.__scraper.__dict__
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
+
+        engine_api_scraper.get_measures.return_value = None
+
+        measures = self.__scraper.scrape_measures({'id': 'app-id'})
+
+        self.assertEqual(0, len(measures))
+        engine_api_scraper.get_measures.assert_called_once()
+
     def test_scrape_sheets_should_return_list_on_success(self):
         attrs = self.__scraper.__dict__
         engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
