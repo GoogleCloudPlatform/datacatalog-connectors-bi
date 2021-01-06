@@ -78,6 +78,13 @@ class EngineAPIScraperTest(unittest.TestCase):
         self.__scraper.get_sheets('app-id')
         mock_set_up_cookie.assert_called_once()
 
+    @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
+    def test_get_visualizations_should_authenticate_user_beforehand(
+            self, mock_set_up_cookie):
+
+        self.__scraper.get_visualizations('app-id')
+        mock_set_up_cookie.assert_called_once()
+
     @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
                 f'.get_qps_session_cookie_windows_auth')
     @mock.patch(f'{__SCRAPER_CLASS}'

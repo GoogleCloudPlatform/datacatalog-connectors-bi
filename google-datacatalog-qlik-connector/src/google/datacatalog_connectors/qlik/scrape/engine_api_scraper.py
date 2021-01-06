@@ -23,7 +23,8 @@ import websockets
 
 from google.datacatalog_connectors.qlik.scrape import \
     authenticator, constants, engine_api_dimensions_helper, \
-    engine_api_measures_helper, engine_api_sheets_helper
+    engine_api_measures_helper, engine_api_sheets_helper, \
+    engine_api_visualizations_helper
 
 
 class EngineAPIScraper:
@@ -92,6 +93,17 @@ class EngineAPIScraper:
         self.__set_up_auth_cookie()
         return engine_api_sheets_helper.EngineAPISheetsHelper(
             self.__server_address, self.__auth_cookie).get_sheets(app_id)
+
+    def get_visualizations(self, app_id):
+        """Gets the Visualizations (Master Items) set up to a given App.
+
+        Returns:
+            A list of [GenericObjectProperties](https://help.qlik.com/en-US/sense-developer/September2020/APIs/EngineAPI/definitions-GenericObjectProperties.html).  # noqa E501
+        """
+        self.__set_up_auth_cookie()
+        return engine_api_visualizations_helper.EngineAPIVisualizationsHelper(
+            self.__server_address,
+            self.__auth_cookie).get_visualizations(app_id)
 
     def __set_up_auth_cookie(self):
         if self.__auth_cookie:
