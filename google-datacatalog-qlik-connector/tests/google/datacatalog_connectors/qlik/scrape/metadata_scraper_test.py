@@ -193,3 +193,39 @@ class MetadataScraperTest(unittest.TestCase):
 
         self.assertEqual(0, len(sheets))
         engine_api_scraper.get_sheets.assert_called_once()
+
+    def test_scrape_visualizations_should_return_list_on_success(self):
+        attrs = self.__scraper.__dict__
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
+
+        visualizations_metadata = [
+            {
+                'qInfo': {
+                    'qId': 'visualization-id',
+                },
+                'qMetaDef': {},
+            },
+        ]
+
+        engine_api_scraper.get_visualizations.return_value = \
+            visualizations_metadata
+
+        visualizations = self.__scraper.scrape_visualizations({'id': 'app-id'})
+
+        self.assertEqual(1, len(visualizations))
+        self.assertEqual('visualization-id',
+                         visualizations[0].get('qInfo').get('qId'))
+        engine_api_scraper.get_visualizations.assert_called_once()
+
+    def test_scrape_visualizations_should_return_empty_list_on_no_server_response(  # noqa E510
+            self):
+
+        attrs = self.__scraper.__dict__
+        engine_api_scraper = attrs['_MetadataScraper__engine_api_scraper']
+
+        engine_api_scraper.get_visualizations.return_value = None
+
+        visualizations = self.__scraper.scrape_visualizations({'id': 'app-id'})
+
+        self.assertEqual(0, len(visualizations))
+        engine_api_scraper.get_visualizations.assert_called_once()

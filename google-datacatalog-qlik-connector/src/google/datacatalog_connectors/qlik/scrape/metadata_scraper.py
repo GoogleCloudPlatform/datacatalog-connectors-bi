@@ -114,6 +114,21 @@ class MetadataScraper:
 
         return sheets
 
+    def scrape_visualizations(self, app_metadata):
+        self.__log_scrape_start(
+            'Scraping Visualizations (Master Items) from the'
+            ' "%s" App...', app_metadata.get('name'))
+        visualizations = self.__engine_api_scraper.get_visualizations(
+            app_metadata.get('id')) or []
+
+        logging.info('  %s Visualizations found:', len(visualizations))
+        for visualization in visualizations:
+            q_meta_def = visualization.get('qMetaDef')
+            logging.info('    - %s [%s]', q_meta_def.get('title'),
+                         visualization.get('qInfo').get('qId'))
+
+        return visualizations
+
     @classmethod
     def __log_scrape_start(cls, message, *args):
         logging.info('')
