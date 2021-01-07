@@ -16,7 +16,7 @@
 
 import setuptools
 
-release_status = 'Development Status :: 3 - Alpha'
+release_status = 'Development Status :: 4 - Beta'
 
 with open('README.md') as readme_file:
     readme = readme_file.read()

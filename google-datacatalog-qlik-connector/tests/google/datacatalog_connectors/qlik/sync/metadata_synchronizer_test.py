@@ -226,6 +226,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
             [self.__make_fake_published_app()]
         scraper.scrape_dimensions.return_value = []
         scraper.scrape_measures.return_value = []
+        scraper.scrape_visualizations.return_value = []
         scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
@@ -241,6 +242,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                 },
                 'dimensions': [],
                 'measures': [],
+                'visualizations': [],
                 'sheets': [],
             }]
         }
@@ -298,6 +300,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
             [self.__make_fake_published_app()]
         scraper.scrape_dimensions.return_value = [self.__make_fake_dimension()]
         scraper.scrape_measures.return_value = []
+        scraper.scrape_visualizations.return_value = []
         scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
@@ -323,6 +326,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                     },
                 }],
                 'measures': [],
+                'visualizations': [],
                 'sheets': [],
             }]
         }
@@ -349,6 +353,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
             [self.__make_fake_published_app()]
         scraper.scrape_dimensions.return_value = []
         scraper.scrape_measures.return_value = [self.__make_fake_measure()]
+        scraper.scrape_visualizations.return_value = []
         scraper.scrape_sheets.return_value = []
 
         self.__synchronizer.run()
@@ -368,6 +373,61 @@ class MetadataSynchronizerTest(unittest.TestCase):
                         'qId': 'test-measure',
                     },
                     'qMeasure': {},
+                    'qMetaDef': {},
+                    'app': {
+                        'id': 'test-app',
+                        'name': None
+                    },
+                }],
+                'visualizations': [],
+                'sheets': [],
+            }]
+        }
+
+        actual_call_args = assembled_entry_factory\
+            .make_assembled_entries_for_stream.call_args[0]
+        self.assertEqual(expected_make_assembled_entries_call_arg,
+                         actual_call_args[0])
+
+    @mock.patch(f'{__SYNCR_MODULE}.ingest.DataCatalogMetadataIngestor',
+                lambda *args: mock.MagicMock())
+    @mock.patch(f'{__SYNCR_MODULE}.cleanup.DataCatalogMetadataCleaner',
+                lambda *args: mock.MagicMock())
+    @mock.patch(f'{__SYNCR_MODULE}.prepare.EntryRelationshipMapper',
+                lambda *args: mock.MagicMock())
+    def test_run_visualization_should_properly_ask_assembled_entries(self):
+        attrs = self.__synchronizer.__dict__
+        scraper = attrs['_MetadataSynchronizer__metadata_scraper']
+        assembled_entry_factory = attrs[
+            '_MetadataSynchronizer__assembled_entry_factory']
+
+        scraper.scrape_all_streams.return_value = [self.__make_fake_stream()]
+        scraper.scrape_all_apps.return_value = \
+            [self.__make_fake_published_app()]
+        scraper.scrape_dimensions.return_value = []
+        scraper.scrape_measures.return_value = []
+        scraper.scrape_visualizations.return_value = [
+            self.__make_fake_visualization()
+        ]
+        scraper.scrape_sheets.return_value = []
+
+        self.__synchronizer.run()
+
+        expected_make_assembled_entries_call_arg = {
+            'id':
+                'test-stream',
+            'apps': [{
+                'id': 'test-app',
+                'published': True,
+                'stream': {
+                    'id': 'test-stream'
+                },
+                'dimensions': [],
+                'measures': [],
+                'visualizations': [{
+                    'qInfo': {
+                        'qId': 'test-visualization',
+                    },
                     'qMetaDef': {},
                     'app': {
                         'id': 'test-app',
@@ -400,6 +460,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
             [self.__make_fake_published_app()]
         scraper.scrape_dimensions.return_value = []
         scraper.scrape_measures.return_value = []
+        scraper.scrape_visualizations.return_value = []
         scraper.scrape_sheets.return_value = [
             self.__make_fake_published_sheet()
         ]
@@ -419,6 +480,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                 },
                 'dimensions': [],
                 'measures': [],
+                'visualizations': [],
                 'sheets': [{
                     'qInfo': {
                         'qId': 'test-sheet',
@@ -458,6 +520,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
             [self.__make_fake_published_app()]
         scraper.scrape_dimensions.return_value = []
         scraper.scrape_measures.return_value = []
+        scraper.scrape_visualizations.return_value = []
         scraper.scrape_sheets.return_value = [self.__make_fake_wip_sheet()]
 
         self.__synchronizer.run()
@@ -473,6 +536,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
                 },
                 'dimensions': [],
                 'measures': [],
+                'visualizations': [],
                 'sheets': [],
             }]
         }
@@ -520,6 +584,15 @@ class MetadataSynchronizerTest(unittest.TestCase):
                 'qId': 'test-measure',
             },
             'qMeasure': {},
+            'qMetaDef': {},
+        }
+
+    @classmethod
+    def __make_fake_visualization(cls):
+        return {
+            'qInfo': {
+                'qId': 'test-visualization',
+            },
             'qMetaDef': {},
         }
 

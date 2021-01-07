@@ -328,6 +328,35 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         return tag
 
+    def make_tag_for_visualization(self, tag_template, visualization_metadata):
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id',
+                               visualization_metadata.get('qInfo').get('qId'))
+
+        self._set_string_field(tag, 'title',
+                               visualization_metadata.get('title'))
+        self._set_string_field(tag, 'subtitle',
+                               visualization_metadata.get('subtitle'))
+        self._set_string_field(tag, 'footnote',
+                               visualization_metadata.get('footnote'))
+        self._set_string_field(tag, 'type',
+                               visualization_metadata.get('visualization'))
+
+        q_meta_def = visualization_metadata.get('qMetaDef')
+        self._set_string_field(tag, 'tags', ', '.join(q_meta_def.get('tags')))
+
+        app_metadata = visualization_metadata.get('app')
+        if app_metadata:
+            self._set_string_field(tag, 'app_id', app_metadata.get('id'))
+            self._set_string_field(tag, 'app_name', app_metadata.get('name'))
+
+        self._set_string_field(tag, 'site_url', self.__site_url)
+
+        return tag
+
     @classmethod
     def __get_human_readable_size_value(cls, size_bytes):
         """

@@ -319,6 +319,40 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+    def test_make_entry_for_visualization_should_set_all_available_fields(
+            self):
+
+        metadata = {
+            'qInfo': {
+                'qId': 'a123-b456',
+            },
+            'qMetaDef': {
+                'title': 'Test visualization',
+                'description': 'Description of the Test visualization',
+            },
+            'app': {
+                'id': 'app-id'
+            },
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_visualization(metadata)
+
+        self.assertEqual('qlik_viz_a123_b456', entry_id)
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'entryGroups/test-entry-group/entries/'
+            'qlik_viz_a123_b456', entry.name)
+        self.assertEqual('test-system', entry.user_specified_system)
+        self.assertEqual('visualization', entry.user_specified_type)
+        self.assertEqual('Test visualization', entry.display_name)
+        self.assertEqual('Description of the Test visualization',
+                         entry.description)
+
+        self.assertEqual('', entry.linked_resource)
+        self.assertIsNone(entry.source_system_timestamps.create_time)
+        self.assertIsNone(entry.source_system_timestamps.update_time)
+
     def test_make_entry_long_id_should_limit_result_id_length(self):
         metadata = {
             'id': '12345678901234567890123456789012'

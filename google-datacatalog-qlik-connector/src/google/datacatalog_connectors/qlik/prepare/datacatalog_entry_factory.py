@@ -253,6 +253,40 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         return generated_id, entry
 
+    def make_entry_for_visualization(self, visualization_metadata):
+        entry = datacatalog.Entry()
+
+        viz_id = visualization_metadata.get('qInfo').get('qId')
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_VISUALIZATION,
+                                        viz_id)
+        entry.name = datacatalog.DataCatalogClient.entry_path(
+            self.__project_id, self.__location_id, self.__entry_group_id,
+            generated_id)
+
+        entry.user_specified_system = self.__user_specified_system
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_VISUALIZATION
+
+        q_meta_def = visualization_metadata.get('qMetaDef')
+
+        entry.display_name = self._format_display_name(q_meta_def.get('title'))
+        entry.description = q_meta_def.get('description')
+
+        # The linked_resource field is not fulfilled because Data Catalog
+        # currently does not accept ``?`` and ``=`` in the field value.
+        # The below statements can be uncommented once
+        # https://issuetracker.google.com/issues/176912978
+        # has been fixed.
+        #
+        # app_id = visualization_metadata.get('app').get('id')
+        # entry.linked_resource = f'{self.__site_url}/sense/single' \
+        #                         f'?appid={app_id}' \
+        #                         f'&obj={viz_id}'
+
+        # The create_time and update_time fields are not fulfilled because
+        # there is no such info in the Visualization metadata.
+
+        return generated_id, entry
+
     @classmethod
     def __format_id(cls, source_type_identifier, source_id):
         no_prefix_fmt_id = cls._format_id(

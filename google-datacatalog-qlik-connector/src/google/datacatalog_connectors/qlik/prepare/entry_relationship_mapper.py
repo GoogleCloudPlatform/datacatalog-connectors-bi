@@ -25,6 +25,7 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
         constants.USER_SPECIFIED_TYPE_CUSTOM_PROPERTY_DEFINITION
     __DIMENSION = constants.USER_SPECIFIED_TYPE_DIMENSION
     __MEASURE = constants.USER_SPECIFIED_TYPE_MEASURE
+    __VISUALIZATION = constants.USER_SPECIFIED_TYPE_VISUALIZATION
     __SHEET = constants.USER_SPECIFIED_TYPE_SHEET
     __STREAM = constants.USER_SPECIFIED_TYPE_STREAM
 
@@ -35,6 +36,7 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
             self.__resolve_measure_mappings,
             self.__resolve_sheet_mappings,
             self.__resolve_stream_mappings,
+            self.__resolve_visualization_mappings,
         )
 
         self._fulfill_tag_fields(assembled_entries, resolvers)
@@ -94,3 +96,15 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
                                    cls.__CUSTOM_PROPERTY_DEFINITION,
                                    'property_definition_id',
                                    'property_definition_entry', id_name_pairs)
+
+    @classmethod
+    def __resolve_visualization_mappings(cls, assembled_entries,
+                                         id_name_pairs):
+
+        viz_assembled_entries = [
+            assembled_entry for assembled_entry in assembled_entries
+            if assembled_entry.entry.user_specified_type == cls.__VISUALIZATION
+        ]
+        for assembled_entry in viz_assembled_entries:
+            cls._map_related_entry(assembled_entry, cls.__APP, 'app_id',
+                                   'app_entry', id_name_pairs)

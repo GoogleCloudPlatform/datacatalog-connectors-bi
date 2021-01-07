@@ -102,6 +102,9 @@ def __delete_tag_templates(project_id, location_id):
             project_id, location_id, 'qlik_measure_metadata'))
     template_names.append(
         datacatalog.DataCatalogClient.tag_template_path(
+            project_id, location_id, 'qlik_visualization_metadata'))
+    template_names.append(
+        datacatalog.DataCatalogClient.tag_template_path(
             project_id, location_id, 'qlik_sheet_metadata'))
     template_names.append(
         datacatalog.DataCatalogClient.tag_template_path(
