@@ -23,7 +23,7 @@ with open('README.md') as readme_file:
 
 setuptools.setup(
     name='google-datacatalog-qlik-connector',
-    version='0.1.0',
+    version='0.1.1',
     author='Google LLC',
     description='Package for ingesting Qlik metadata'
     ' into Google Cloud Data Catalog',
