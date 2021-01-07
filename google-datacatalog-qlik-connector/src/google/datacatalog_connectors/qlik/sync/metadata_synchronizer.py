@@ -131,6 +131,7 @@ class MetadataSynchronizer:
             # to turn further processing more efficient.
             app['dimensions'] = self.__scrape_dimensions(app)
             app['measures'] = self.__scrape_measures(app)
+            app['visualizations'] = self.__scrape_visualizations(app)
             app['sheets'] = self.__scrape_published_sheets(app)
 
         self.__assemble_streams_metadata_from_flat_lists(
@@ -160,7 +161,7 @@ class MetadataSynchronizer:
         """Scrapes metadata from the Measures the current user has access to
         within the given App.
 
-        :return: A ``list`` of dimension metadata.
+        :return: A ``list`` of measure metadata.
         """
         measures = self.__metadata_scraper.scrape_measures(app)
         # The 'app' field is not available in the scrape measures API
@@ -173,6 +174,24 @@ class MetadataSynchronizer:
             }
 
         return measures
+
+    def __scrape_visualizations(self, app):
+        """Scrapes metadata from the Visualizations the current user has access
+        to within the given App.
+
+        :return: A ``list`` of visualization metadata.
+        """
+        visualizations = self.__metadata_scraper.scrape_visualizations(app)
+        # The 'app' field is not available in the scrape visualizations API
+        # response, so it is injected into the returned metadata object to turn
+        # further processing more efficient.
+        for visualization in visualizations:
+            visualization['app'] = {
+                'id': app.get('id'),
+                'name': app.get('name'),
+            }
+
+        return visualizations
 
     def __scrape_published_sheets(self, app):
         """Scrapes metadata from all the published Sheets the current user has
@@ -237,6 +256,9 @@ class MetadataSynchronizer:
         self.__add_template_to_dict(
             templates_dict,
             self.__tag_template_factory.make_tag_template_for_measure())
+        self.__add_template_to_dict(
+            templates_dict,
+            self.__tag_template_factory.make_tag_template_for_visualization())
         self.__add_template_to_dict(
             templates_dict,
             self.__tag_template_factory.make_tag_template_for_sheet())

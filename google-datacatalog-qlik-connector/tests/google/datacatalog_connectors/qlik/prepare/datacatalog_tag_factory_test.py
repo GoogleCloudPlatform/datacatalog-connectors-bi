@@ -459,3 +459,43 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('https://test.server.com',
                          tag.fields['site_url'].string_value)
+
+    def test_make_tag_for_visualization_should_set_all_available_fields(self):
+        tag_template = \
+            self.__tag_template_factory.make_tag_template_for_visualization()
+
+        metadata = {
+            'qInfo': {
+                'qId': 'c987-d654',
+            },
+            'qMetaDef': {
+                'tags': [
+                    'tag 1',
+                    'tag 2',
+                ],
+            },
+            'title': 'Test title',
+            'subtitle': 'Test subtitle',
+            'footnote': 'Test footnote',
+            'visualization': 'test-type',
+            'app': {
+                'id': 'a123-b456',
+                'name': 'Test app',
+            },
+        }
+
+        tag = self.__factory.make_tag_for_visualization(tag_template, metadata)
+
+        self.assertEqual('c987-d654', tag.fields['id'].string_value)
+
+        self.assertEqual('Test title', tag.fields['title'].string_value)
+        self.assertEqual('Test subtitle', tag.fields['subtitle'].string_value)
+        self.assertEqual('Test footnote', tag.fields['footnote'].string_value)
+        self.assertEqual('test-type', tag.fields['type'].string_value)
+        self.assertEqual('tag 1, tag 2', tag.fields['tags'].string_value)
+
+        self.assertEqual('a123-b456', tag.fields['app_id'].string_value)
+        self.assertEqual('Test app', tag.fields['app_name'].string_value)
+
+        self.assertEqual('https://test.server.com',
+                         tag.fields['site_url'].string_value)

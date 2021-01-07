@@ -109,6 +109,10 @@ class AssembledEntryFactory:
                     app_metadata.get('measures'), tag_templates_dict))
 
             assembled_entries.extend(
+                self.__make_assembled_entries_for_visualizations(
+                    app_metadata.get('visualizations'), tag_templates_dict))
+
+            assembled_entries.extend(
                 self.__make_assembled_entries_for_sheets(
                     app_metadata.get('sheets'), tag_templates_dict))
 
@@ -210,5 +214,33 @@ class AssembledEntryFactory:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_sheet(
                     tag_template, sheet_metadata))
+
+        return prepare.AssembledEntryData(entry_id, entry, tags)
+
+    def __make_assembled_entries_for_visualizations(self,
+                                                    visualizations_metadata,
+                                                    tag_templates_dict):
+
+        return [
+            self.__make_assembled_entry_for_visualization(
+                visualization_metadata, tag_templates_dict)
+            for visualization_metadata in visualizations_metadata
+        ] if visualizations_metadata else []
+
+    def __make_assembled_entry_for_visualization(self, visualization_metadata,
+                                                 tag_templates_dict):
+
+        entry_id, entry = \
+            self.__datacatalog_entry_factory.make_entry_for_visualization(
+                visualization_metadata)
+
+        tag_template = tag_templates_dict.get(
+            constants.TAG_TEMPLATE_ID_VISUALIZATION)
+
+        tags = []
+        if tag_template:
+            tags.append(
+                self.__datacatalog_tag_factory.make_tag_for_visualization(
+                    tag_template, visualization_metadata))
 
         return prepare.AssembledEntryData(entry_id, entry, tags)
