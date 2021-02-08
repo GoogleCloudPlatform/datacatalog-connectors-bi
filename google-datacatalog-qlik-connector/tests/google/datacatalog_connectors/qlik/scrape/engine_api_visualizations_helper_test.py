@@ -41,10 +41,21 @@ class EngineAPIVisualizationsHelperTest(unittest.TestCase):
         f'{__HELPER_CLASS}._EngineAPIVisualizationsHelper__get_visualizations',
         lambda *args: None)
     @mock.patch(f'{__BASE_CLASS}._run_until_complete')
-    def test_get_visualizations_should_return_empty_list_on_exception(
+    def test_get_visualizations_should_raise_unknown_exception(
             self, mock_run_until_complete):
 
         mock_run_until_complete.side_effect = Exception
+        self.assertRaises(Exception, self.__helper.get_visualizations,
+                          'app_id')
+
+    @mock.patch(
+        f'{__HELPER_CLASS}._EngineAPIVisualizationsHelper__get_visualizations',
+        lambda *args: None)
+    @mock.patch(f'{__BASE_CLASS}._run_until_complete')
+    def test_get_visualizations_should_return_empty_list_on_timeout(
+            self, mock_run_until_complete):
+
+        mock_run_until_complete.side_effect = asyncio.TimeoutError
         visualizations = self.__helper.get_visualizations('app-id')
         self.assertEqual(0, len(visualizations))
 

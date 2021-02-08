@@ -23,15 +23,11 @@ from google.datacatalog_connectors.qlik.scrape import \
 
 from . import scrape_ops_mocks
 
-_SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
-_SCRAPER_MODULE = f'{_SCRAPE_PACKAGE}.engine_api_scraper'
 
-
-@mock.patch(f'{_SCRAPER_MODULE}'
-            f'.engine_api_sheets_helper.EngineAPISheetsHelper.get_sheets',
-            lambda *args: None)
 class EngineAPIScraperTest(unittest.TestCase):
-    __SCRAPER_CLASS = f'{_SCRAPER_MODULE}.EngineAPIScraper'
+    __SCRAPE_PACKAGE = 'google.datacatalog_connectors.qlik.scrape'
+    __SCRAPER_MODULE = f'{__SCRAPE_PACKAGE}.engine_api_scraper'
+    __SCRAPER_CLASS = f'{__SCRAPER_MODULE}.EngineAPIScraper'
 
     def setUp(self):
         self.__scraper = engine_api_scraper.EngineAPIScraper(
@@ -57,6 +53,9 @@ class EngineAPIScraperTest(unittest.TestCase):
         attrs = self.__scraper.__dict__
         self.assertIsNone(attrs['_EngineAPIScraper__auth_cookie'])
 
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_dimensions_helper'
+                f'.EngineAPIDimensionsHelper.get_dimensions',
+                lambda *args: None)
     @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
     def test_get_dimensions_should_authenticate_user_beforehand(
             self, mock_set_up_cookie):
@@ -64,6 +63,8 @@ class EngineAPIScraperTest(unittest.TestCase):
         self.__scraper.get_dimensions('app-id')
         mock_set_up_cookie.assert_called_once()
 
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_measures_helper'
+                f'.EngineAPIMeasuresHelper.get_measures', lambda *args: None)
     @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
     def test_get_measures_should_authenticate_user_beforehand(
             self, mock_set_up_cookie):
@@ -71,6 +72,8 @@ class EngineAPIScraperTest(unittest.TestCase):
         self.__scraper.get_measures('app-id')
         mock_set_up_cookie.assert_called_once()
 
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_sheets_helper'
+                f'.EngineAPISheetsHelper.get_sheets', lambda *args: None)
     @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
     def test_get_sheets_should_authenticate_user_beforehand(
             self, mock_set_up_cookie):
@@ -78,6 +81,9 @@ class EngineAPIScraperTest(unittest.TestCase):
         self.__scraper.get_sheets('app-id')
         mock_set_up_cookie.assert_called_once()
 
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_visualizations_helper'
+                f'.EngineAPIVisualizationsHelper.get_visualizations',
+                lambda *args: None)
     @mock.patch(f'{__SCRAPER_CLASS}._EngineAPIScraper__set_up_auth_cookie')
     def test_get_visualizations_should_authenticate_user_beforehand(
             self, mock_set_up_cookie):
@@ -85,7 +91,9 @@ class EngineAPIScraperTest(unittest.TestCase):
         self.__scraper.get_visualizations('app-id')
         mock_set_up_cookie.assert_called_once()
 
-    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_sheets_helper'
+                f'.EngineAPISheetsHelper.get_sheets', lambda *args: None)
+    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator'
                 f'.get_qps_session_cookie_windows_auth')
     @mock.patch(f'{__SCRAPER_CLASS}'
                 f'._EngineAPIScraper__get_windows_authentication_url')
@@ -105,7 +113,9 @@ class EngineAPIScraperTest(unittest.TestCase):
         attrs = self.__scraper.__dict__
         self.assertEqual(fake_cookie, attrs['_EngineAPIScraper__auth_cookie'])
 
-    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_sheets_helper'
+                f'.EngineAPISheetsHelper.get_sheets', lambda *args: None)
+    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator'
                 f'.get_qps_session_cookie_windows_auth')
     @mock.patch(f'{__SCRAPER_CLASS}'
                 f'._EngineAPIScraper__get_windows_authentication_url')
@@ -123,10 +133,12 @@ class EngineAPIScraperTest(unittest.TestCase):
 
         mock_get_qps_session_cookie.assert_not_called()
 
-    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_sheets_helper'
+                f'.EngineAPISheetsHelper.get_sheets', lambda *args: None)
+    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator'
                 f'.get_qps_session_cookie_windows_auth',
                 lambda *args, **kwargs: None)
-    @mock.patch(f'{_SCRAPE_PACKAGE}.engine_api_scraper.websockets.connect',
+    @mock.patch(f'{__SCRAPE_PACKAGE}.engine_api_scraper.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_windows_authentication_url_should_pass_appropriate_auth_args(
             self, mock_websocket):
@@ -148,9 +160,11 @@ class EngineAPIScraperTest(unittest.TestCase):
         actual_ws_call_args = mock_websocket.call_args_list[0]
         self.assertEqual(expected_ws_call_args, actual_ws_call_args)
 
-    @mock.patch(f'{_SCRAPER_MODULE}.authenticator.Authenticator'
+    @mock.patch(f'{__SCRAPER_MODULE}.engine_api_sheets_helper'
+                f'.EngineAPISheetsHelper.get_sheets', lambda *args: None)
+    @mock.patch(f'{__SCRAPER_MODULE}.authenticator.Authenticator'
                 f'.get_qps_session_cookie_windows_auth')
-    @mock.patch(f'{_SCRAPE_PACKAGE}.engine_api_scraper.websockets.connect',
+    @mock.patch(f'{__SCRAPE_PACKAGE}.engine_api_scraper.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_windows_authentication_url_should_return_login_uri(
             self, mock_websocket, mock_get_qps_session_cookie):

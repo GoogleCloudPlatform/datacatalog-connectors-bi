@@ -34,9 +34,12 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
         try:
             return self._run_until_complete(
                 self.__get_visualizations(app_id, timeout))
-        except Exception:
+        except Exception as e:
             logging.warning("error on get_visualizations:", exc_info=True)
-            return []
+            if isinstance(e, asyncio.TimeoutError):
+                return []
+            else:
+                raise
 
     async def __get_visualizations(self, app_id, timeout):
         async with self._connect_websocket(app_id) as websocket:

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,9 +29,12 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
     def get_sheets(self, app_id, timeout=60):
         try:
             return self._run_until_complete(self.__get_sheets(app_id, timeout))
-        except Exception:
+        except Exception as e:
             logging.warning("error on get_sheets:", exc_info=True)
-            return []
+            if isinstance(e, asyncio.TimeoutError):
+                return []
+            else:
+                raise
 
     async def __get_sheets(self, app_id, timeout):
         async with self._connect_websocket(app_id) as websocket:

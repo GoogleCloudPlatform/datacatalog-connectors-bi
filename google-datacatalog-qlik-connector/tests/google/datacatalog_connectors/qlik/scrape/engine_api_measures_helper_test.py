@@ -38,10 +38,19 @@ class EngineAPIMeasuresHelperTest(unittest.TestCase):
     @mock.patch(f'{__HELPER_CLASS}._EngineAPIMeasuresHelper__get_measures',
                 lambda *args: None)
     @mock.patch(f'{__BASE_CLASS}._run_until_complete')
-    def test_get_measures_should_return_empty_list_on_exception(
+    def test_get_measures_should_raise_unknown_exception(
             self, mock_run_until_complete):
 
         mock_run_until_complete.side_effect = Exception
+        self.assertRaises(Exception, self.__helper.get_measures, 'app_id')
+
+    @mock.patch(f'{__HELPER_CLASS}._EngineAPIMeasuresHelper__get_measures',
+                lambda *args: None)
+    @mock.patch(f'{__BASE_CLASS}._run_until_complete')
+    def test_get_measures_should_return_empty_list_on_timeout(
+            self, mock_run_until_complete):
+
+        mock_run_until_complete.side_effect = asyncio.TimeoutError
         measures = self.__helper.get_measures('app-id')
         self.assertEqual(0, len(measures))
 
