@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,17 +80,19 @@ class BaseEngineAPIHelper(abc.ABC):
         event_loop = asyncio.new_event_loop()
         try:
             return event_loop.run_until_complete(future)
-        except asyncio.TimeoutError:
-            cls.__handle_event_loop_exec_timeout(event_loop)
+        except Exception:
+            logging.warning(
+                'Something wrong happened while running the event loop.')
+            cls.__cancel_all_tasks(event_loop)
             raise
+        finally:
+            event_loop.close()
 
     @classmethod
-    def __handle_event_loop_exec_timeout(cls, event_loop):
-        logging.warning(
-            'Timeout reached during the websocket communication session.')
+    def __cancel_all_tasks(cls, event_loop):
+        logging.info('All tasks will be canceled...')
         for task in asyncio.Task.all_tasks(loop=event_loop):
             task.cancel()
-        event_loop.stop()
 
     async def _start_websocket_communication(self, websocket, app_id,
                                              responses_manager):

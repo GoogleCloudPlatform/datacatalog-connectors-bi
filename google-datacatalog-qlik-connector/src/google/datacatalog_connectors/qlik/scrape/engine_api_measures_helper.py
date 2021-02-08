@@ -34,9 +34,12 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
         try:
             return self._run_until_complete(
                 self.__get_measures(app_id, timeout))
-        except Exception:
+        except Exception as e:
             logging.warning("error on get_measures:", exc_info=True)
-            return []
+            if isinstance(e, asyncio.TimeoutError):
+                return []
+            else:
+                raise
 
     async def __get_measures(self, app_id, timeout):
         async with self._connect_websocket(app_id) as websocket:

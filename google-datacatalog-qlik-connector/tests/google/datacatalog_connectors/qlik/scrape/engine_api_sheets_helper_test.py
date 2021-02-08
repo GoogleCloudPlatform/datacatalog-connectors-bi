@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,10 +37,19 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
     @mock.patch(f'{__HELPER_CLASS}._EngineAPISheetsHelper__get_sheets',
                 lambda *args: None)
     @mock.patch(f'{__BASE_CLASS}._run_until_complete')
-    def test_get_sheets_should_return_empty_list_on_exception(
+    def test_get_sheets_should_raise_unknown_exception(
             self, mock_run_until_complete):
 
         mock_run_until_complete.side_effect = Exception
+        self.assertRaises(Exception, self.__helper.get_sheets, 'app_id')
+
+    @mock.patch(f'{__HELPER_CLASS}._EngineAPISheetsHelper__get_sheets',
+                lambda *args: None)
+    @mock.patch(f'{__BASE_CLASS}._run_until_complete')
+    def test_get_sheets_should_return_empty_list_on_timeout(
+            self, mock_run_until_complete):
+
+        mock_run_until_complete.side_effect = asyncio.TimeoutError
         sheets = self.__helper.get_sheets('app-id')
         self.assertEqual(0, len(sheets))
 
