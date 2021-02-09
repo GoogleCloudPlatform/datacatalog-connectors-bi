@@ -102,6 +102,25 @@ class BaseEngineAPIHelper(abc.ABC):
         responses_manager.add_pending_id(request_id, self._OPEN_DOC)
 
     @classmethod
+    async def _hold_websocket_communication(cls, msg_sender, msg_receiver):
+        """Holds a websocket communication session until the awaitable message
+        sender and receiver are done.
+
+        Args:
+            msg_sender: A coroutine or future that sends messages.
+            msg_receiver: A coroutine or future that receives messages.
+
+        Returns:
+            The result of the receiver.
+        """
+        # The ``results`` list is expected to have two elements. The first one
+        # stores the message sender's result and can be ignored. The second one
+        # stores the receiver's result, which means the object to be returned
+        # on successful execution.
+        results = await asyncio.gather(*[msg_sender, msg_receiver])
+        return results[1]
+
+    @classmethod
     async def _consume_messages(cls, websocket, responses_manager,
                                 result_method, result_path):
 
@@ -151,17 +170,6 @@ class BaseEngineAPIHelper(abc.ABC):
 
         # Closes the websocket when there is no further response to process.
         await websocket.close()
-
-    @classmethod
-    async def _handle_websocket_communication(cls, consumer_future,
-                                              producer_future):
-
-        # The 'results' array is expected to have two elements. The first one
-        # stores the result of the consumer, which means the object to be
-        # returned on a successfull execution. The second one stores the result
-        # of the producer and can be ignored.
-        results = await asyncio.gather(*[consumer_future, producer_future])
-        return results[0]
 
     async def __send_open_doc_request(self, websocket, app_id):
         """Sends a Open Doc (aka App) Interface request.

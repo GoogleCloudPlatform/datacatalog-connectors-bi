@@ -52,9 +52,9 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
             consumer = self.__consume_get_visualizations_msg
             producer = self.__produce_get_visualizations_msg
             return await asyncio.wait_for(
-                self._handle_websocket_communication(
-                    consumer(websocket, responses_manager),
-                    producer(websocket, responses_manager)), timeout)
+                self._hold_websocket_communication(
+                    producer(websocket, responses_manager),
+                    consumer(websocket, responses_manager)), timeout)
 
     async def __consume_get_visualizations_msg(self, websocket,
                                                responses_manager):
