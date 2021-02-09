@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,10 +60,10 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
             uri=f'wss://test-server/app/app-id?Xrfkey={constants.XRFKEY}',
             extra_headers=extra_headers)
 
-    def test_generate_request_id_should_increment_on_each_call(self):
-        self.assertEqual(1, self.__helper._generate_request_id())
-        self.assertEqual(2, self.__helper._generate_request_id())
-        self.assertEqual(3, self.__helper._generate_request_id())
+    def test_generate_message_id_should_increment_on_each_call(self):
+        self.assertEqual(1, self.__helper._generate_message_id())
+        self.assertEqual(2, self.__helper._generate_message_id())
+        self.assertEqual(3, self.__helper._generate_message_id())
 
     def test_run_until_complete_should_stop_on_timeout(self):
 

@@ -127,7 +127,7 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         Returns:
             The request id.
         """
-        request_id = self._generate_request_id()
+        message_id = self._generate_message_id()
         await websocket.send(
             json.dumps({
                 'handle': doc_handle,
@@ -135,11 +135,11 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 'params': {
                     'qId': dimension_id,
                 },
-                'id': request_id,
+                'id': message_id,
             }))
 
-        logging.debug('Get Dimension Interface request sent: %d', request_id)
-        return request_id
+        logging.debug('Get Dimension Interface request sent: %d', message_id)
+        return message_id
 
     async def __send_get_properties_request(self, websocket, dimension_handle):
         """Sends a Get Dimension Properties request.
@@ -147,14 +147,14 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         Returns:
             The request id.
         """
-        request_id = self._generate_request_id()
+        message_id = self._generate_message_id()
         await websocket.send(
             json.dumps({
                 'handle': dimension_handle,
                 'method': self.__GET_PROPERTIES,
                 'params': {},
-                'id': request_id,
+                'id': message_id,
             }))
 
-        logging.debug('Get Dimension Properties request sent: %d', request_id)
-        return request_id
+        logging.debug('Get Dimension Properties request sent: %d', message_id)
+        return message_id

@@ -82,7 +82,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         Returns:
             The request id.
         """
-        request_id = self._generate_request_id()
+        message_id = self._generate_message_id()
         await websocket.send(
             json.dumps({
                 'handle': doc_handle,
@@ -92,8 +92,8 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                         'qTypes': ['sheet'],
                     },
                 },
-                'id': request_id,
+                'id': message_id,
             }))
 
-        logging.debug('Get Objects (type=sheet) request sent: %d', request_id)
-        return request_id
+        logging.debug('Get Objects (type=sheet) request sent: %d', message_id)
+        return message_id

@@ -43,8 +43,8 @@ class BaseEngineAPIHelper(abc.ABC):
         self.__common_headers = {
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
-        self.__requests_counter = 0
-        self.__requests_counter_thread_lock = threading.Lock()
+        self.__messages_counter = 0
+        self.__messages_counter_thread_lock = threading.Lock()
 
     def _connect_websocket(self, app_id):
         """Opens a websocket connection.
@@ -69,11 +69,6 @@ class BaseEngineAPIHelper(abc.ABC):
         headers['Cookie'] = f'{auth_cookie.name}={auth_cookie.value}'
 
         return websockets.connect(uri=uri, extra_headers=headers)
-
-    def _generate_request_id(self):
-        with self.__requests_counter_thread_lock:
-            self.__requests_counter += 1
-            return self.__requests_counter
 
     @classmethod
     def _run_until_complete(cls, future):
@@ -177,17 +172,17 @@ class BaseEngineAPIHelper(abc.ABC):
         Returns:
             The request id.
         """
-        request_id = self._generate_request_id()
+        message_id = self._generate_message_id()
         await websocket.send(
             json.dumps({
                 'handle': -1,
                 'method': self._OPEN_DOC,
                 'params': [app_id],
-                'id': request_id
+                'id': message_id
             }))
 
-        logging.debug('Open Doc Interface request sent: %d', request_id)
-        return request_id
+        logging.debug('Open Doc Interface request sent: %d', message_id)
+        return message_id
 
     async def _send_get_all_infos_request(self, websocket, doc_handle):
         """Sends a Get All Infos request.
@@ -195,14 +190,19 @@ class BaseEngineAPIHelper(abc.ABC):
         Returns:
             The request id.
         """
-        request_id = self._generate_request_id()
+        message_id = self._generate_message_id()
         await websocket.send(
             json.dumps({
                 'handle': doc_handle,
                 'method': self._GET_ALL_INFOS,
                 'params': {},
-                'id': request_id,
+                'id': message_id,
             }))
 
-        logging.debug('Get All Infos request sent: %d', request_id)
-        return request_id
+        logging.debug('Get All Infos request sent: %d', message_id)
+        return message_id
+
+    def _generate_message_id(self):
+        with self.__messages_counter_thread_lock:
+            self.__messages_counter += 1
+            return self.__messages_counter
