@@ -79,21 +79,21 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
             self, mock_websocket, mock_generate_message_id):
 
         mock_generate_message_id.return_value = 10
-        mock_responses_manager = mock.MagicMock()
+        mock_replies_helper = mock.MagicMock()
 
         asyncio.new_event_loop().run_until_complete(
             self.__helper._start_websocket_communication(
-                mock_websocket, 'app-id', mock_responses_manager))
+                mock_websocket, 'app-id', mock_replies_helper))
 
         mock_generate_message_id.assert_called_once()
-        mock_responses_manager.add_pending_id.assert_called_once_with(
+        mock_replies_helper.add_pending_id.assert_called_once_with(
             10, 'OpenDoc')
 
     @mock.patch(f'{__HELPER_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_receive_messages_should_process_lists(self, mock_websocket):
-        mock_responses_manager = mock.MagicMock()
-        mock_responses_manager.is_pending.return_value = True
+        mock_replies_helper = mock.MagicMock()
+        mock_replies_helper.is_pending.return_value = True
 
         incoming_message = {
             'id': 1,
@@ -109,7 +109,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
 
         results = asyncio.new_event_loop().run_until_complete(
             base_engine_api_helper.BaseEngineAPIHelper._receive_messages(
-                websocket_ctx, mock_responses_manager, 'Test', 'result.list'))
+                websocket_ctx, mock_replies_helper, 'Test', 'result.list'))
 
         self.assertEqual(1, len(results))
         self.assertEqual('test-id', results[0]['id'])
@@ -119,8 +119,8 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
     def test_receive_messages_should_process_single_objects(
             self, mock_websocket):
 
-        mock_responses_manager = mock.MagicMock()
-        mock_responses_manager.is_pending.return_value = True
+        mock_replies_helper = mock.MagicMock()
+        mock_replies_helper.is_pending.return_value = True
 
         incoming_message = {
             'id': 1,
@@ -134,7 +134,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
 
         results = asyncio.new_event_loop().run_until_complete(
             base_engine_api_helper.BaseEngineAPIHelper._receive_messages(
-                websocket_ctx, mock_responses_manager, 'Test', 'result'))
+                websocket_ctx, mock_replies_helper, 'Test', 'result'))
 
         self.assertEqual(1, len(results))
         self.assertEqual('test-id', results[0]['id'])

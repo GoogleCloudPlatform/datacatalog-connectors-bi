@@ -90,11 +90,11 @@ class BaseEngineAPIHelper(abc.ABC):
             task.cancel()
 
     async def _start_websocket_communication(self, websocket, app_id,
-                                             responses_manager):
+                                             replies_helper):
 
         request_id = \
             await self.__send_open_doc_message(websocket, app_id)
-        responses_manager.add_pending_id(request_id, self._OPEN_DOC)
+        replies_helper.add_pending_id(request_id, self._OPEN_DOC)
 
     @classmethod
     async def _hold_websocket_communication(cls, msg_sender, msg_receiver):
@@ -116,8 +116,8 @@ class BaseEngineAPIHelper(abc.ABC):
         return results[1]
 
     @classmethod
-    async def _receive_messages(cls, websocket, responses_manager,
-                                result_method, result_path):
+    async def _receive_messages(cls, websocket, replies_helper, result_method,
+                                result_path):
 
         results = []
         async for message in websocket:
@@ -128,17 +128,17 @@ class BaseEngineAPIHelper(abc.ABC):
                 continue
 
             logging.debug('Reply received: %d', message_id)
-            if responses_manager.is_pending(message_id, result_method):
+            if replies_helper.is_pending(message_id, result_method):
                 result = jmespath.search(result_path, message_json)
                 if isinstance(result, list):
                     results.extend(result)
                 else:
                     results.append(result)
             else:
-                responses_manager.add_unhandled(message_json)
+                replies_helper.add_unhandled(message_json)
 
-            responses_manager.remove_pending_id(message_id)
-            responses_manager.notify_new_response()
+            replies_helper.remove_pending_id(message_id)
+            replies_helper.notify_new_reply()
 
         return results
 
@@ -155,13 +155,13 @@ class BaseEngineAPIHelper(abc.ABC):
             raise Exception(error_message)
 
     @classmethod
-    async def _send_messages(cls, websocket, responses_manager, sender):
-        while not responses_manager.were_all_precessed():
-            if not responses_manager.is_there_response_notification():
-                await responses_manager.wait_for_responses()
-                responses_manager.clear_response_notifications()
-            for response in responses_manager.get_all_unhandled():
-                await sender(websocket, responses_manager, response)
+    async def _send_messages(cls, websocket, replies_helper, sender):
+        while not replies_helper.were_all_processed():
+            if not replies_helper.is_there_reply_notification():
+                await replies_helper.wait_for_replies()
+                replies_helper.clear_reply_notifications()
+            for reply in replies_helper.get_all_unhandled():
+                await sender(websocket, replies_helper, reply)
 
         # Closes the websocket when there are no more replies to be processed.
         await websocket.close()
