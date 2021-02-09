@@ -40,7 +40,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
                          attrs['_BaseEngineAPIHelper__base_api_endpoint'])
         self.assertIsNotNone(attrs['_BaseEngineAPIHelper__auth_cookie'])
         self.assertIsNotNone(attrs['_BaseEngineAPIHelper__common_headers'])
-        self.assertEqual(0, attrs['_BaseEngineAPIHelper__requests_counter'])
+        self.assertEqual(0, attrs['_BaseEngineAPIHelper__messages_counter'])
 
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
@@ -72,20 +72,20 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
             base_engine_api_helper.BaseEngineAPIHelper._run_until_complete,
             asyncio.wait_for(asyncio.sleep(0.5), timeout=0.25))
 
-    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
+    @mock.patch(f'{__HELPER_CLASS}._generate_message_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_start_websocket_communication_should_record_open_doc_request_id(
-            self, mock_websocket, mock_generate_request_id):
+            self, mock_websocket, mock_generate_message_id):
 
-        mock_generate_request_id.return_value = 10
+        mock_generate_message_id.return_value = 10
         mock_responses_manager = mock.MagicMock()
 
         asyncio.new_event_loop().run_until_complete(
             self.__helper._start_websocket_communication(
                 mock_websocket, 'app-id', mock_responses_manager))
 
-        mock_generate_request_id.assert_called_once()
+        mock_generate_message_id.assert_called_once()
         mock_responses_manager.add_pending_id.assert_called_once_with(
             10, 'OpenDoc')
 
@@ -186,15 +186,15 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
         except Exception as e:
             self.assertEqual('Test message', str(e))
 
-    @mock.patch(f'{__HELPER_CLASS}._generate_request_id')
+    @mock.patch(f'{__HELPER_CLASS}._generate_message_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_send_get_all_infos_request_should_return_request_id(
-            self, mock_websocket, mock_generate_request_id):
+            self, mock_websocket, mock_generate_message_id):
 
-        mock_generate_request_id.return_value = 10
+        mock_generate_message_id.return_value = 10
         request_id = asyncio.new_event_loop().run_until_complete(
             self.__helper._send_get_all_infos_request(mock_websocket, 1))
 
-        mock_generate_request_id.assert_called_once()
+        mock_generate_message_id.assert_called_once()
         self.assertEqual(10, request_id)

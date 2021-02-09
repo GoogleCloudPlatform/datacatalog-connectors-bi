@@ -93,7 +93,7 @@ class BaseEngineAPIHelper(abc.ABC):
                                              responses_manager):
 
         request_id = \
-            await self.__send_open_doc_request(websocket, app_id)
+            await self.__send_open_doc_message(websocket, app_id)
         responses_manager.add_pending_id(request_id, self._OPEN_DOC)
 
     @classmethod
@@ -166,11 +166,11 @@ class BaseEngineAPIHelper(abc.ABC):
         # Closes the websocket when there is no further response to process.
         await websocket.close()
 
-    async def __send_open_doc_request(self, websocket, app_id):
-        """Sends a Open Doc (aka App) Interface request.
+    async def __send_open_doc_message(self, websocket, app_id):
+        """Sends a Open Doc (aka App) Interface message.
 
         Returns:
-            The request id.
+            The message id.
         """
         message_id = self._generate_message_id()
         await websocket.send(
@@ -181,7 +181,7 @@ class BaseEngineAPIHelper(abc.ABC):
                 'id': message_id
             }))
 
-        logging.debug('Open Doc Interface request sent: %d', message_id)
+        logging.debug('Open Doc Interface message sent: %d', message_id)
         return message_id
 
     async def _send_get_all_infos_request(self, websocket, doc_handle):

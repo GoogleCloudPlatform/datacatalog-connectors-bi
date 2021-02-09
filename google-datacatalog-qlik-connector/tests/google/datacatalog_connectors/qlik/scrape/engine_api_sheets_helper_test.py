@@ -53,22 +53,22 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         sheets = self.__helper.get_sheets('app-id')
         self.assertEqual(0, len(sheets))
 
-    # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
-    # mocked in this test case in order to simulate a full produce/consume
-    # scenario with responses that represent an App with Sheets. Maybe it's
-    # worth refactoring it in the future to mock that method, and the private
-    # async ones from EngineAPISheetsHelper as well, thus testing in a more
-    # granular way.
-    @mock.patch(f'{__BASE_CLASS}._generate_request_id')
-    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
+    # BaseEngineAPIHelper._hold_websocket_communication is purposefully not
+    # mocked in this test case in order to simulate a full send/reply scenario
+    # with replies representing an App with Sheets. Maybe it's worth
+    # refactoring it in the future to mock that method, and the private async
+    # ones from EngineAPISheetsHelper as well, thus testing in a more granular
+    # way.
+    @mock.patch(f'{__BASE_CLASS}._generate_message_id')
+    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_message')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_sheets_should_return_list_on_success(
             self, mock_websocket, mock_send_open_doc,
-            mock_generate_request_id):
+            mock_generate_message_id):
 
         mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
-        mock_generate_request_id.return_value = 2
+        mock_generate_message_id.return_value = 2
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
         websocket_ctx.set_itr_break(0.25)
@@ -99,22 +99,22 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
         self.assertEqual('sheet-id', sheets[0].get('qInfo').get('qId'))
         mock_send_open_doc.assert_called_once()
 
-    # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
-    # mocked in this test case in order to simulate a full produce/consume
-    # scenario with responses that represent an App with no Sheets. Maybe it's
-    # worth refactoring it in the future to mock that method, and the private
-    # async ones from EngineAPISheetsHelper as well, thus testing in a more
-    # granular way.
-    @mock.patch(f'{__BASE_CLASS}._generate_request_id')
-    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
+    # BaseEngineAPIHelper._hold_websocket_communication is purposefully not
+    # mocked in this test case in order to simulate a full send/reply scenario
+    # with replies representing an App with no Sheets. Maybe it's worth
+    # refactoring it in the future to mock that method, and the private async
+    # ones from EngineAPISheetsHelper as well, thus testing in a more granular
+    # way.
+    @mock.patch(f'{__BASE_CLASS}._generate_message_id')
+    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_message')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_sheets_should_return_empty_list_on_none_available(
             self, mock_websocket, mock_send_open_doc,
-            mock_generate_request_id):
+            mock_generate_message_id):
 
         mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
-        mock_generate_request_id.return_value = 2
+        mock_generate_message_id.return_value = 2
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
         websocket_ctx.set_itr_break(0.25)
@@ -139,4 +139,4 @@ class EngineAPISheetsHelperTest(unittest.TestCase):
 
         self.assertEqual(0, len(sheets))
         mock_send_open_doc.assert_called_once()
-        mock_generate_request_id.assert_called_once()
+        mock_generate_message_id.assert_called_once()
