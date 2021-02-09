@@ -49,12 +49,12 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
             await self._start_websocket_communication(websocket, app_id,
                                                       responses_manager)
 
-            consumer = self.__receive_get_measures_msg
-            producer = self.__send_get_measures_msg
+            sender = self.__send_get_measures_msg
+            receiver = self.__receive_get_measures_msg
             return await asyncio.wait_for(
                 self._hold_websocket_communication(
-                    producer(websocket, responses_manager),
-                    consumer(websocket, responses_manager)), timeout)
+                    sender(websocket, responses_manager),
+                    receiver(websocket, responses_manager)), timeout)
 
     async def __receive_get_measures_msg(self, websocket, responses_manager):
         return await self._receive_messages(websocket, responses_manager,
@@ -71,22 +71,21 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
         response_id = response.get('id')
         if responses_manager.is_method(response_id, self._OPEN_DOC):
-            await self.__handle_open_doc_response(websocket, responses_manager,
-                                                  response)
+            await self.__handle_open_doc_reply(websocket, responses_manager,
+                                               response)
             responses_manager.remove_unhandled(response)
         elif responses_manager.is_method(response_id, self._GET_ALL_INFOS):
-            await self.__handle_get_all_infos_response(websocket,
-                                                       responses_manager,
-                                                       response)
+            await self.__handle_get_all_infos_reply(websocket,
+                                                    responses_manager,
+                                                    response)
             responses_manager.remove_unhandled(response)
         elif responses_manager.is_method(response_id, self.__GET_MEASURE):
-            await self.__handle_get_measure_response(websocket,
-                                                     responses_manager,
-                                                     response)
+            await self.__handle_get_measure_reply(websocket, responses_manager,
+                                                  response)
             responses_manager.remove_unhandled(response)
 
-    async def __handle_open_doc_response(self, websocket, responses_manager,
-                                         response):
+    async def __handle_open_doc_reply(self, websocket, responses_manager,
+                                      response):
 
         doc_handle = response.get('result').get('qReturn').get('qHandle')
         responses_manager.set_handle(doc_handle, self.__DOC_HANDLE)
@@ -94,8 +93,8 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
             websocket, doc_handle)
         responses_manager.add_pending_id(follow_up_req_id, self._GET_ALL_INFOS)
 
-    async def __handle_get_all_infos_response(self, websocket,
-                                              responses_manager, response):
+    async def __handle_get_all_infos_reply(self, websocket, responses_manager,
+                                           response):
 
         all_infos = response.get('result').get('qInfos')
         doc_handle = responses_manager.get_handle(self.__DOC_HANDLE)
@@ -111,8 +110,8 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
         responses_manager.add_pending_ids(follow_up_req_ids,
                                           self.__GET_MEASURE)
 
-    async def __handle_get_measure_response(self, websocket, responses_manager,
-                                            response):
+    async def __handle_get_measure_reply(self, websocket, responses_manager,
+                                         response):
 
         measure_handle = response.get('result').get('qReturn').get('qHandle')
         follow_up_req_id = await self.__send_get_properties_message(

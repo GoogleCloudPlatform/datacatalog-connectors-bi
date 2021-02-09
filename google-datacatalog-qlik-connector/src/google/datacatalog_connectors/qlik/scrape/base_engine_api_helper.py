@@ -163,7 +163,7 @@ class BaseEngineAPIHelper(abc.ABC):
             for response in responses_manager.get_all_unhandled():
                 await sender(websocket, responses_manager, response)
 
-        # Closes the websocket when there is no further response to process.
+        # Closes the websocket when there are no more replies to be processed.
         await websocket.close()
 
     async def __send_open_doc_message(self, websocket, app_id):

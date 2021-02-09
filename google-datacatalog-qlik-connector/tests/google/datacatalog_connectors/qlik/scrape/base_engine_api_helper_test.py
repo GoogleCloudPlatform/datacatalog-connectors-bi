@@ -75,7 +75,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
     @mock.patch(f'{__HELPER_CLASS}._generate_message_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    def test_start_websocket_communication_should_record_open_doc_request_id(
+    def test_start_websocket_communication_should_record_open_doc_message_id(
             self, mock_websocket, mock_generate_message_id):
 
         mock_generate_message_id.return_value = 10
@@ -185,12 +185,12 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
     @mock.patch(f'{__HELPER_CLASS}._generate_message_id')
     @mock.patch(f'{__HELPER_MODULE}.websockets.connect',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
-    def test_send_get_all_infos_request_should_return_message_id(
+    def test_send_get_all_infos_message_should_return_message_id(
             self, mock_websocket, mock_generate_message_id):
 
         mock_generate_message_id.return_value = 10
-        request_id = asyncio.new_event_loop().run_until_complete(
+        message_id = asyncio.new_event_loop().run_until_complete(
             self.__helper._send_get_all_infos_message(mock_websocket, 1))
 
         mock_generate_message_id.assert_called_once()
-        self.assertEqual(10, request_id)
+        self.assertEqual(10, message_id)

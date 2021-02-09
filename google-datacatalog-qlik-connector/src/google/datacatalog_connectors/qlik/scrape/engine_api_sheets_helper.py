@@ -44,12 +44,12 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
             await self._start_websocket_communication(websocket, app_id,
                                                       responses_manager)
 
-            consumer = self.__receive_get_sheets_msg
-            producer = self.__send_get_sheets_msg
+            sender = self.__send_get_sheets_msg
+            receiver = self.__receive_get_sheets_msg
             return await asyncio.wait_for(
                 self._hold_websocket_communication(
-                    producer(websocket, responses_manager),
-                    consumer(websocket, responses_manager)), timeout)
+                    sender(websocket, responses_manager),
+                    receiver(websocket, responses_manager)), timeout)
 
     async def __receive_get_sheets_msg(self, websocket, responses_manager):
         return await self._receive_messages(websocket, responses_manager,
@@ -64,12 +64,12 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
         response_id = response.get('id')
         if responses_manager.is_method(response_id, self._OPEN_DOC):
-            await self.__handle_open_doc_response(websocket, responses_manager,
-                                                  response)
+            await self.__handle_open_doc_reply(websocket, responses_manager,
+                                               response)
             responses_manager.remove_unhandled(response)
 
-    async def __handle_open_doc_response(self, websocket, responses_manager,
-                                         response):
+    async def __handle_open_doc_reply(self, websocket, responses_manager,
+                                      response):
 
         doc_handle = response.get('result').get('qReturn').get('qHandle')
         follow_up_req_id = await self.__send_get_sheets_message(
