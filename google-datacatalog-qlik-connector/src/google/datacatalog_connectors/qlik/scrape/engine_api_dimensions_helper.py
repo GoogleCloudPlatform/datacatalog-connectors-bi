@@ -105,7 +105,7 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
             if 'dimension' == info.get('qType')
         ]
         follow_up_req_ids = await asyncio.gather(*[
-            self.__send_get_dimension_request(websocket, doc_handle, dim_id)
+            self.__send_get_dimension_message(websocket, doc_handle, dim_id)
             for dim_id in dim_ids
         ])
         responses_manager.add_pending_ids(follow_up_req_ids,
@@ -115,17 +115,17 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                                               responses_manager, response):
 
         dim_handle = response.get('result').get('qReturn').get('qHandle')
-        follow_up_req_id = await self.__send_get_properties_request(
+        follow_up_req_id = await self.__send_get_properties_message(
             websocket, dim_handle)
         responses_manager.add_pending_id(follow_up_req_id,
                                          self.__GET_PROPERTIES)
 
-    async def __send_get_dimension_request(self, websocket, doc_handle,
+    async def __send_get_dimension_message(self, websocket, doc_handle,
                                            dimension_id):
-        """Sends a Get Dimension Interface request.
+        """Sends a Get Dimension Interface message.
 
         Returns:
-            The request id.
+            The message id.
         """
         message_id = self._generate_message_id()
         await websocket.send(
@@ -138,14 +138,14 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 'id': message_id,
             }))
 
-        logging.debug('Get Dimension Interface request sent: %d', message_id)
+        logging.debug('Get Dimension Interface message sent: %d', message_id)
         return message_id
 
-    async def __send_get_properties_request(self, websocket, dimension_handle):
-        """Sends a Get Dimension Properties request.
+    async def __send_get_properties_message(self, websocket, dimension_handle):
+        """Sends a Get Dimension Properties message.
 
         Returns:
-            The request id.
+            The message id.
         """
         message_id = self._generate_message_id()
         await websocket.send(
@@ -156,5 +156,5 @@ class EngineAPIDimensionsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 'id': message_id,
             }))
 
-        logging.debug('Get Dimension Properties request sent: %d', message_id)
+        logging.debug('Get Dimension Properties message sent: %d', message_id)
         return message_id

@@ -108,7 +108,7 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
             if 'masterobject' == info.get('qType')
         ]
         follow_up_req_ids = await asyncio.gather(*[
-            self.__send_get_object_request(websocket, doc_handle,
+            self.__send_get_object_message(websocket, doc_handle,
                                            master_obj_id)
             for master_obj_id in master_obj_ids
         ])
@@ -118,17 +118,17 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
                                            response):
 
         object_handle = response.get('result').get('qReturn').get('qHandle')
-        follow_up_req_id = await self.__send_get_properties_request(
+        follow_up_req_id = await self.__send_get_properties_message(
             websocket, object_handle)
         responses_manager.add_pending_id(follow_up_req_id,
                                          self.__GET_PROPERTIES)
 
-    async def __send_get_object_request(self, websocket, doc_handle,
+    async def __send_get_object_message(self, websocket, doc_handle,
                                         object_id):
-        """Sends a Get Object Interface request.
+        """Sends a Get Object Interface message.
 
         Returns:
-            The request id.
+            The message id.
         """
         message_id = self._generate_message_id()
         await websocket.send(
@@ -141,14 +141,14 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
                 'id': message_id,
             }))
 
-        logging.debug('Get Object Interface request sent: %d', message_id)
+        logging.debug('Get Object Interface message sent: %d', message_id)
         return message_id
 
-    async def __send_get_properties_request(self, websocket, object_handle):
-        """Sends a Get Object Properties request.
+    async def __send_get_properties_message(self, websocket, object_handle):
+        """Sends a Get Object Properties message.
 
         Returns:
-            The request id.
+            The message id.
         """
         message_id = self._generate_message_id()
         await websocket.send(
@@ -159,5 +159,5 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
                 'id': message_id,
             }))
 
-        logging.debug('Get Object Properties request sent: %d', message_id)
+        logging.debug('Get Object Properties message sent: %d', message_id)
         return message_id
