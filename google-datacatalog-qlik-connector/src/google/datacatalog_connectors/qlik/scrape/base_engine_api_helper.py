@@ -116,43 +116,43 @@ class BaseEngineAPIHelper(abc.ABC):
         return results[1]
 
     @classmethod
-    async def _consume_messages(cls, websocket, responses_manager,
+    async def _receive_messages(cls, websocket, responses_manager,
                                 result_method, result_path):
 
         results = []
         async for message in websocket:
-            response = json.loads(message)
-            response_id = response.get('id')
-            if not response_id:
-                cls.__handle_generic_api_response(response)
+            message_json = json.loads(message)
+            message_id = message_json.get('id')
+            if not message_id:
+                cls.__handle_generic_api_message(message_json)
                 continue
 
-            logging.debug('Response received: %d', response_id)
-            if responses_manager.is_pending(response_id, result_method):
-                result = jmespath.search(result_path, response)
+            logging.debug('Reply received: %d', message_id)
+            if responses_manager.is_pending(message_id, result_method):
+                result = jmespath.search(result_path, message_json)
                 if isinstance(result, list):
                     results.extend(result)
                 else:
                     results.append(result)
             else:
-                responses_manager.add_unhandled(response)
+                responses_manager.add_unhandled(message_json)
 
-            responses_manager.remove_pending_id(response_id)
+            responses_manager.remove_pending_id(message_id)
             responses_manager.notify_new_response()
 
         return results
 
     @classmethod
-    def __handle_generic_api_response(cls, response):
-        cls.__handle_error_api_response(response)
+    def __handle_generic_api_message(cls, message):
+        cls.__handle_error_api_message(message)
 
     @classmethod
-    def __handle_error_api_response(cls, response):
-        method = response.get('method')
+    def __handle_error_api_message(cls, message):
+        method = message.get('method')
         if 'OnMaxParallelSessionsExceeded' == method:
-            message = response.get('params').get('message')
-            logging.warning(message)
-            raise Exception(message)
+            error_message = message.get('params').get('message')
+            logging.warning(error_message)
+            raise Exception(error_message)
 
     @classmethod
     async def _send_messages(cls, websocket, responses_manager, sender):

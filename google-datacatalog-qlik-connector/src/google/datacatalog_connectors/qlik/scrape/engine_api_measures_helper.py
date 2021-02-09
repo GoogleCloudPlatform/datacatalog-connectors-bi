@@ -49,15 +49,15 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
             await self._start_websocket_communication(websocket, app_id,
                                                       responses_manager)
 
-            consumer = self.__consume_get_measures_msg
+            consumer = self.__receive_get_measures_msg
             producer = self.__send_get_measures_msg
             return await asyncio.wait_for(
                 self._hold_websocket_communication(
                     producer(websocket, responses_manager),
                     consumer(websocket, responses_manager)), timeout)
 
-    async def __consume_get_measures_msg(self, websocket, responses_manager):
-        return await self._consume_messages(websocket, responses_manager,
+    async def __receive_get_measures_msg(self, websocket, responses_manager):
+        return await self._receive_messages(websocket, responses_manager,
                                             self.__GET_PROPERTIES,
                                             'result.qProp')
 
