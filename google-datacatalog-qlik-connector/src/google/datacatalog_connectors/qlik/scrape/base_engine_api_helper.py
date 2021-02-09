@@ -155,13 +155,13 @@ class BaseEngineAPIHelper(abc.ABC):
             raise Exception(message)
 
     @classmethod
-    async def _produce_messages(cls, websocket, responses_manager, producer):
+    async def _send_messages(cls, websocket, responses_manager, sender):
         while not responses_manager.were_all_precessed():
             if not responses_manager.is_there_response_notification():
                 await responses_manager.wait_for_responses()
                 responses_manager.clear_response_notifications()
             for response in responses_manager.get_all_unhandled():
-                await producer(websocket, responses_manager, response)
+                await sender(websocket, responses_manager, response)
 
         # Closes the websocket when there is no further response to process.
         await websocket.close()

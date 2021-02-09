@@ -45,7 +45,7 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                                                       responses_manager)
 
             consumer = self.__consume_get_sheets_msg
-            producer = self.__produce_get_sheets_msg
+            producer = self.__send_get_sheets_msg
             return await asyncio.wait_for(
                 self._hold_websocket_communication(
                     producer(websocket, responses_manager),
@@ -55,9 +55,9 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
         return await self._consume_messages(websocket, responses_manager,
                                             self.__GET_OBJECTS, 'result.qList')
 
-    async def __produce_get_sheets_msg(self, websocket, responses_manager):
-        return await self._produce_messages(
-            websocket, responses_manager, self.__send_follow_up_msg_get_sheets)
+    async def __send_get_sheets_msg(self, websocket, responses_manager):
+        return await self._send_messages(websocket, responses_manager,
+                                         self.__send_follow_up_msg_get_sheets)
 
     async def __send_follow_up_msg_get_sheets(self, websocket,
                                               responses_manager, response):
@@ -72,15 +72,15 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                                          response):
 
         doc_handle = response.get('result').get('qReturn').get('qHandle')
-        follow_up_req_id = await self.__send_get_sheets_request(
+        follow_up_req_id = await self.__send_get_sheets_message(
             websocket, doc_handle)
         responses_manager.add_pending_id(follow_up_req_id, self.__GET_OBJECTS)
 
-    async def __send_get_sheets_request(self, websocket, doc_handle):
-        """Sends a Get Objects request for the sheet type.
+    async def __send_get_sheets_message(self, websocket, doc_handle):
+        """Sends a Get Objects message for the sheet type.
 
         Returns:
-            The request id.
+            The message id.
         """
         message_id = self._generate_message_id()
         await websocket.send(
@@ -95,5 +95,5 @@ class EngineAPISheetsHelper(base_engine_api_helper.BaseEngineAPIHelper):
                 'id': message_id,
             }))
 
-        logging.debug('Get Objects (type=sheet) request sent: %d', message_id)
+        logging.debug('Get Objects (type=sheet) message sent: %d', message_id)
         return message_id

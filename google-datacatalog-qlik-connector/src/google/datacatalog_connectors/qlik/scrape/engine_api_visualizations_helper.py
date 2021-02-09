@@ -50,7 +50,7 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
                                                       responses_manager)
 
             consumer = self.__consume_get_visualizations_msg
-            producer = self.__produce_get_visualizations_msg
+            producer = self.__send_get_visualizations_msg
             return await asyncio.wait_for(
                 self._hold_websocket_communication(
                     producer(websocket, responses_manager),
@@ -58,13 +58,15 @@ class EngineAPIVisualizationsHelper(base_helper.BaseEngineAPIHelper):
 
     async def __consume_get_visualizations_msg(self, websocket,
                                                responses_manager):
+
         return await self._consume_messages(websocket, responses_manager,
                                             self.__GET_PROPERTIES,
                                             'result.qProp')
 
-    async def __produce_get_visualizations_msg(self, websocket,
-                                               responses_manager):
-        return await self._produce_messages(
+    async def __send_get_visualizations_msg(self, websocket,
+                                            responses_manager):
+
+        return await self._send_messages(
             websocket, responses_manager,
             self.__send_follow_up_msg_get_visualizations)
 
