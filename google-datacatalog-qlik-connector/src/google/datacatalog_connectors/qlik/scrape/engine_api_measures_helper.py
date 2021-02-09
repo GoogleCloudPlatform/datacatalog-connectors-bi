@@ -90,7 +90,7 @@ class EngineAPIMeasuresHelper(base_engine_api_helper.BaseEngineAPIHelper):
 
         doc_handle = response.get('result').get('qReturn').get('qHandle')
         responses_manager.set_handle(doc_handle, self.__DOC_HANDLE)
-        follow_up_req_id = await self._send_get_all_infos_request(
+        follow_up_req_id = await self._send_get_all_infos_message(
             websocket, doc_handle)
         responses_manager.add_pending_id(follow_up_req_id, self._GET_ALL_INFOS)
 

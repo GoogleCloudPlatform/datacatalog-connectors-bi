@@ -184,11 +184,11 @@ class BaseEngineAPIHelper(abc.ABC):
         logging.debug('Open Doc Interface message sent: %d', message_id)
         return message_id
 
-    async def _send_get_all_infos_request(self, websocket, doc_handle):
-        """Sends a Get All Infos request.
+    async def _send_get_all_infos_message(self, websocket, doc_handle):
+        """Sends a Get All Infos message.
 
         Returns:
-            The request id.
+            The message id.
         """
         message_id = self._generate_message_id()
         await websocket.send(
@@ -199,7 +199,7 @@ class BaseEngineAPIHelper(abc.ABC):
                 'id': message_id,
             }))
 
-        logging.debug('Get All Infos request sent: %d', message_id)
+        logging.debug('Get All Infos message sent: %d', message_id)
         return message_id
 
     def _generate_message_id(self):

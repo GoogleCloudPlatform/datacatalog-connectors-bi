@@ -66,7 +66,7 @@ class EngineAPIVisualizationsHelperTest(unittest.TestCase):
     # ones from EngineAPIVisualizationsHelper as well, thus testing in a more
     # granular way.
     @mock.patch(f'{__BASE_CLASS}._generate_message_id')
-    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
+    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_message')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_message')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
@@ -132,7 +132,7 @@ class EngineAPIVisualizationsHelperTest(unittest.TestCase):
     # refactoring it in the future to mock that method, and the private async
     # ones from EngineAPIVisualizationsHelper as well, thus testing in a more
     # granular way.
-    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
+    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_message')
     @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_message')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)

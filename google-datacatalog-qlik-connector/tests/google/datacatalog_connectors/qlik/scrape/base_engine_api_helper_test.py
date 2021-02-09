@@ -194,7 +194,7 @@ class BaseEngineAPIHelperTest(unittest.TestCase):
 
         mock_generate_message_id.return_value = 10
         request_id = asyncio.new_event_loop().run_until_complete(
-            self.__helper._send_get_all_infos_request(mock_websocket, 1))
+            self.__helper._send_get_all_infos_message(mock_websocket, 1))
 
         mock_generate_message_id.assert_called_once()
         self.assertEqual(10, request_id)
