@@ -59,24 +59,24 @@ class EngineAPIVisualizationsHelperTest(unittest.TestCase):
         visualizations = self.__helper.get_visualizations('app-id')
         self.assertEqual(0, len(visualizations))
 
-    # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
-    # mocked in this test case in order to simulate a full produce/consume
-    # scenario with responses that represent an App with Visualizations. Maybe
-    # it's worth refactoring it in the future to mock that method, and the
-    # private async ones from EngineAPIVisualizationsHelper as well, thus
-    # testing in a more granular way.
-    @mock.patch(f'{__BASE_CLASS}._generate_request_id')
-    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
-    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
+    # BaseEngineAPIHelper._hold_websocket_communication is purposefully not
+    # mocked in this test case in order to simulate a full send/reply scenario
+    # with replies representing an App with Visualizations. Maybe it's worth
+    # refactoring it in the future to mock that method, and the private async
+    # ones from EngineAPIVisualizationsHelper as well, thus testing in a more
+    # granular way.
+    @mock.patch(f'{__BASE_CLASS}._generate_message_id')
+    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_message')
+    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_message')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_visualizations_should_return_list_on_success(
             self, mock_websocket, mock_send_open_doc, mock_send_get_all_infos,
-            mock_generate_request_id):
+            mock_generate_message_id):
 
         mock_send_open_doc.return_value = asyncio.sleep(delay=0, result=1)
         mock_send_get_all_infos.return_value = asyncio.sleep(delay=0, result=2)
-        mock_generate_request_id.side_effect = [3, 4]
+        mock_generate_message_id.side_effect = [3, 4]
 
         websocket_ctx = mock_websocket.return_value.__enter__.return_value
         websocket_ctx.set_itr_break(0.25)
@@ -126,14 +126,14 @@ class EngineAPIVisualizationsHelperTest(unittest.TestCase):
         mock_send_open_doc.assert_called_once()
         mock_send_get_all_infos.assert_called_once()
 
-    # BaseEngineAPIHelper._handle_websocket_communication is purposefully not
-    # mocked in this test case in order to simulate a full produce/consume
-    # scenario with responses that represent an App with no Visualizations.
-    # Maybe it's worth refactoring it in the future to mock that method, and
-    # the private async ones from EngineAPIVisualizationsHelper as well, thus
-    # testing in a more granular way.
-    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_request')
-    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_request')
+    # BaseEngineAPIHelper._hold_websocket_communication is purposefully not
+    # mocked in this test case in order to simulate a full send/reply scenario
+    # with replies representing an App with no Visualizations. Maybe it's worth
+    # refactoring it in the future to mock that method, and the private async
+    # ones from EngineAPIVisualizationsHelper as well, thus testing in a more
+    # granular way.
+    @mock.patch(f'{__BASE_CLASS}._send_get_all_infos_message')
+    @mock.patch(f'{__BASE_CLASS}._BaseEngineAPIHelper__send_open_doc_message')
     @mock.patch(f'{__BASE_CLASS}._connect_websocket',
                 new_callable=scrape_ops_mocks.AsyncContextManager)
     def test_get_visualizations_should_return_empty_list_on_none_available(

@@ -43,8 +43,8 @@ class BaseEngineAPIHelper(abc.ABC):
         self.__common_headers = {
             constants.XRFKEY_HEADER_NAME: constants.XRFKEY,
         }
-        self.__requests_counter = 0
-        self.__requests_counter_thread_lock = threading.Lock()
+        self.__messages_counter = 0
+        self.__messages_counter_thread_lock = threading.Lock()
 
     def _connect_websocket(self, app_id):
         """Opens a websocket connection.
@@ -70,11 +70,6 @@ class BaseEngineAPIHelper(abc.ABC):
 
         return websockets.connect(uri=uri, extra_headers=headers)
 
-    def _generate_request_id(self):
-        with self.__requests_counter_thread_lock:
-            self.__requests_counter += 1
-            return self.__requests_counter
-
     @classmethod
     def _run_until_complete(cls, future):
         event_loop = asyncio.new_event_loop()
@@ -95,106 +90,119 @@ class BaseEngineAPIHelper(abc.ABC):
             task.cancel()
 
     async def _start_websocket_communication(self, websocket, app_id,
-                                             responses_manager):
+                                             replies_helper):
 
         request_id = \
-            await self.__send_open_doc_request(websocket, app_id)
-        responses_manager.add_pending_id(request_id, self._OPEN_DOC)
+            await self.__send_open_doc_message(websocket, app_id)
+        replies_helper.add_pending_id(request_id, self._OPEN_DOC)
 
     @classmethod
-    async def _consume_messages(cls, websocket, responses_manager,
-                                result_method, result_path):
+    async def _hold_websocket_communication(cls, msg_sender, msg_receiver):
+        """Holds a websocket communication session until the awaitable message
+        sender and receiver are done.
+
+        Args:
+            msg_sender: A coroutine or future that sends messages.
+            msg_receiver: A coroutine or future that receives messages.
+
+        Returns:
+            The result of the receiver.
+        """
+        # The ``results`` list is expected to have two elements. The first one
+        # stores the message sender's result and can be ignored. The second one
+        # stores the receiver's result, which means the object to be returned
+        # on successful execution.
+        results = await asyncio.gather(*[msg_sender, msg_receiver])
+        return results[1]
+
+    @classmethod
+    async def _receive_messages(cls, websocket, replies_helper, result_method,
+                                result_path):
 
         results = []
         async for message in websocket:
-            response = json.loads(message)
-            response_id = response.get('id')
-            if not response_id:
-                cls.__handle_generic_api_response(response)
+            message_json = json.loads(message)
+            message_id = message_json.get('id')
+            if not message_id:
+                cls.__handle_generic_api_message(message_json)
                 continue
 
-            logging.debug('Response received: %d', response_id)
-            if responses_manager.is_pending(response_id, result_method):
-                result = jmespath.search(result_path, response)
+            logging.debug('Reply received: %d', message_id)
+            if replies_helper.is_pending(message_id, result_method):
+                result = jmespath.search(result_path, message_json)
                 if isinstance(result, list):
                     results.extend(result)
                 else:
                     results.append(result)
             else:
-                responses_manager.add_unhandled(response)
+                replies_helper.add_unhandled(message_json)
 
-            responses_manager.remove_pending_id(response_id)
-            responses_manager.notify_new_response()
+            replies_helper.remove_pending_id(message_id)
+            replies_helper.notify_new_reply()
 
         return results
 
     @classmethod
-    def __handle_generic_api_response(cls, response):
-        cls.__handle_error_api_response(response)
+    def __handle_generic_api_message(cls, message):
+        cls.__handle_error_api_message(message)
 
     @classmethod
-    def __handle_error_api_response(cls, response):
-        method = response.get('method')
+    def __handle_error_api_message(cls, message):
+        method = message.get('method')
         if 'OnMaxParallelSessionsExceeded' == method:
-            message = response.get('params').get('message')
-            logging.warning(message)
-            raise Exception(message)
+            error_message = message.get('params').get('message')
+            logging.warning(error_message)
+            raise Exception(error_message)
 
     @classmethod
-    async def _produce_messages(cls, websocket, responses_manager, producer):
-        while not responses_manager.were_all_precessed():
-            if not responses_manager.is_there_response_notification():
-                await responses_manager.wait_for_responses()
-                responses_manager.clear_response_notifications()
-            for response in responses_manager.get_all_unhandled():
-                await producer(websocket, responses_manager, response)
+    async def _send_messages(cls, websocket, replies_helper, sender):
+        while not replies_helper.were_all_processed():
+            if not replies_helper.is_there_reply_notification():
+                await replies_helper.wait_for_replies()
+                replies_helper.clear_reply_notifications()
+            for reply in replies_helper.get_all_unhandled():
+                await sender(websocket, replies_helper, reply)
 
-        # Closes the websocket when there is no further response to process.
+        # Closes the websocket when there are no more replies to be processed.
         await websocket.close()
 
-    @classmethod
-    async def _handle_websocket_communication(cls, consumer_future,
-                                              producer_future):
-
-        # The 'results' array is expected to have two elements. The first one
-        # stores the result of the consumer, which means the object to be
-        # returned on a successfull execution. The second one stores the result
-        # of the producer and can be ignored.
-        results = await asyncio.gather(*[consumer_future, producer_future])
-        return results[0]
-
-    async def __send_open_doc_request(self, websocket, app_id):
-        """Sends a Open Doc (aka App) Interface request.
+    async def __send_open_doc_message(self, websocket, app_id):
+        """Sends a Open Doc (aka App) Interface message.
 
         Returns:
-            The request id.
+            The message id.
         """
-        request_id = self._generate_request_id()
+        message_id = self._generate_message_id()
         await websocket.send(
             json.dumps({
                 'handle': -1,
                 'method': self._OPEN_DOC,
                 'params': [app_id],
-                'id': request_id
+                'id': message_id
             }))
 
-        logging.debug('Open Doc Interface request sent: %d', request_id)
-        return request_id
+        logging.debug('Open Doc Interface message sent: %d', message_id)
+        return message_id
 
-    async def _send_get_all_infos_request(self, websocket, doc_handle):
-        """Sends a Get All Infos request.
+    async def _send_get_all_infos_message(self, websocket, doc_handle):
+        """Sends a Get All Infos message.
 
         Returns:
-            The request id.
+            The message id.
         """
-        request_id = self._generate_request_id()
+        message_id = self._generate_message_id()
         await websocket.send(
             json.dumps({
                 'handle': doc_handle,
                 'method': self._GET_ALL_INFOS,
                 'params': {},
-                'id': request_id,
+                'id': message_id,
             }))
 
-        logging.debug('Get All Infos request sent: %d', request_id)
-        return request_id
+        logging.debug('Get All Infos message sent: %d', message_id)
+        return message_id
+
+    def _generate_message_id(self):
+        with self.__messages_counter_thread_lock:
+            self.__messages_counter += 1
+            return self.__messages_counter
