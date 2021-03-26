@@ -42,60 +42,107 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         tag_template.display_name = 'Qlik App Metadata'
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       is_required=True,
+                                       order=16)
 
-        self._add_primitive_type_field(tag_template, 'owner_username',
-                                       self.__STRING_TYPE, 'Owner username')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner username',
+                                       order=15)
 
-        self._add_primitive_type_field(tag_template, 'owner_name',
-                                       self.__STRING_TYPE, 'Owner name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner name',
+                                       order=14)
 
-        self._add_primitive_type_field(tag_template, 'modified_by_username',
-                                       self.__STRING_TYPE,
-                                       'Username who modified it')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='modified_by_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Username who modified it',
+                                       order=13)
 
-        self._add_primitive_type_field(tag_template, 'published',
-                                       self.__BOOL_TYPE, 'Published')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='published',
+                                       field_type=self.__BOOL_TYPE,
+                                       display_name='Published',
+                                       is_required=True,
+                                       order=12)
 
-        self._add_primitive_type_field(tag_template, 'publish_time',
-                                       self.__TIMESTAMP_TYPE, 'Publish time')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='publish_time',
+                                       field_type=self.__TIMESTAMP_TYPE,
+                                       display_name='Publish time',
+                                       order=11)
 
-        self._add_primitive_type_field(tag_template, 'last_reload_time',
-                                       self.__TIMESTAMP_TYPE,
-                                       'Last reload time')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='last_reload_time',
+                                       field_type=self.__TIMESTAMP_TYPE,
+                                       display_name='Last reload time',
+                                       order=10)
 
-        self._add_primitive_type_field(tag_template, 'stream_id',
-                                       self.__STRING_TYPE, 'Stream Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='stream_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Stream Id',
+                                       is_required=True,
+                                       order=9)
 
-        self._add_primitive_type_field(tag_template, 'stream_name',
-                                       self.__STRING_TYPE, 'Stream name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='stream_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Stream name',
+                                       is_required=True,
+                                       order=8)
 
-        self._add_primitive_type_field(tag_template, 'stream_entry',
-                                       self.__STRING_TYPE,
-                                       'Data Catalog Entry for the Stream')
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='stream_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the Stream',
+            order=7)
 
-        self._add_primitive_type_field(tag_template, 'file_size',
-                                       self.__STRING_TYPE, 'File size')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='file_size',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='File size',
+                                       order=6)
 
-        self._add_primitive_type_field(tag_template, 'thumbnail',
-                                       self.__STRING_TYPE, 'Thumbnail')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='thumbnail',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Thumbnail',
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template,
-                                       'saved_in_product_version',
-                                       self.__STRING_TYPE,
-                                       'Saved in product version')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='saved_in_product_version',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Saved in product version',
+                                       order=4)
 
-        self._add_primitive_type_field(tag_template, 'migration_hash',
-                                       self.__STRING_TYPE, 'Migration hash')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='migration_hash',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Migration hash',
+                                       order=3)
 
-        self._add_primitive_type_field(tag_template, 'availability_status',
-                                       self.__DOUBLE_TYPE,
-                                       'Availability status')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='availability_status',
+                                       field_type=self.__DOUBLE_TYPE,
+                                       display_name='Availability status',
+                                       order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
 
@@ -109,25 +156,43 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         tag_template.display_name = 'Qlik Custom Property Definition Metadata'
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       is_required=True,
+                                       order=6)
 
-        self._add_primitive_type_field(tag_template, 'modified_by_username',
-                                       self.__STRING_TYPE,
-                                       'Username who modified it')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='modified_by_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Username who modified it',
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template, 'value_type',
-                                       self.__STRING_TYPE, 'Value type')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='value_type',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Value type',
+                                       order=4)
 
-        self._add_primitive_type_field(tag_template, 'choice_values',
-                                       self.__STRING_TYPE, 'Choice values')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='choice_values',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Choice values',
+                                       order=3)
 
-        self._add_primitive_type_field(tag_template, 'object_types',
-                                       self.__STRING_TYPE, 'Object types')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='object_types',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Object types',
+                                       order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
 
@@ -148,25 +213,44 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
             .make_display_name_for_custom_property_value_tag_template(
                 definition_metadata, value)
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       is_required=True,
+                                       order=9)
 
-        self._add_primitive_type_field(tag_template, 'created_date',
-                                       self.__TIMESTAMP_TYPE, 'Created date')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='created_date',
+                                       field_type=self.__TIMESTAMP_TYPE,
+                                       display_name='Created date',
+                                       order=8)
 
-        self._add_primitive_type_field(tag_template, 'modified_date',
-                                       self.__TIMESTAMP_TYPE, 'Modified date')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='modified_date',
+                                       field_type=self.__TIMESTAMP_TYPE,
+                                       display_name='Modified date',
+                                       order=7)
 
-        self._add_primitive_type_field(tag_template, 'modified_by_username',
-                                       self.__STRING_TYPE,
-                                       'Username who modified it')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='modified_by_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Username who modified it',
+                                       order=6)
 
-        self._add_primitive_type_field(tag_template, 'value',
-                                       self.__STRING_TYPE, 'Value')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='value',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Value',
+                                       is_required=True,
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template, 'property_definition_id',
-                                       self.__STRING_TYPE,
-                                       'Property Definition Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='property_definition_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Property Definition Id',
+                                       is_required=True,
+                                       order=4)
 
         # According to the Qlik Analytics Platform Architecture Team, there was
         # no way of searching assets by the Custom Property values using Qlik
@@ -174,17 +258,27 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         # catalog search might be helpful to address such a use case. Hence the
         # 'definition_' part was supressed from this Tag Field Id to turn seach
         # queries more intuitive, e.g. tag:property_name:<PROPERTY-NAME>.
-        self._add_primitive_type_field(tag_template, 'property_name',
-                                       self.__STRING_TYPE,
-                                       'Property Definition name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='property_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Property Definition name',
+                                       is_required=True,
+                                       order=3)
 
         self._add_primitive_type_field(
-            tag_template, 'property_definition_entry', self.__STRING_TYPE,
-            'Data Catalog Entry for the Property Definition')
+            tag_template=tag_template,
+            field_id='property_definition_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the Property Definition',
+            is_required=True,
+            order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
 
@@ -198,36 +292,69 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         tag_template.display_name = 'Qlik Dimension Metadata'
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       is_required=True,
+                                       order=9)
 
-        self._add_enum_type_field(tag_template, 'grouping', [
-            constants.DIMENSION_GROUPING_SINGLE_TAG_FIELD,
-            constants.DIMENSION_GROUPING_DRILL_DOWN_TAG_FIELD
-        ], 'Grouping')
+        self._add_enum_type_field(
+            tag_template=tag_template,
+            field_id='grouping',
+            values=[
+                constants.DIMENSION_GROUPING_SINGLE_TAG_FIELD,
+                constants.DIMENSION_GROUPING_DRILL_DOWN_TAG_FIELD
+            ],
+            display_name='Grouping',
+            order=8)
 
-        self._add_primitive_type_field(tag_template, 'fields',
-                                       self.__STRING_TYPE, 'Fields')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='fields',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Fields',
+                                       order=7)
 
-        self._add_primitive_type_field(tag_template, 'field_labels',
-                                       self.__STRING_TYPE, 'Field labels')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='field_labels',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Field labels',
+                                       order=6)
 
-        self._add_primitive_type_field(tag_template, 'tags',
-                                       self.__STRING_TYPE, 'Qlik tags')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='tags',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik tags',
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template, 'app_id',
-                                       self.__STRING_TYPE, 'App Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App Id',
+                                       is_required=True,
+                                       order=4)
 
-        self._add_primitive_type_field(tag_template, 'app_name',
-                                       self.__STRING_TYPE, 'App name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App name',
+                                       is_required=True,
+                                       order=3)
 
-        self._add_primitive_type_field(tag_template, 'app_entry',
-                                       self.__STRING_TYPE,
-                                       'Data Catalog Entry for the App')
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='app_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the App',
+            is_required=True,
+            order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
 
@@ -241,34 +368,64 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         tag_template.display_name = 'Qlik Measure Metadata'
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       order=9)
 
-        self._add_primitive_type_field(tag_template, 'expression',
-                                       self.__STRING_TYPE, 'Expression')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='expression',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Expression',
+                                       order=8)
 
-        self._add_primitive_type_field(tag_template, 'label_expression',
-                                       self.__STRING_TYPE, 'Label expression')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='label_expression',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Label expression',
+                                       order=7)
 
-        self._add_primitive_type_field(tag_template, 'is_custom_formatted',
-                                       self.__BOOL_TYPE, 'Is custom formatted')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='is_custom_formatted',
+                                       field_type=self.__BOOL_TYPE,
+                                       display_name='Is custom formatted',
+                                       order=6)
 
-        self._add_primitive_type_field(tag_template, 'tags',
-                                       self.__STRING_TYPE, 'Qlik tags')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='tags',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik tags',
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template, 'app_id',
-                                       self.__STRING_TYPE, 'App Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App Id',
+                                       is_required=True,
+                                       order=4)
 
-        self._add_primitive_type_field(tag_template, 'app_name',
-                                       self.__STRING_TYPE, 'App name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App name',
+                                       is_required=True,
+                                       order=3)
 
-        self._add_primitive_type_field(tag_template, 'app_entry',
-                                       self.__STRING_TYPE,
-                                       'Data Catalog Entry for the App')
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='app_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the App',
+            is_required=True,
+            order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
 
@@ -282,43 +439,83 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         tag_template.display_name = 'Qlik Sheet Metadata'
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       is_required=True,
+                                       order=12)
 
-        self._add_primitive_type_field(tag_template, 'owner_username',
-                                       self.__STRING_TYPE, 'Owner username')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner username',
+                                       order=11)
 
-        self._add_primitive_type_field(tag_template, 'owner_name',
-                                       self.__STRING_TYPE, 'Owner name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner name',
+                                       order=10)
 
-        self._add_primitive_type_field(tag_template, 'published',
-                                       self.__BOOL_TYPE, 'Published')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='published',
+                                       field_type=self.__BOOL_TYPE,
+                                       display_name='Published',
+                                       order=9)
 
-        self._add_primitive_type_field(tag_template, 'publish_time',
-                                       self.__TIMESTAMP_TYPE, 'Publish time')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='publish_time',
+                                       field_type=self.__TIMESTAMP_TYPE,
+                                       display_name='Publish time',
+                                       order=8)
 
-        self._add_primitive_type_field(tag_template, 'approved',
-                                       self.__BOOL_TYPE, 'Approved')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='approved',
+                                       field_type=self.__BOOL_TYPE,
+                                       display_name='Approved',
+                                       order=7)
 
-        self._add_primitive_type_field(tag_template, 'app_id',
-                                       self.__STRING_TYPE, 'App Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App Id',
+                                       is_required=True,
+                                       order=6)
 
-        self._add_primitive_type_field(tag_template, 'app_name',
-                                       self.__STRING_TYPE, 'App name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App name',
+                                       is_required=True,
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template, 'app_entry',
-                                       self.__STRING_TYPE,
-                                       'Data Catalog Entry for the App')
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='app_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the App',
+            is_required=True,
+            order=4)
 
-        self._add_primitive_type_field(tag_template, 'source_object',
-                                       self.__STRING_TYPE, 'Source object')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='source_object',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Source object',
+                                       order=3)
 
-        self._add_primitive_type_field(tag_template, 'draft_object',
-                                       self.__STRING_TYPE, 'Draft object')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='draft_object',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Draft object',
+                                       order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
 
@@ -332,22 +529,37 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         tag_template.display_name = 'Qlik Stream Metadata'
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       is_required=True,
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template, 'owner_username',
-                                       self.__STRING_TYPE, 'Owner username')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner username',
+                                       order=4)
 
-        self._add_primitive_type_field(tag_template, 'owner_name',
-                                       self.__STRING_TYPE, 'Owner name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner name',
+                                       order=3)
 
-        self._add_primitive_type_field(tag_template, 'modified_by_username',
-                                       self.__STRING_TYPE,
-                                       'Username who modified it')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='modified_by_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Username who modified it',
+                                       order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
 
@@ -361,36 +573,70 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         tag_template.display_name = 'Qlik Visualization Metadata'
 
-        self._add_primitive_type_field(tag_template, 'id', self.__STRING_TYPE,
-                                       'Unique Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Unique Id',
+                                       is_required=True,
+                                       order=10)
 
-        self._add_primitive_type_field(tag_template, 'title',
-                                       self.__STRING_TYPE, 'Title')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='title',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Title',
+                                       order=9)
 
-        self._add_primitive_type_field(tag_template, 'subtitle',
-                                       self.__STRING_TYPE, 'Subtitle')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='subtitle',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Subtitle',
+                                       order=8)
 
-        self._add_primitive_type_field(tag_template, 'footnote',
-                                       self.__STRING_TYPE, 'Footnote')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='footnote',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Footnote',
+                                       order=7)
 
-        self._add_primitive_type_field(tag_template, 'type',
-                                       self.__STRING_TYPE, 'Type')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='type',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Type',
+                                       order=6)
 
-        self._add_primitive_type_field(tag_template, 'tags',
-                                       self.__STRING_TYPE, 'Qlik tags')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='tags',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik tags',
+                                       order=5)
 
-        self._add_primitive_type_field(tag_template, 'app_id',
-                                       self.__STRING_TYPE, 'App Id')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App Id',
+                                       is_required=True,
+                                       order=4)
 
-        self._add_primitive_type_field(tag_template, 'app_name',
-                                       self.__STRING_TYPE, 'App name')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='app_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='App name',
+                                       is_required=True,
+                                       order=3)
 
-        self._add_primitive_type_field(tag_template, 'app_entry',
-                                       self.__STRING_TYPE,
-                                       'Data Catalog Entry for the App')
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='app_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the App',
+            is_required=True,
+            order=2)
 
-        self._add_primitive_type_field(tag_template, 'site_url',
-                                       self.__STRING_TYPE,
-                                       'Qlik Sense site url')
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='site_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Qlik Sense site url',
+                                       is_required=True,
+                                       order=1)
 
         return tag_template
