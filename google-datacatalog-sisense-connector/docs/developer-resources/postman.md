@@ -20,4 +20,6 @@ v1](https://sisense.dev/reference/rest/v1.html).
 
 1. Sample environment file: [tools/postman/sisense-sample-environment.postman_environment.json](../../tools/postman/sisense-sample-environment.postman_environment.json)
 
+---
+
 Back to the [Developer Resources index](..)
