@@ -1,0 +1,236 @@
+{
+	"info": {
+		"_postman_id": "973ae1ce-2cc9-41b8-8c07-5e661315673c",
+		"name": "Sisense REST API v1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 Authentication",
+			"item": [
+				{
+					"name": "0.01.01 Login",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.clear();"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"access_token\", pm.response.json().access_token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "{{USERNAME}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{PASSWORD}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/authentication/login",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"authentication",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1 REST API",
+			"item": [
+				{
+					"name": "1.01.01 Get Folders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/folders",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"folders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.02.01 Get Dashboards",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const dashboards = jsonData;",
+									"",
+									"pm.globals.unset(\"dashboardId\");",
+									"",
+									"if (dashboards.length > 0) {",
+									"    pm.globals.set(\"dashboardId\", dashboards[0].oid);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards?expand=owner,parentFolder",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboards"
+							],
+							"query": [
+								{
+									"key": "expand",
+									"value": "owner,parentFolder"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.02.02 Get Dashboard by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}?expand=owner",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboards",
+								"{{dashboardId}}"
+							],
+							"query": [
+								{
+									"key": "expand",
+									"value": "owner"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.03.01 Get Widgets by dashboard",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}/widgets",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"dashboards",
+								"{{dashboardId}}",
+								"widgets"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
