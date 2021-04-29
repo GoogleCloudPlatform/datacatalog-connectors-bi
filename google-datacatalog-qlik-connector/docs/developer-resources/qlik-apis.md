@@ -19,4 +19,4 @@ The below API docs were used as a reference to develop this connector:
    actions on these objects.
    - [Overview](https://help.qlik.com/en-US/sense-developer/September2020/Subsystems/EngineAPI/Content/Sense_EngineAPI/introducing-engine-API.htm)
    - [Specification](https://help.qlik.com/en-US/sense-developer/September2020/APIs/EngineAPI/index.html)
-   - API explorer tool: https://<your-qlik-site>/dev-hub/engine-api-explorer
+   - API explorer tool: `https://<your-qlik-site>/dev-hub/engine-api-explorer`
