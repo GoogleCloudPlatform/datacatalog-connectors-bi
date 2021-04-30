@@ -119,4 +119,7 @@ downloadable Workbooks and start adding content to your sites:
   although designed to connect to common enterprise applications and analyse
   actual data, they come with sample data that fit very well for testing and
   demonstration purposes.
-  
+
+---
+
+Back to the [Developer Resources index](..)

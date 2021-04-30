@@ -1,8 +1,9 @@
-# Detailed documentation
+# Additional documentation
 
-More detailed documentation related to the Connector is available in this
-directory.
+This directory contains additional documentation on the connector.
 
 - [Developer Resources](developer-resources)
+
+---
 
 Back to [Home](..)
