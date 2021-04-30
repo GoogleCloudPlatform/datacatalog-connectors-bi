@@ -38,3 +38,7 @@ requests. The available collections cover both Tableau GraphQL and REST APIs.
 ## Sample environment
 
 1. File: [tools/postman/tableau-sample-environment.postman_environment.json](../../tools/postman/tableau-sample-environment.postman_environment.json)
+
+---
+
+Back to the [Developer Resources index](..)

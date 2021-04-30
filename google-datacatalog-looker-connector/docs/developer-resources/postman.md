@@ -19,3 +19,7 @@ requests. The available collection covers the Looker REST API.
    | `QUERY_ID`          | ID of a Query to fetch its metadata, including the generated SQL statement |
    | `LOOKML_MODEL_NAME` | Name of a LookML Model to fetch metadata from                              |
    | `CONNECTION_NAME`   | Name of a Connection to fetch metadata from                                |
+
+---
+
+Back to the [Developer Resources index](..)
