@@ -17,6 +17,7 @@ jobs:
         build-dir:
           [
             "./google-datacatalog-qlik-connector",
+            "./google-datacatalog-sisense-connector",
             "./google-datacatalog-tableau-connector",
           ]
         python-version: [3.6]
@@ -54,6 +55,7 @@ jobs:
           [
             "./google-datacatalog-looker-connector",
             "./google-datacatalog-qlik-connector",
+            "./google-datacatalog-sisense-connector",
             "./google-datacatalog-tableau-connector",
           ]
         python-version: [3.7]
@@ -89,6 +91,7 @@ jobs:
       matrix:
         build-dir:
           [
+            "./google-datacatalog-sisense-connector",
             "./google-datacatalog-tableau-connector",
           ]
         python-version: [3.8]
