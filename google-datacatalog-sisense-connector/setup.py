@@ -31,6 +31,11 @@ setuptools.setup(
     packages=setuptools.find_packages(where='./src'),
     namespace_packages=['google', 'google.datacatalog_connectors'],
     package_dir={'': 'src'},
+    entry_points={
+        'console_scripts': [
+            'google-datacatalog-sisense-connector = google.datacatalog_connectors.sisense:main',
+        ],
+    },
     include_package_data=True,
     install_requires=('google-datacatalog-connectors-commons ~= 0.6.8',),
     setup_requires=('pytest-runner',),
