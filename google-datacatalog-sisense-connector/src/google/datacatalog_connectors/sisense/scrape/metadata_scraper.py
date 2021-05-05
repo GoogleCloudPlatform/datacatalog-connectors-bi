@@ -35,10 +35,24 @@ class MetadataScraper:
         logging.info('')
         logging.info('  %s Folders found:', len(folders))
         for folder in folders:
-            logging.info('    - %s [%s]', folder.get('name'),
-                         folder.get('_id'))
+            name = folder.get('name')
+            folder_id = folder.get('_id')
+            logging.info('    - %s [%s]', name, folder_id)
 
         return folders
+
+    def scrape_user(self, user_id) -> Dict:
+        self.__log_scrape_start(f'Scraping user "{user_id}" metadata...')
+        user = self.__api_helper.get_user(user_id)
+
+        if user:
+            first_name = user.get('firstName')
+            last_name = user.get('lastName')
+            logging.info('  User found: %s %s', first_name, last_name)
+        else:
+            logging.info('  User NOT found!')
+
+        return user
 
     @classmethod
     def __log_scrape_start(cls, message: str, *args: Any) -> None:

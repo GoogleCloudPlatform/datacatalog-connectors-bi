@@ -53,6 +53,16 @@ class RESTAPIHelper:
         url = f'{self.__base_api_endpoint}/folders?structure=flat'
         return self.__get_using_pagination(base_url=url, results_per_page=50)
 
+    def get_user(self, user_id: str) -> Dict:
+        """Get a specific User.
+
+        Returns:
+            A user object.
+        """
+        self.__set_up_auth()
+        url = f'{self.__base_api_endpoint}/users/{user_id}'
+        return requests.get(url=url, headers=self.__common_headers).json()
+
     def __set_up_auth(self) -> None:
         if self.__auth_credentials:
             return
