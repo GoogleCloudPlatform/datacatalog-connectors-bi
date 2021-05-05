@@ -46,6 +46,9 @@ class RESTAPIHelper:
             A ``list``.
         """
         self.__set_up_auth()
+
+        # Sisense can return the folders in flat (default) or tree structures.
+        # We decided for flat because it simplifies further processing.
         url = f'{self.__base_api_endpoint}/folders?structure=flat'
         return requests.get(url=url, headers=self.__common_headers).json()
 

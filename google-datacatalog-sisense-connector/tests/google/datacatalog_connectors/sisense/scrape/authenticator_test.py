@@ -30,11 +30,10 @@ class AuthenticatorTest(unittest.TestCase):
     def test_authenticate_should_return_credentials_on_success(
             self, mock_post):
 
-        mock_post.return_value = metadata_scraper_mocks.make_fake_response(
-            {
-                'success': True,
-                'access_token': 'TEST-TOKEN',
-            }, 200)
+        mock_post.return_value = metadata_scraper_mocks.FakeResponse({
+            'success': True,
+            'access_token': 'TEST-TOKEN',
+        })
 
         credentials = authenticator.Authenticator.authenticate(
             'https://test-server.com', 'test-api', 'test-username',
@@ -43,7 +42,7 @@ class AuthenticatorTest(unittest.TestCase):
         self.assertEqual('TEST-TOKEN', credentials['access_token'])
 
     def test_authenticate_should_return_none_on_failure(self, mock_post):
-        mock_post.return_value = metadata_scraper_mocks.make_fake_response(
+        mock_post.return_value = metadata_scraper_mocks.FakeResponse(
             {'error': {}}, 401)
 
         credentials = authenticator.Authenticator.authenticate(
