@@ -54,7 +54,7 @@ class RESTAPIHelper:
         return self.__get_list_using_pagination(base_url=url,
                                                 results_per_page=50)
 
-    def get_user(self, user_id: str) -> Dict:
+    def get_user(self, user_id: str) -> Dict[str, Any]:
         """Get a specific User.
 
         Returns:
@@ -62,7 +62,19 @@ class RESTAPIHelper:
         """
         self.__set_up_auth()
         url = f'{self.__base_api_endpoint}/users/{user_id}'
-        return requests.get(url=url, headers=self.__common_headers).json()
+        response = requests.get(url=url, headers=self.__common_headers)
+        status_code = response.status_code
+
+        if status_code == 200:
+            return response.json()
+
+        # The ``GET /users/{id}`` endpoint needs admin license rights in the
+        # API version we are using as reference, ``Windows 8.2.5.11026 v1``.
+        # A ``403 Forbidden`` is returned when the user does not have access
+        # and we raise an exception to let the caller know what went wrong.
+        error = response.json().get('error') or {}
+        logging.warning('error on get_user: %s', error)
+        raise Exception(error.get('message'))
 
     def __set_up_auth(self) -> None:
         if self.__auth_credentials:
