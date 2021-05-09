@@ -16,6 +16,7 @@
 
 import logging
 import requests
+from typing import Dict, Optional
 
 from google.datacatalog_connectors.sisense.scrape import constants
 
@@ -23,7 +24,9 @@ from google.datacatalog_connectors.sisense.scrape import constants
 class Authenticator:
 
     @classmethod
-    def authenticate(cls, server_address, api_version, username, password):
+    def authenticate(cls, server_address: str, api_version: str, username: str,
+                     password: str) -> Optional[Dict]:
+
         url = f'{server_address}/api/{api_version}/authentication/login'
 
         headers = {

@@ -14,5 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Authentication and authorization
+AUTHORIZATION_HEADER_NAME = 'Authorization'
+BEARER_TOKEN_PREFIX = 'Bearer'
+
+# Content types
 JSON_CONTENT_TYPE = 'application/json'
 X_WWW_FORM_URLENCODED_CONTENT_TYPE = 'application/x-www-form-urlencoded'

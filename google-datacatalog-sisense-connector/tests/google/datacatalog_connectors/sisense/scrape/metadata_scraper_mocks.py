@@ -14,16 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any
 
-class __FakeResponse:
 
-    def __init__(self, json_data, status_code):
+class FakeResponse:
+
+    def __init__(self, json_data: Any, status_code=200):
         self.__json_data = json_data
         self.__status_code = status_code
 
-    def json(self):
+    def json(self) -> Any:
         return self.__json_data
-
-
-def make_fake_response(json_data, status_code):
-    return __FakeResponse(json_data, status_code)
