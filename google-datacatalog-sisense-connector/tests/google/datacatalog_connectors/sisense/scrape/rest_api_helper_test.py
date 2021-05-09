@@ -52,26 +52,26 @@ class RESTAPIHelperTest(unittest.TestCase):
         attrs = self.__helper.__dict__
         self.assertIsNone(attrs['_RESTAPIHelper__auth_credentials'])
 
-    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_using_pagination')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_list_using_pagination')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
     def test_get_all_folders_should_return_list_on_success(
-            self, mock_get_using_pagination):
+            self, mock_get_list_using_pagination):
 
-        mock_get_using_pagination.return_value = [{'_id': 'folder-id'}]
+        mock_get_list_using_pagination.return_value = [{'_id': 'folder-id'}]
 
         folders = self.__helper.get_all_folders()
 
         self.assertEqual(1, len(folders))
         self.assertEqual('folder-id', folders[0]['_id'])
 
-    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_using_pagination')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_list_using_pagination')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
-    def test_get_all_folders_should_use_pagination(self,
-                                                   mock_get_using_pagination):
+    def test_get_all_folders_should_use_pagination(
+            self, mock_get_list_using_pagination):
 
         self.__helper.get_all_folders()
 
-        mock_get_using_pagination.assert_called_once_with(
+        mock_get_list_using_pagination.assert_called_once_with(
             base_url='test-server/api/test-version/folders?structure=flat',
             results_per_page=50,
         )
@@ -79,6 +79,7 @@ class RESTAPIHelperTest(unittest.TestCase):
     @mock.patch(f'{__HELPER_MODULE}.authenticator.Authenticator.authenticate')
     def test_set_up_auth_should_set_credentials_if_not_authenticated(
             self, mock_authenticate):
+
         mock_authenticate.return_value = {'access_token': 'test-token'}
 
         self.__helper._RESTAPIHelper__set_up_auth()
@@ -103,13 +104,15 @@ class RESTAPIHelperTest(unittest.TestCase):
 
         mock_authenticate.assert_not_called()
 
-    def test_get_using_pagination_should_validate_results_per_page(self):
-        self.assertRaises(ValueError,
-                          self.__helper._RESTAPIHelper__get_using_pagination,
-                          '', 1)
+    def test_get_list_using_pagination_should_validate_results_per_page(self):
+        self.assertRaises(
+            ValueError,
+            self.__helper._RESTAPIHelper__get_list_using_pagination, '', 1)
 
     @mock.patch(f'{__HELPER_MODULE}.requests')
-    def test_get_using_pagination_should_get_all_pages(self, mock_requests):
+    def test_get_list_using_pagination_should_get_all_pages(
+            self, mock_requests):
+
         mock_requests.get.side_effect = [
             metadata_scraper_mocks.FakeResponse([{
                 '_id': 'object-id-1'
@@ -126,7 +129,7 @@ class RESTAPIHelperTest(unittest.TestCase):
             }])
         ]
 
-        results = self.__helper._RESTAPIHelper__get_using_pagination(
+        results = self.__helper._RESTAPIHelper__get_list_using_pagination(
             'test-url', 2)
 
         self.assertEqual(5, len(results))
@@ -148,7 +151,7 @@ class RESTAPIHelperTest(unittest.TestCase):
         mock_requests.get.has_calls([first_call, second_call, third_call])
 
     @mock.patch(f'{__HELPER_MODULE}.requests')
-    def test_get_using_pagination_should_remove_duplicates(
+    def test_get_list_using_pagination_should_remove_duplicates(
             self, mock_requests):
 
         mock_requests.get.side_effect = [
@@ -162,7 +165,7 @@ class RESTAPIHelperTest(unittest.TestCase):
             }])
         ]
 
-        results = self.__helper._RESTAPIHelper__get_using_pagination(
+        results = self.__helper._RESTAPIHelper__get_list_using_pagination(
             'test-url', 2)
 
         self.assertEqual(2, len(results))

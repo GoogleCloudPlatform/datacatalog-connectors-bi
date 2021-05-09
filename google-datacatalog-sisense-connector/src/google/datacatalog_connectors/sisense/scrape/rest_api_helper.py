@@ -51,7 +51,8 @@ class RESTAPIHelper:
         # Sisense can return the folders in flat (default) or tree structures.
         # We decided for flat because it simplifies further processing.
         url = f'{self.__base_api_endpoint}/folders?structure=flat'
-        return self.__get_using_pagination(base_url=url, results_per_page=50)
+        return self.__get_list_using_pagination(base_url=url,
+                                                results_per_page=50)
 
     def get_user(self, user_id: str) -> Dict:
         """Get a specific User.
@@ -78,8 +79,9 @@ class RESTAPIHelper:
             f'{constants.BEARER_TOKEN_PREFIX}' \
             f' {self.__auth_credentials["access_token"]}'
 
-    def __get_using_pagination(self, base_url: str,
-                               results_per_page: int) -> List[Dict[str, Any]]:
+    def __get_list_using_pagination(
+            self, base_url: str,
+            results_per_page: int) -> List[Dict[str, Any]]:
         """Get a ``List`` using pagination.
 
         Args:

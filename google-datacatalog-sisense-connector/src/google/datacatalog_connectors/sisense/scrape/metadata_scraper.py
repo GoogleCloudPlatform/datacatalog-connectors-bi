@@ -45,6 +45,7 @@ class MetadataScraper:
         self.__log_scrape_start(f'Scraping user "{user_id}" metadata...')
         user = self.__api_helper.get_user(user_id)
 
+        logging.info('')
         if user:
             first_name = user.get('firstName')
             last_name = user.get('lastName')
