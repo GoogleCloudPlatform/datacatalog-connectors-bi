@@ -46,12 +46,8 @@ class MetadataScraper:
         user = self.__api_helper.get_user(user_id)
 
         logging.info('')
-        if user:
-            first_name = user.get('firstName')
-            last_name = user.get('lastName')
-            logging.info('  User found: %s %s', first_name, last_name)
-        else:
-            logging.info('  User NOT found!')
+        logging.info('  User found: %s %s', user.get('firstName'),
+                     user.get('lastName'))
 
         return user
 

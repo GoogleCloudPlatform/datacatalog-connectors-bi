@@ -76,6 +76,35 @@ class RESTAPIHelperTest(unittest.TestCase):
             results_per_page=50,
         )
 
+    @mock.patch(f'{__HELPER_MODULE}.requests')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_user_should_return_object_on_success(self, mock_requests):
+        mock_requests.get.return_value = metadata_scraper_mocks.FakeResponse({
+            '_id': 'user-id',
+            'firstName': 'Jane',
+            'lastName': 'Doe'
+        })
+
+        user = self.__helper.get_user('user-id')
+
+        self.assertIsNotNone(user)
+        self.assertEqual('user-id', user['_id'])
+
+    @mock.patch(f'{__HELPER_MODULE}.requests')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_user_should_raise_exception_on_api_error(self, mock_requests):
+        mock_requests.get.return_value = metadata_scraper_mocks.FakeResponse(
+            {
+                'error': {
+                    'code': 101,
+                    'message': 'Access denied',
+                    'status': 403,
+                    'httpMessage': 'Forbidden'
+                }
+            }, 403)
+
+        self.assertRaises(Exception, self.__helper.get_user, 'user-id')
+
     @mock.patch(f'{__HELPER_MODULE}.authenticator.Authenticator.authenticate')
     def test_set_up_auth_should_set_credentials_if_not_authenticated(
             self, mock_authenticate):

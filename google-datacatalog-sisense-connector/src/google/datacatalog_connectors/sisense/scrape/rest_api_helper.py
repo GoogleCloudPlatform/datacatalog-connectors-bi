@@ -59,6 +59,9 @@ class RESTAPIHelper:
 
         Returns:
             A user object.
+
+        Raises:
+            Exception: If the API returns any status code than ``200``.
         """
         self.__set_up_auth()
         url = f'{self.__base_api_endpoint}/users/{user_id}'
@@ -70,8 +73,14 @@ class RESTAPIHelper:
 
         # The ``GET /users/{id}`` endpoint needs admin license rights in the
         # API version we are using as reference, ``Windows 8.2.5.11026 v1``.
-        # A ``403 Forbidden`` is returned when the user does not have access
-        # and we raise an exception to let the caller know what went wrong.
+        # A ``403 Forbidden`` is returned when the authenticated user does not
+        # have access to the endpoint.
+        #
+        # A ``404 Not Found`` is returned when there is no user with the
+        # provided ``user_id``.
+        #
+        # For all status codes other than ``200`` we raise an exception to let
+        # the caller know what went wrong.
         error = response.json().get('error') or {}
         logging.warning('error on get_user: %s', error)
         raise Exception(error.get('message'))
