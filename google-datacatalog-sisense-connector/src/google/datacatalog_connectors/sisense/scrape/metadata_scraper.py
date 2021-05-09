@@ -28,7 +28,7 @@ class MetadataScraper:
         self.__api_helper = rest_api_helper.RESTAPIHelper(
             server_address, api_version, username, password)
 
-    def scrape_all_folders(self) -> List[Dict]:
+    def scrape_all_folders(self) -> List[Dict[str, Any]]:
         self.__log_scrape_start('Scraping all Folders...')
         folders = self.__api_helper.get_all_folders()
 

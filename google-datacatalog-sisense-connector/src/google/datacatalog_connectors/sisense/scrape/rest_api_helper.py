@@ -16,7 +16,7 @@
 
 import logging
 import requests
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from google.datacatalog_connectors.sisense.scrape import \
     authenticator, constants
@@ -40,7 +40,7 @@ class RESTAPIHelper:
 
         self.__auth_credentials = None
 
-    def get_all_folders(self) -> List[Dict]:
+    def get_all_folders(self) -> List[Dict[str, Any]]:
         """Get all Folders the user has access to on a given server.
 
         Returns:
@@ -69,13 +69,33 @@ class RESTAPIHelper:
             f' {self.__auth_credentials["access_token"]}'
 
     def __get_using_pagination(self, base_url: str,
-                               results_per_page: int) -> List[Dict]:
+                               results_per_page: int) -> List[Dict[str, Any]]:
+        """Get a ``List`` using pagination.
+
+        Args:
+            base_url: The url to which the ``skip`` and ``limit`` query
+              parameters will be appended to handle pagination accordingly.
+            results_per_page: The number of results per page. Must be greater
+              than 1.
+
+        Returns:
+            A ``list``.
+        """
+        if results_per_page <= 1:
+            raise ValueError('results_per_page must be greater than 1')
 
         results = []
         query_param_prefix = '?' if '?' not in base_url else '&'
 
         page_count = 0
         page_results = []
+        # Sisense APIs may add more results to some pages than specified by the
+        # ``results_per_page`` argument. It happens in the ``GET /folders``
+        # pages, for instance: all pages include the ``rootFolder``, resulting
+        # in ``results_per_page + 1`` folders in all pages but the last.
+        # Given this behavior, we need ``results_per_page`` to be greater than
+        # ``1`` and to use the ``>=`` operator to decide between executing the
+        # ``while`` loop or not, to avoid issues.
         while page_count == 0 or len(page_results) >= results_per_page:
             offset = page_count * results_per_page
             url = f'{base_url}{query_param_prefix}skip={offset}' \
@@ -88,6 +108,9 @@ class RESTAPIHelper:
 
         logging.info('')
         logging.info('Removing potential duplicates...')
+        # Set comprehension is used to remove potential duplicates after
+        # merging the results, e.g.: the ``rootFolder`` that comes in all
+        # ``GET /folders`` pages.
         results_set = {tuple(result.items()) for result in results}
 
         return [dict(result_tuple) for result_tuple in results_set]
