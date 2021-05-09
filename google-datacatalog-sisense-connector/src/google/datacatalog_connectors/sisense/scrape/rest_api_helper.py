@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import lru_cache
 import logging
 import requests
 from typing import Any, Dict, List
@@ -54,6 +55,7 @@ class RESTAPIHelper:
         return self.__get_list_using_pagination(base_url=url,
                                                 results_per_page=50)
 
+    @lru_cache(maxsize=128)
     def get_user(self, user_id: str) -> Dict[str, Any]:
         """Get a specific User.
 
