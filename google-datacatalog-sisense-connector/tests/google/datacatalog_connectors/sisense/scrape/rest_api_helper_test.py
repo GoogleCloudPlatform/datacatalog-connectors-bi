@@ -52,24 +52,28 @@ class RESTAPIHelperTest(unittest.TestCase):
         attrs = self.__helper.__dict__
         self.assertIsNone(attrs['_RESTAPIHelper__auth_credentials'])
 
-    @mock.patch(f'{__HELPER_MODULE}.requests')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_using_pagination')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
     def test_get_all_folders_should_return_list_on_success(
-            self, mock_requests):
+            self, mock_get_using_pagination):
 
-        mock_requests.get.return_value = metadata_scraper_mocks.FakeResponse([{
-            '_id': 'folder-id'
-        }])
+        mock_get_using_pagination.return_value = [{'_id': 'folder-id'}]
 
         folders = self.__helper.get_all_folders()
 
         self.assertEqual(1, len(folders))
         self.assertEqual('folder-id', folders[0]['_id'])
 
-        attrs = self.__helper.__dict__
-        mock_requests.get.assert_called_once_with(
-            url='test-server/api/test-version/folders?structure=flat',
-            headers=attrs['_RESTAPIHelper__common_headers'],
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_using_pagination')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_all_folders_should_use_pagination(self,
+                                                   mock_get_using_pagination):
+
+        self.__helper.get_all_folders()
+
+        mock_get_using_pagination.assert_called_once_with(
+            base_url='test-server/api/test-version/folders?structure=flat',
+            results_per_page=50,
         )
 
     @mock.patch(f'{__HELPER_MODULE}.authenticator.Authenticator.authenticate')
@@ -98,3 +102,68 @@ class RESTAPIHelperTest(unittest.TestCase):
         self.__helper._RESTAPIHelper__set_up_auth()
 
         mock_authenticate.assert_not_called()
+
+    def test_get_using_pagination_should_validate_results_per_page(self):
+        self.assertRaises(ValueError,
+                          self.__helper._RESTAPIHelper__get_using_pagination,
+                          '', 1)
+
+    @mock.patch(f'{__HELPER_MODULE}.requests')
+    def test_get_using_pagination_should_get_all_pages(self, mock_requests):
+        mock_requests.get.side_effect = [
+            metadata_scraper_mocks.FakeResponse([{
+                '_id': 'object-id-1'
+            }, {
+                '_id': 'object-id-2'
+            }]),
+            metadata_scraper_mocks.FakeResponse([{
+                '_id': 'object-id-3'
+            }, {
+                '_id': 'object-id-4'
+            }]),
+            metadata_scraper_mocks.FakeResponse([{
+                '_id': 'object-id-5'
+            }])
+        ]
+
+        results = self.__helper._RESTAPIHelper__get_using_pagination(
+            'test-url', 2)
+
+        self.assertEqual(5, len(results))
+        self.assertEqual(3, mock_requests.get.call_count)
+
+        attrs = self.__helper.__dict__
+        first_call = mock.call(
+            url='test-url?skip=0&limit=2',
+            headers=attrs['_RESTAPIHelper__common_headers'],
+        )
+        second_call = mock.call(
+            url='test-url?skip=2&limit=2',
+            headers=attrs['_RESTAPIHelper__common_headers'],
+        )
+        third_call = mock.call(
+            url='test-url?skip=4&limit=2',
+            headers=attrs['_RESTAPIHelper__common_headers'],
+        )
+        mock_requests.get.has_calls([first_call, second_call, third_call])
+
+    @mock.patch(f'{__HELPER_MODULE}.requests')
+    def test_get_using_pagination_should_remove_duplicates(
+            self, mock_requests):
+
+        mock_requests.get.side_effect = [
+            metadata_scraper_mocks.FakeResponse([{
+                '_id': 'object-id-1'
+            }, {
+                '_id': 'object-id-2'
+            }]),
+            metadata_scraper_mocks.FakeResponse([{
+                '_id': 'object-id-2'
+            }])
+        ]
+
+        results = self.__helper._RESTAPIHelper__get_using_pagination(
+            'test-url', 2)
+
+        self.assertEqual(2, len(results))
+        self.assertEqual(2, mock_requests.get.call_count)

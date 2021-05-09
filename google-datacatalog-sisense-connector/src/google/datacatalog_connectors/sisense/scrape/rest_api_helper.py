@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import requests
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from google.datacatalog_connectors.sisense.scrape import \
     authenticator, constants
@@ -39,7 +40,7 @@ class RESTAPIHelper:
 
         self.__auth_credentials = None
 
-    def get_all_folders(self) -> List[Dict]:
+    def get_all_folders(self) -> List[Dict[str, Any]]:
         """Get all Folders the user has access to on a given server.
 
         Returns:
@@ -50,7 +51,7 @@ class RESTAPIHelper:
         # Sisense can return the folders in flat (default) or tree structures.
         # We decided for flat because it simplifies further processing.
         url = f'{self.__base_api_endpoint}/folders?structure=flat'
-        return requests.get(url=url, headers=self.__common_headers).json()
+        return self.__get_using_pagination(base_url=url, results_per_page=50)
 
     def __set_up_auth(self) -> None:
         if self.__auth_credentials:
@@ -66,3 +67,50 @@ class RESTAPIHelper:
         self.__common_headers[constants.AUTHORIZATION_HEADER_NAME] = \
             f'{constants.BEARER_TOKEN_PREFIX}' \
             f' {self.__auth_credentials["access_token"]}'
+
+    def __get_using_pagination(self, base_url: str,
+                               results_per_page: int) -> List[Dict[str, Any]]:
+        """Get a ``List`` using pagination.
+
+        Args:
+            base_url: The url to which the ``skip`` and ``limit`` query
+              parameters will be appended to handle pagination accordingly.
+            results_per_page: The number of results per page. Must be greater
+              than 1.
+
+        Returns:
+            A ``list``.
+        """
+        if results_per_page <= 1:
+            raise ValueError('results_per_page must be greater than 1')
+
+        results = []
+        query_param_prefix = '?' if '?' not in base_url else '&'
+
+        page_count = 0
+        page_results = []
+        # Sisense APIs may add more results to some pages than specified by the
+        # ``results_per_page`` argument. It happens in the ``GET /folders``
+        # pages, for instance: all pages include the ``rootFolder``, resulting
+        # in ``results_per_page + 1`` folders in all pages but the last.
+        # Given this behavior, we need ``results_per_page`` to be greater than
+        # ``1`` and to use the ``>=`` operator to decide between executing the
+        # ``while`` loop or not, to avoid issues.
+        while page_count == 0 or len(page_results) >= results_per_page:
+            offset = page_count * results_per_page
+            url = f'{base_url}{query_param_prefix}skip={offset}' \
+                  f'&limit={results_per_page}'
+            page_results = requests.get(url=url,
+                                        headers=self.__common_headers).json()
+            results.extend(page_results)
+            page_count += 1
+            logging.info(f'page {page_count}: {len(page_results)} results')
+
+        logging.info('')
+        logging.info('Removing potential duplicates...')
+        # Set comprehension is used to remove potential duplicates after
+        # merging the results, e.g.: the ``rootFolder`` that comes in all
+        # ``GET /folders`` pages.
+        results_set = {tuple(result.items()) for result in results}
+
+        return [dict(result_tuple) for result_tuple in results_set]

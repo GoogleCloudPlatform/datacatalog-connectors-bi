@@ -14,12 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, Dict, List, Union
 
 
 class FakeResponse:
 
-    def __init__(self, json_data: Any, status_code=200):
+    def __init__(self,
+                 json_data: Union[Dict[str, Any], List[Dict[str, Any]]],
+                 status_code=200):
+
         self.__json_data = json_data
         self.__status_code = status_code
 
