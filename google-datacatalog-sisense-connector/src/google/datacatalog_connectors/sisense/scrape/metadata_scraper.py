@@ -32,6 +32,7 @@ class MetadataScraper:
         self.__log_scrape_start('Scraping all Folders...')
         folders = self.__api_helper.get_all_folders()
 
+        logging.info('')
         logging.info('  %s Folders found:', len(folders))
         for folder in folders:
             logging.info('    - %s [%s]', folder.get('name'),
