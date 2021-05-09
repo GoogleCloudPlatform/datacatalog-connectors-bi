@@ -31,4 +31,4 @@ are going to skip fulfilling the assets' ownership metadata.
 
 ---
 
-Back to the [Developer Resources index](..)
+Back to the [Documentation index](README.md)
