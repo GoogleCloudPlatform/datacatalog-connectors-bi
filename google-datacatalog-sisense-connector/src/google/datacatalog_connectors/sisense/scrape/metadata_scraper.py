@@ -35,9 +35,8 @@ class MetadataScraper:
         logging.info('')
         logging.info('  %s Folders found:', len(folders))
         for folder in folders:
-            name = folder.get('name')
-            folder_id = folder.get('_id')
-            logging.info('    - %s [%s]', name, folder_id)
+            logging.info('    - %s [%s]', folder.get('name'),
+                         folder.get('_id'))
 
         return folders
 
