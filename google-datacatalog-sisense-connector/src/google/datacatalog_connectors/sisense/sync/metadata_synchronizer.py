@@ -56,6 +56,8 @@ class MetadataSynchronizer:
         logging.info('Objects to be scraped: Folders')
         folders = self.__scrape_folders()
 
+        user = self.__scrape_user(folders[0]['owner'])
+
     def __scrape_folders(self) -> List[Dict]:
         """Scrapes metadata from all the Folders the user has access to.
 
@@ -63,3 +65,11 @@ class MetadataSynchronizer:
             A ``list``.
         """
         return self.__metadata_scraper.scrape_all_folders()
+
+    def __scrape_user(self, user_id) -> Dict:
+        """Scrapes metadata from a specific user.
+
+        Returns:
+             A user metadata object.
+        """
+        return self.__metadata_scraper.scrape_user(user_id)
