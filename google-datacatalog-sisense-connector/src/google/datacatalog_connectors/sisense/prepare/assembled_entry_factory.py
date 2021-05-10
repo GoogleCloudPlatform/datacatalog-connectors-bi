@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any, Dict, List
+
 from google.datacatalog_connectors.commons import prepare
+from google.datacatalog_connectors.commons.prepare import AssembledEntryData
 
 from google.datacatalog_connectors.sisense.prepare import \
     datacatalog_entry_factory
@@ -25,22 +28,26 @@ from google.datacatalog_connectors.sisense.prepare.datacatalog_entry_factory \
 class AssembledEntryFactory:
     __datacatalog_entry_factory: DataCatalogEntryFactory
 
-    def __init__(self, project_id, location_id, entry_group_id,
-                 user_specified_system, server_address):
+    def __init__(self, project_id: str, location_id: str, entry_group_id: str,
+                 user_specified_system: str, server_address: str):
 
         self.__datacatalog_entry_factory = datacatalog_entry_factory \
             .DataCatalogEntryFactory(
                 project_id, location_id, entry_group_id, user_specified_system,
                 server_address)
 
-    def make_assembled_entries_for_folder(self, folder_metadata):
+    def make_assembled_entries_for_folder(
+            self, folder_metadata: Dict[str, Any]) -> List[AssembledEntryData]:
+
         assembled_entries = [
             self.__make_assembled_entry_for_folder(folder_metadata)
         ]
 
         return assembled_entries
 
-    def __make_assembled_entry_for_folder(self, folder_metadata):
+    def __make_assembled_entry_for_folder(
+            self, folder_metadata: Dict[str, Any]) -> AssembledEntryData:
+
         entry_id, entry = \
             self.__datacatalog_entry_factory.make_entry_for_folder(
                 folder_metadata)
