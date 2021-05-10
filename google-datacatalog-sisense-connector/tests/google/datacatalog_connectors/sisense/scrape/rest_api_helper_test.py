@@ -185,16 +185,17 @@ class RESTAPIHelperTest(unittest.TestCase):
         self.assertEqual(2, mock_get_response_body_or_raise.call_count)
 
     def test_get_response_body_or_raise_should_get_on_success(self):
-        body = self.__helper._RESTAPIHelper__get_response_body_or_raise(
-            metadata_scraper_mocks.FakeResponse({'_id': 'object-id'}))
+        body = rest_api_helper.RESTAPIHelper\
+            ._RESTAPIHelper__get_response_body_or_raise(
+                metadata_scraper_mocks.FakeResponse({'_id': 'object-id'}))
 
         self.assertIsNotNone(body)
         self.assertEqual('object-id', body['_id'])
 
     def test_get_response_body_or_raise_should_raise_on_api_error(self):
         self.assertRaises(
-            Exception,
-            self.__helper._RESTAPIHelper__get_response_body_or_raise,
+            Exception, rest_api_helper.RESTAPIHelper.
+            _RESTAPIHelper__get_response_body_or_raise,
             metadata_scraper_mocks.FakeResponse(
                 {
                     'error': {
