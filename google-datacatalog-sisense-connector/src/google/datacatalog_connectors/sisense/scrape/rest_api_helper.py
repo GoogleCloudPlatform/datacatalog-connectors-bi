@@ -17,7 +17,8 @@
 from functools import lru_cache
 import logging
 import requests
-from typing import Any, Dict, List
+from requests import Response
+from typing import Any, Dict, List, Union
 
 from google.datacatalog_connectors.sisense.scrape import \
     authenticator, constants
@@ -46,6 +47,9 @@ class RESTAPIHelper:
 
         Returns:
             A ``list``.
+
+        Raises:
+            Exception: If the API returns any status code than ``200``.
         """
         self.__set_up_auth()
 
@@ -68,10 +72,6 @@ class RESTAPIHelper:
         self.__set_up_auth()
         url = f'{self.__base_api_endpoint}/users/{user_id}'
         response = requests.get(url=url, headers=self.__common_headers)
-        status_code = response.status_code
-
-        if status_code == 200:
-            return response.json()
 
         # The ``GET /users/{id}`` endpoint needs admin license rights in the
         # API version we are using as reference, ``Windows 8.2.5.11026 v1``.
@@ -80,12 +80,7 @@ class RESTAPIHelper:
         #
         # A ``404 Not Found`` is returned when there is no user with the
         # provided ``user_id``.
-        #
-        # For all status codes other than ``200`` we raise an exception to let
-        # the caller know what went wrong.
-        error = response.json().get('error') or {}
-        logging.warning('error on get_user: %s', error)
-        raise Exception(error.get('message'))
+        return self.__get_response_body_or_raise(response)
 
     def __set_up_auth(self) -> None:
         if self.__auth_credentials:
@@ -135,8 +130,8 @@ class RESTAPIHelper:
             offset = page_count * results_per_page
             url = f'{base_url}{query_param_prefix}skip={offset}' \
                   f'&limit={results_per_page}'
-            page_results = requests.get(url=url,
-                                        headers=self.__common_headers).json()
+            response = requests.get(url=url, headers=self.__common_headers)
+            page_results = self.__get_response_body_or_raise(response)
             results.extend(page_results)
             page_count += 1
             logging.info(f'page {page_count}: {len(page_results)} results')
@@ -149,3 +144,27 @@ class RESTAPIHelper:
         results_set = {tuple(result.items()) for result in results}
 
         return [dict(result_tuple) for result_tuple in results_set]
+
+    @classmethod
+    def __get_response_body_or_raise(
+            cls,
+            response: Response) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+        """Get the response body on successful API call or raise an exception.
+
+        Returns:
+            A ``Dict`` or ``List``.
+
+        Raises:
+            Exception: If the API returns any status code than ``200``.
+        """
+
+        status_code = response.status_code
+
+        if status_code == 200:
+            return response.json()
+
+        # Raise exception for all status codes other than ``200`` to let the
+        # caller know what went wrong.
+        error = response.json().get('error') or {}
+        logging.warning('error on API call: %s', error)
+        raise Exception(error.get('message'))
