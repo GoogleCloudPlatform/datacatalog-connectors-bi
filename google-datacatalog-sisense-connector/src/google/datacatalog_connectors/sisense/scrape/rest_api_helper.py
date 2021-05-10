@@ -72,14 +72,6 @@ class RESTAPIHelper:
         self.__set_up_auth()
         url = f'{self.__base_api_endpoint}/users/{user_id}'
         response = requests.get(url=url, headers=self.__common_headers)
-
-        # The ``GET /users/{id}`` endpoint needs admin license rights in the
-        # API version we are using as reference, ``Windows 8.2.5.11026 v1``.
-        # A ``403 Forbidden`` is returned when the authenticated user does not
-        # have access to the endpoint.
-        #
-        # A ``404 Not Found`` is returned when there is no user with the
-        # provided ``user_id``.
         return self.__get_response_body_or_raise(response)
 
     def __set_up_auth(self) -> None:
