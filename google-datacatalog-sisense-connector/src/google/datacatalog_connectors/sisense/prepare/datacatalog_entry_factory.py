@@ -29,16 +29,16 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     def __init__(self, project_id: str, location_id: str, entry_group_id: str,
-                 user_specified_system: str, instance_url: str):
+                 user_specified_system: str, __server_address: str):
 
         self.__project_id = project_id
         self.__location_id = location_id
         self.__entry_group_id = entry_group_id
         self.__user_specified_system = user_specified_system
-        self.__instance_url = instance_url
+        self.__server_address = __server_address
 
         # Strip schema (http | https) and slashes from the server url.
-        self.__server_id = instance_url[instance_url.find('//') + 2:]
+        self.__server_id = __server_address[__server_address.find('//') + 2:]
 
     def make_entry_for_folder(
             self, folder_metadata: Dict[str, Any]) -> Tuple[str, Entry]:
@@ -48,6 +48,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         # The root folder does not have an ``_id`` field.
         folder_id = folder_metadata['_id'] if folder_metadata.get(
             '_id') else folder_metadata.get('name')
+
         generated_id = self.__format_id(constants.ENTRY_ID_PART_FOLDER,
                                         folder_id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
@@ -60,7 +61,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.display_name = self._format_display_name(
             folder_metadata.get('name'))
 
-        entry.linked_resource = f'{self.__instance_url}/app/main#/home/' \
+        entry.linked_resource = f'{self.__server_address}/app/main#/home/' \
                                 f'{folder_metadata.get("oid")}'
 
         created_datetime = datetime.strptime(
