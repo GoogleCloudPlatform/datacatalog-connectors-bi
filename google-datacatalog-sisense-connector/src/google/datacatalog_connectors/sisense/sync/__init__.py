@@ -16,4 +16,4 @@
 
 from .metadata_synchronizer import MetadataSynchronizer
 
-__all__ = ['MetadataSynchronizer']
+__all__ = ('MetadataSynchronizer',)

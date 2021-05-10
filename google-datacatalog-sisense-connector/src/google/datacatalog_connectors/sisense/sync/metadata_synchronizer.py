@@ -19,8 +19,9 @@ import re
 from typing import Any, Dict, List
 
 from google.datacatalog_connectors.commons import cleanup, ingest
+from google.datacatalog_connectors.commons.prepare import AssembledEntryData
 
-from google.datacatalog_connectors.sisense import scrape
+from google.datacatalog_connectors.sisense import prepare, scrape
 
 
 class MetadataSynchronizer:
@@ -44,6 +45,13 @@ class MetadataSynchronizer:
 
         self.__project_id = datacatalog_project_id
         self.__location_id = datacatalog_location_id
+
+        self.__assembled_entry_factory = prepare.AssembledEntryFactory(
+            project_id=datacatalog_project_id,
+            location_id=datacatalog_location_id,
+            entry_group_id=self.__ENTRY_GROUP_ID,
+            user_specified_system=self.__SPECIFIED_SYSTEM,
+            server_address=sisense_server_address)
 
     def run(self) -> None:
         """Coordinates a full scrape > prepare > ingest process."""
@@ -75,7 +83,7 @@ class MetadataSynchronizer:
         """
         return self.__metadata_scraper.scrape_all_folders()
 
-    def __scrape_user(self, user_id) -> Dict[str, Any]:
+    def __scrape_user(self, user_id: str) -> Dict[str, Any]:
         """Scrapes metadata from a specific user.
 
         Returns:
@@ -83,7 +91,9 @@ class MetadataSynchronizer:
         """
         return self.__metadata_scraper.scrape_user(user_id)
 
-    def __make_assembled_entries_dict(self, folders_metadata) -> Dict:
+    def __make_assembled_entries_dict(
+        self, folders_metadata: List[Dict[str, Any]]
+    ) -> Dict[str:List[AssembledEntryData]]:
         """Makes Data Catalog entries and tags for the Sisense assets the
         current user has access to.
         Returns:
