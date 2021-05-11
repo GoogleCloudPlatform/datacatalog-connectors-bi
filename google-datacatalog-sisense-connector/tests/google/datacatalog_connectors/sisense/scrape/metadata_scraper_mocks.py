@@ -24,7 +24,7 @@ class FakeResponse:
                  status_code=200):
 
         self.__json_data = json_data
-        self.__status_code = status_code
+        self.status_code = status_code
 
     def json(self) -> Any:
         return self.__json_data

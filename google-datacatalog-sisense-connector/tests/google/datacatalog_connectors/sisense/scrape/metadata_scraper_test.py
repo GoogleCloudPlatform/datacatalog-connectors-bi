@@ -50,3 +50,21 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(1, len(folders))
         self.assertEqual('folder-id', folders[0]['_id'])
         api_helper.get_all_folders.assert_called_once()
+
+    def test_scrape_user_should_delegate_to_api_helper(self):
+        attrs = self.__scraper.__dict__
+        api_helper = attrs['_MetadataScraper__api_helper']
+
+        user_metadata = {
+            '_id': 'user-id',
+            'firstName': 'Jane',
+            'lastName': 'Doe'
+        }
+
+        api_helper.get_user.return_value = user_metadata
+
+        user = self.__scraper.scrape_user('user-id')
+
+        self.assertIsNotNone(user)
+        self.assertEqual('user-id', user['_id'])
+        api_helper.get_user.assert_called_once()

@@ -40,6 +40,16 @@ class MetadataScraper:
 
         return folders
 
+    def scrape_user(self, user_id) -> Dict[str, Any]:
+        self.__log_scrape_start(f'Scraping User metadata (Id: {user_id})...')
+        user = self.__api_helper.get_user(user_id)
+
+        logging.info('')
+        logging.info('  User found: %s %s', user.get('firstName'),
+                     user.get('lastName'))
+
+        return user
+
     @classmethod
     def __log_scrape_start(cls, message: str, *args: Any) -> None:
         logging.info('')
