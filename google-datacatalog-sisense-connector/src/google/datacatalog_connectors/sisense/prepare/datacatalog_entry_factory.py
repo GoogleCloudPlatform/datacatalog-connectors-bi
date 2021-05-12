@@ -61,8 +61,10 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.display_name = self._format_display_name(
             folder_metadata.get('name'))
 
-        entry.linked_resource = f'{self.__server_address}/app/main#/home/' \
-                                f'{folder_metadata.get("oid")}'
+        if folder_metadata.get('oid'):
+            entry.linked_resource = f'{self.__server_address}' \
+                                    f'/app/main#/home' \
+                                    f'/{folder_metadata.get("oid")}'
 
         if folder_metadata.get('created'):
             created_datetime = datetime.strptime(
