@@ -54,7 +54,7 @@ class MetadataSynchronizer:
             server_address=sisense_server_address)
 
     def run(self) -> None:
-        """Coordinates a full scrape > prepare > ingest process."""
+        """Coordinate a full scrape > prepare > ingest process."""
 
         # Scrape metadata from the Sisense server.
         logging.info('')
@@ -75,8 +75,15 @@ class MetadataSynchronizer:
         assembled_entries_dict = self.__make_assembled_entries_dict(folders)
         logging.info('==== DONE ========================================')
 
+        # Ingest metadata into Data Catalog.
+        logging.info('')
+        logging.info('===> Synchronizing Sisense :: Data Catalog metadata...')
+
+        self.__ingest_metadata(assembled_entries_dict, {})
+        logging.info('==== DONE ========================================')
+
     def __scrape_folders(self) -> List[Dict[str, Any]]:
-        """Scrapes metadata from all the Folders the user has access to.
+        """Scrape metadata from all the Folders the user has access to.
 
         Returns:
             A ``list``.
@@ -84,17 +91,17 @@ class MetadataSynchronizer:
         return self.__metadata_scraper.scrape_all_folders()
 
     def __scrape_user(self, user_id: str) -> Dict[str, Any]:
-        """Scrapes metadata from a specific user.
+        """Scrape metadata from a specific user.
 
         Returns:
-             A user metadata object.
+             A User metadata object.
         """
         return self.__metadata_scraper.scrape_user(user_id)
 
     def __make_assembled_entries_dict(
         self, folders_metadata: List[Dict[str, Any]]
-    ) -> Dict[str:List[AssembledEntryData]]:
-        """Makes Data Catalog entries and tags for the Sisense assets the
+    ) -> Dict[str, List[AssembledEntryData]]:
+        """Make Data Catalog entries and tags for the Sisense assets the
         current user has access to.
         Returns:
             A ``dict`` in which keys are the top level asset ids and values are
@@ -113,3 +120,26 @@ class MetadataSynchronizer:
                     .make_assembled_entries_for_folder(folder_metadata)
 
         return assembled_entries
+
+    def __ingest_metadata(self, assembled_entries_dict, tag_templates_dict):
+        metadata_ingestor = ingest.DataCatalogMetadataIngestor(
+            self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID)
+
+        entries_count = sum(
+            len(entries) for entries in assembled_entries_dict.values())
+        logging.info('==== %d entries to be synchronized!', entries_count)
+
+        synced_entries_count = 0
+        for folder_id, assembled_entries in assembled_entries_dict.items():
+            folder_entries_count = len(assembled_entries)
+
+            logging.info('')
+            logging.info('==== The Folder identified by %s has %d entries.',
+                         folder_id, folder_entries_count)
+            metadata_ingestor.ingest_metadata(assembled_entries,
+                                              tag_templates_dict)
+            synced_entries_count = synced_entries_count + folder_entries_count
+
+        logging.info('')
+        logging.info('==== %d of %d entries successfully synchronized!',
+                     synced_entries_count, entries_count)
