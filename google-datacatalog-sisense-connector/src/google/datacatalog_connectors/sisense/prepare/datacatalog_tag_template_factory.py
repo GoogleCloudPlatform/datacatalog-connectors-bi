@@ -101,9 +101,9 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        order=3)
 
         self._add_primitive_type_field(tag_template=tag_template,
-                                       field_id='dashboards_count',
+                                       field_id='dashboard_count',
                                        field_type=self.__DOUBLE_TYPE,
-                                       display_name='Dashboards count',
+                                       display_name='Dashboard count',
                                        order=2)
 
         self._add_primitive_type_field(tag_template=tag_template,

@@ -56,10 +56,14 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         children = folder_metadata.get('children')
         child_count = len(children) if children else 0
         self._set_bool_field(tag, 'has_children', child_count > 0)
+        if child_count:
+            self._set_double_field(tag, 'child_count', child_count)
 
         dashboards = folder_metadata.get('dashboards')
         dashboard_count = len(dashboards) if dashboards else 0
         self._set_bool_field(tag, 'has_dashboards', dashboard_count > 0)
+        if dashboard_count:
+            self._set_double_field(tag, 'dashboard_count', dashboard_count)
 
         self._set_string_field(tag, 'server_url', self.__server_address)
 
