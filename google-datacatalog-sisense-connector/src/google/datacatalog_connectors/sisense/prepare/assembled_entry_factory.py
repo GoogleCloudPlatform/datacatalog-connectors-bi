@@ -52,6 +52,6 @@ class AssembledEntryFactory:
             self.__datacatalog_entry_factory.make_entry_for_folder(
                 folder_metadata)
 
-        tags = []
-
-        return prepare.AssembledEntryData(entry_id, entry, tags)
+        return prepare.AssembledEntryData(entry_id=entry_id,
+                                          entry=entry,
+                                          tags=[])
