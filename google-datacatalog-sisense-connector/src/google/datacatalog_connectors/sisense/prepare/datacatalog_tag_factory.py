@@ -30,7 +30,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
     def __init__(self, server_address: str):
         self.__server_address = server_address
 
-    def make_tag_for_stream(self, tag_template: TagTemplate,
+    def make_tag_for_folder(self, tag_template: TagTemplate,
                             folder_metadata: Dict[str, Any]) -> Tag:
 
         tag = datacatalog.Tag()
