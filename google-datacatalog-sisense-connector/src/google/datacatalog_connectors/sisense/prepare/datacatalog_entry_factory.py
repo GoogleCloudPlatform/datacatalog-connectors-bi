@@ -64,21 +64,22 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.linked_resource = f'{self.__server_address}/app/main#/home/' \
                                 f'{folder_metadata.get("oid")}'
 
-        created_datetime = datetime.strptime(
-            folder_metadata.get('created'),
-            self.__INCOMING_TIMESTAMP_UTC_FORMAT)
-        create_timestamp = timestamp_pb2.Timestamp()
-        create_timestamp.FromDatetime(created_datetime)
-        entry.source_system_timestamps.create_time = create_timestamp
+        if folder_metadata.get('created'):
+            created_datetime = datetime.strptime(
+                folder_metadata.get('created'),
+                self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+            create_timestamp = timestamp_pb2.Timestamp()
+            create_timestamp.FromDatetime(created_datetime)
+            entry.source_system_timestamps.create_time = create_timestamp
 
-        modified_date = folder_metadata.get('lastUpdated')
-        resolved_modified_date = modified_date or folder_metadata.get(
-            'created')
-        modified_datetime = datetime.strptime(
-            resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
-        update_timestamp = timestamp_pb2.Timestamp()
-        update_timestamp.FromDatetime(modified_datetime)
-        entry.source_system_timestamps.update_time = update_timestamp
+            modified_date = folder_metadata.get('lastUpdated')
+            resolved_modified_date = modified_date or folder_metadata.get(
+                'created')
+            modified_datetime = datetime.strptime(
+                resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+            update_timestamp = timestamp_pb2.Timestamp()
+            update_timestamp.FromDatetime(modified_datetime)
+            entry.source_system_timestamps.update_time = update_timestamp
 
         return generated_id, entry
 
