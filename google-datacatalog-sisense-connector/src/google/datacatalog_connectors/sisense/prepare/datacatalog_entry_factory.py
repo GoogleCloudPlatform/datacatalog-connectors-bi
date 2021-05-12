@@ -29,16 +29,16 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     def __init__(self, project_id: str, location_id: str, entry_group_id: str,
-                 user_specified_system: str, __server_address: str):
+                 user_specified_system: str, server_address: str):
 
         self.__project_id = project_id
         self.__location_id = location_id
         self.__entry_group_id = entry_group_id
         self.__user_specified_system = user_specified_system
-        self.__server_address = __server_address
+        self.__server_address = server_address
 
         # Strip schema (http | https) and slashes from the server url.
-        self.__server_id = __server_address[__server_address.find('//') + 2:]
+        self.__server_id = server_address[server_address.find('//') + 2:]
 
     def make_entry_for_folder(
             self, folder_metadata: Dict[str, Any]) -> Tuple[str, Entry]:
