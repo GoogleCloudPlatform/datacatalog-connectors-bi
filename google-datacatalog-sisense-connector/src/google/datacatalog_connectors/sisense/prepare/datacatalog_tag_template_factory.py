@@ -68,30 +68,30 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        order=8)
 
         self._add_primitive_type_field(tag_template=tag_template,
-                                       field_id='has_children',
-                                       field_type=self.__BOOL_TYPE,
-                                       display_name='Has children',
-                                       is_required=True,
-                                       order=7)
-
-        self._add_primitive_type_field(tag_template=tag_template,
-                                       field_id='children_count',
-                                       field_type=self.__DOUBLE_TYPE,
-                                       display_name='Children count',
-                                       order=6)
-
-        self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='parent_id',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Id of Parent',
-                                       order=5)
+                                       order=7)
 
         self._add_primitive_type_field(
             tag_template=tag_template,
             field_id='parent_entry',
             field_type=self.__STRING_TYPE,
             display_name='Data Catalog Entry for the parent Folder',
-            order=4)
+            order=6)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='has_children',
+                                       field_type=self.__BOOL_TYPE,
+                                       display_name='Has children',
+                                       is_required=True,
+                                       order=5)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='child_count',
+                                       field_type=self.__DOUBLE_TYPE,
+                                       display_name='Child count',
+                                       order=4)
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='has_dashboards',

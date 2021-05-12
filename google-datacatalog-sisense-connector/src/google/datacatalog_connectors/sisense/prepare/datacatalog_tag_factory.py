@@ -53,9 +53,13 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             self._set_string_field(tag, 'owner_name',
                                    f'{first_name} {last_name}')
 
-        self._set_bool_field(tag, 'has_children', False)
+        children = folder_metadata.get('children')
+        child_count = len(children) if children else 0
+        self._set_bool_field(tag, 'has_children', child_count > 0)
 
-        self._set_bool_field(tag, 'has_dashboards', False)
+        dashboards = folder_metadata.get('dashboards')
+        dashboard_count = len(dashboards) if dashboards else 0
+        self._set_bool_field(tag, 'has_dashboards', dashboard_count > 0)
 
         self._set_string_field(tag, 'server_url', self.__server_address)
 
