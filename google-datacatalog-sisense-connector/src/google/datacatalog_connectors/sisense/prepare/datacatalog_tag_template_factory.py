@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from google.cloud import datacatalog
+from google.cloud.datacatalog import TagTemplate
 from google.datacatalog_connectors.commons import prepare
 
 from google.datacatalog_connectors.sisense.prepare import constants
@@ -26,11 +27,11 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
     __STRING_TYPE = datacatalog.FieldType.PrimitiveType.STRING
     __TIMESTAMP_TYPE = datacatalog.FieldType.PrimitiveType.TIMESTAMP
 
-    def __init__(self, project_id, location_id):
+    def __init__(self, project_id: str, location_id: str):
         self.__project_id = project_id
         self.__location_id = location_id
 
-    def make_tag_template_for_folder(self):
+    def make_tag_template_for_folder(self) -> TagTemplate:
         tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
@@ -111,3 +112,5 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        display_name='Sisense Server Url',
                                        is_required=True,
                                        order=1)
+
+        return tag_template

@@ -46,8 +46,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry = datacatalog.Entry()
 
         # The root folder does not have an ``_id`` field.
-        folder_id = folder_metadata['_id'] if folder_metadata.get(
-            '_id') else folder_metadata.get('name')
+        folder_id = folder_metadata.get('_id') or folder_metadata.get('name')
 
         generated_id = self.__format_id(constants.ENTRY_ID_PART_FOLDER,
                                         folder_id)
