@@ -15,5 +15,6 @@
 # limitations under the License.
 
 from .assembled_entry_factory import AssembledEntryFactory
+from .datacatalog_tag_template_factory import DataCatalogTagTemplateFactory
 
-__all__ = ('AssembledEntryFactory',)
+__all__ = ('AssembledEntryFactory', 'DataCatalogTagTemplateFactory')
