@@ -14,6 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .metadata_scraper import MetadataScraper
+# This is the common prefix for all Sisense Entries.
+ENTRY_ID_PREFIX = 'sss_'
+# The below asset type specific strings are appended to the standard
+# ENTRY_ID_PREFIX when generating Sisense Entry IDs.
+ENTRY_ID_PART_FOLDER = 'fd_'
 
-__all__ = ('MetadataScraper',)
+# The user specified type of Folder-related Entries.
+USER_SPECIFIED_TYPE_FOLDER = 'folder'

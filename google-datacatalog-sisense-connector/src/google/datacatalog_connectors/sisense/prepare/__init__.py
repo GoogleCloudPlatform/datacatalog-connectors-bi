@@ -14,6 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .metadata_scraper import MetadataScraper
+from .assembled_entry_factory import AssembledEntryFactory
 
-__all__ = ('MetadataScraper',)
+__all__ = ('AssembledEntryFactory',)

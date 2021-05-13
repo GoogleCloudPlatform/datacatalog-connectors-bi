@@ -31,18 +31,19 @@ class MetadataScraperTest(unittest.TestCase):
                                                 username='test-username',
                                                 password='test-password')
 
+        self.__api_helper = mock_rest_api_helper.return_value
+
     def test_constructor_should_set_instance_attributes(self):
         attrs = self.__scraper.__dict__
-        self.assertIsNotNone(attrs['_MetadataScraper__api_helper'])
+        self.assertEqual(self.__api_helper,
+                         attrs['_MetadataScraper__api_helper'])
 
     def test_scrape_all_folders_should_delegate_to_api_helper(self):
-        attrs = self.__scraper.__dict__
-        api_helper = attrs['_MetadataScraper__api_helper']
-
         folders_metadata = [{
             '_id': 'folder-id',
         }]
 
+        api_helper = self.__api_helper
         api_helper.get_all_folders.return_value = folders_metadata
 
         folders = self.__scraper.scrape_all_folders()
@@ -52,15 +53,13 @@ class MetadataScraperTest(unittest.TestCase):
         api_helper.get_all_folders.assert_called_once()
 
     def test_scrape_user_should_delegate_to_api_helper(self):
-        attrs = self.__scraper.__dict__
-        api_helper = attrs['_MetadataScraper__api_helper']
-
         user_metadata = {
             '_id': 'user-id',
             'firstName': 'Jane',
             'lastName': 'Doe'
         }
 
+        api_helper = self.__api_helper
         api_helper.get_user.return_value = user_metadata
 
         user = self.__scraper.scrape_user('user-id')
