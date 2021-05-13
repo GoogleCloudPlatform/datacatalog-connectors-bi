@@ -18,10 +18,12 @@ import logging
 import re
 from typing import Any, Dict, List
 
+from google.cloud.datacatalog import TagTemplate
 from google.datacatalog_connectors.commons import cleanup, ingest
 from google.datacatalog_connectors.commons.prepare import AssembledEntryData
 
 from google.datacatalog_connectors.sisense import prepare, scrape
+from google.datacatalog_connectors.sisense.prepare import constants
 
 
 class MetadataSynchronizer:
@@ -53,6 +55,10 @@ class MetadataSynchronizer:
             user_specified_system=self.__SPECIFIED_SYSTEM,
             server_address=sisense_server_address)
 
+        self.__tag_template_factory = prepare.DataCatalogTagTemplateFactory(
+            project_id=datacatalog_project_id,
+            location_id=datacatalog_location_id)
+
     def run(self) -> None:
         """Coordinate a full scrape > prepare > ingest process."""
 
@@ -70,7 +76,9 @@ class MetadataSynchronizer:
         logging.info('===> Converting Sisense metadata'
                      ' into Data Catalog entities model...')
 
-        # tag_templates_dict = self.__make_tag_templates_dict()
+        assembled_assets = self.__assemble_sisense_assets(folders)
+
+        tag_templates_dict = self.__make_tag_templates_dict()
 
         assembled_entries_dict = self.__make_assembled_entries_dict(folders)
         logging.info('==== DONE ========================================')
@@ -79,16 +87,28 @@ class MetadataSynchronizer:
         logging.info('')
         logging.info('===> Synchronizing Sisense :: Data Catalog metadata...')
 
-        self.__ingest_metadata(assembled_entries_dict, {})
+        self.__ingest_metadata(assembled_entries_dict, tag_templates_dict)
         logging.info('==== DONE ========================================')
 
     def __scrape_folders(self) -> List[Dict[str, Any]]:
-        """Scrape metadata from all the Folders the user has access to.
+        """Scrape metadata from all the Folders the current user has access to.
+        A custom ``owner`` field is added to the Folder metadata if the
+        authenticated user is allowed to scrape users' metadata.
 
         Returns:
             A ``list``.
         """
-        return self.__metadata_scraper.scrape_all_folders()
+        all_folders = self.__metadata_scraper.scrape_all_folders()
+        folders_with_owner = [
+            folder for folder in all_folders if folder.get('userId')
+        ]
+        for folder in folders_with_owner:
+            try:
+                folder['user'] = self.__scrape_user(folder.get('userId'))
+            except:  # noqa E722
+                logging.warning("error on __scrape_folders:", exc_info=True)
+
+        return all_folders
 
     def __scrape_user(self, user_id: str) -> Dict[str, Any]:
         """Scrape metadata from a specific user.
@@ -98,11 +118,23 @@ class MetadataSynchronizer:
         """
         return self.__metadata_scraper.scrape_user(user_id)
 
+    def __assemble_sisense_assets(
+            self, folders: List[Dict[str, Any]]) -> Dict[str, Any]:
+
+        return folders[0]
+
+    def __make_tag_templates_dict(self) -> Dict[str, TagTemplate]:
+        return {
+            constants.TAG_TEMPLATE_ID_FOLDER:
+                self.__tag_template_factory.make_tag_template_for_folder(),
+        }
+
     def __make_assembled_entries_dict(
         self, folders_metadata: List[Dict[str, Any]]
     ) -> Dict[str, List[AssembledEntryData]]:
         """Make Data Catalog entries and tags for the Sisense assets the
         current user has access to.
+
         Returns:
             A ``dict`` in which keys are the top level asset ids and values are
             flat lists containing those assets and their nested ones, with all
@@ -112,8 +144,8 @@ class MetadataSynchronizer:
 
         for folder_metadata in folders_metadata:
             # The root folder does not have an ``_id`` field.
-            folder_id = folder_metadata['_id'] if folder_metadata.get(
-                '_id') else folder_metadata.get('name')
+            folder_id = folder_metadata.get('_id') or folder_metadata.get(
+                'name')
 
             assembled_entries[folder_id] = \
                 self.__assembled_entry_factory \
@@ -121,7 +153,10 @@ class MetadataSynchronizer:
 
         return assembled_entries
 
-    def __ingest_metadata(self, assembled_entries_dict, tag_templates_dict):
+    def __ingest_metadata(self, assembled_entries_dict: Dict[
+        str, List[AssembledEntryData]],
+                          tag_templates_dict: Dict[str, TagTemplate]) -> None:
+
         metadata_ingestor = ingest.DataCatalogMetadataIngestor(
             self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID)
 
