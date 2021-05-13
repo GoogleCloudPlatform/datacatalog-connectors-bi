@@ -77,10 +77,10 @@ class MetadataSynchronizer:
                      ' into Data Catalog entities model...')
 
         assembled_assets = self.__assemble_sisense_assets(folders)
-
         tag_templates_dict = self.__make_tag_templates_dict()
 
-        assembled_entries_dict = self.__make_assembled_entries_dict(folders)
+        assembled_entries_dict = self.__make_assembled_entries_dict(
+            assembled_assets, tag_templates_dict)
         logging.info('==== DONE ========================================')
 
         # Ingest metadata into Data Catalog.
@@ -91,8 +91,8 @@ class MetadataSynchronizer:
         logging.info('==== DONE ========================================')
 
     def __scrape_folders(self) -> List[Dict[str, Any]]:
-        """Scrape metadata from all the Folders the current user has access to.
-        A custom ``owner`` field is added to the Folder metadata if the
+        """Scrape metadata from all Folders the current user has access to. A
+        custom ``owner`` field is added to the Folder metadata if the
         authenticated user is allowed to scrape users' metadata.
 
         Returns:
@@ -119,9 +119,56 @@ class MetadataSynchronizer:
         return self.__metadata_scraper.scrape_user(user_id)
 
     def __assemble_sisense_assets(
-            self, folders: List[Dict[str, Any]]) -> Dict[str, Any]:
+            self, folders: List[Dict[str,
+                                     Any]]) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        Assemble metadata from all assets the current user has access to.
+        Folders metadata include nested objects such as sub-folders,
+        dashboards, widgets, and fields.
 
-        return folders[0]
+        Returns:
+            A ``dict`` in which keys are top-level asset IDs and values are
+            lists containing all metadata gathered for those assets in a
+            deep-first hierarchy.
+        """
+        top_level_folders = [
+            folder for folder in folders if not folder.get('parentId')
+        ]
+
+        top_level_assets_dict = {}
+        for folder in top_level_folders:
+            # The root folder does not have an ``_id`` field.
+            folder_id = folder.get('_id') or folder.get('name')
+            top_level_assets_dict[
+                folder_id] = self.__assemble_folder_from_flat_lists(
+                    folder, folders)
+
+        return top_level_assets_dict
+
+    def __assemble_folder_from_flat_lists(
+            self, folder: Dict[str, Any],
+            all_folders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Assemble folders metadata from the given flat asset lists.
+        """
+        folders = [folder]
+
+        # The root folder does not have an ``_id`` field.
+        folder_id = folder.get('_id') or folder.get('name')
+        child_folders = [
+            child for child in all_folders
+            if child.get('parentId') == folder_id
+        ]
+
+        # TODO Check whether the already used folders, dashboards, widgets, and
+        #  fields can be removed from the given lists to improve next
+        #  iterations performance and memory usage.
+
+        for child in child_folders:
+            folders.extend(
+                self.__assemble_folder_from_flat_lists(child, all_folders))
+
+        return folders
 
     def __make_tag_templates_dict(self) -> Dict[str, TagTemplate]:
         return {
@@ -130,7 +177,8 @@ class MetadataSynchronizer:
         }
 
     def __make_assembled_entries_dict(
-        self, folders_metadata: List[Dict[str, Any]]
+        self, assembled_metadata: Dict[str, List[Dict[str, Any]]],
+        tag_templates: Dict[str, TagTemplate]
     ) -> Dict[str, List[AssembledEntryData]]:
         """Make Data Catalog entries and tags for the Sisense assets the
         current user has access to.
@@ -142,39 +190,34 @@ class MetadataSynchronizer:
         """
         assembled_entries = {}
 
-        for folder_metadata in folders_metadata:
-            # The root folder does not have an ``_id`` field.
-            folder_id = folder_metadata.get('_id') or folder_metadata.get(
-                'name')
-
-            assembled_entries[folder_id] = \
-                self.__assembled_entry_factory \
-                    .make_assembled_entries_for_folder(folder_metadata)
+        for asset_id, assets in assembled_metadata.items():
+            assembled_entries[asset_id] = self.__assembled_entry_factory \
+                    .make_assembled_entries_list(assets, tag_templates)
 
         return assembled_entries
 
-    def __ingest_metadata(self, assembled_entries_dict: Dict[
-        str, List[AssembledEntryData]],
-                          tag_templates_dict: Dict[str, TagTemplate]) -> None:
+    def __ingest_metadata(self,
+                          assembled_entries: Dict[str,
+                                                  List[AssembledEntryData]],
+                          tag_templates: Dict[str, TagTemplate]) -> None:
 
         metadata_ingestor = ingest.DataCatalogMetadataIngestor(
             self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID)
 
-        entries_count = sum(
-            len(entries) for entries in assembled_entries_dict.values())
-        logging.info('==== %d entries to be synchronized!', entries_count)
+        entry_count = sum(
+            len(entries) for entries in assembled_entries.values())
+        logging.info('==== %d entries to be synchronized!', entry_count)
 
-        synced_entries_count = 0
-        for folder_id, assembled_entries in assembled_entries_dict.items():
-            folder_entries_count = len(assembled_entries)
+        synced_entry_count = 0
+        for asset_id, assembled_entries in assembled_entries.items():
+            asset_entry_count = len(assembled_entries)
 
             logging.info('')
-            logging.info('==== The Folder identified by %s has %d entries.',
-                         folder_id, folder_entries_count)
-            metadata_ingestor.ingest_metadata(assembled_entries,
-                                              tag_templates_dict)
-            synced_entries_count = synced_entries_count + folder_entries_count
+            logging.info('==== The asset identified by %s has %d entries.',
+                         asset_id, asset_entry_count)
+            metadata_ingestor.ingest_metadata(assembled_entries, tag_templates)
+            synced_entry_count += asset_entry_count
 
         logging.info('')
         logging.info('==== %d of %d entries successfully synchronized!',
-                     synced_entries_count, entries_count)
+                     synced_entry_count, entry_count)
