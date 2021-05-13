@@ -20,6 +20,9 @@ ENTRY_ID_PREFIX = 'sss_'
 # ENTRY_ID_PREFIX when generating Sisense Entry IDs.
 ENTRY_ID_PART_FOLDER = 'fd_'
 
+# The Sisense type for Folder assets.
+SISENSE_ASSET_TYPE_FOLDER = 'folder'
+
 # The ID of the Tag Template created to store additional metadata for
 # Folder-related Entries.
 TAG_TEMPLATE_ID_FOLDER = 'sisense_folder_metadata'

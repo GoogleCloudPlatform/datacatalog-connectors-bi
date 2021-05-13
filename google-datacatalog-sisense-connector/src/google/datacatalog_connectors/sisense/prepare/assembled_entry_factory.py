@@ -16,10 +16,11 @@
 
 from typing import Any, Dict, List
 
+from google.cloud.datacatalog import TagTemplate
 from google.datacatalog_connectors.commons import prepare
 from google.datacatalog_connectors.commons.prepare import AssembledEntryData
 
-from google.datacatalog_connectors.sisense.prepare import \
+from google.datacatalog_connectors.sisense.prepare import constants, \
     datacatalog_entry_factory
 from google.datacatalog_connectors.sisense.prepare.datacatalog_entry_factory \
     import DataCatalogEntryFactory
@@ -36,17 +37,44 @@ class AssembledEntryFactory:
                 project_id, location_id, entry_group_id, user_specified_system,
                 server_address)
 
-    def make_assembled_entries_for_folder(
-            self, folder_metadata: Dict[str, Any]) -> List[AssembledEntryData]:
+    def make_assembled_entries_list(
+            self, assets_metadata: List[Dict[str, Any]],
+            tag_templates: Dict[str, TagTemplate]) -> List[AssembledEntryData]:
+
+        assembled_entries = []
+        for asset in assets_metadata:
+            if constants.SISENSE_ASSET_TYPE_FOLDER == asset.get('type'):
+                assembled_entries.extend(
+                    self.__make_assembled_entries_for_folder(
+                        asset, tag_templates))
+
+        return assembled_entries
+
+    @classmethod
+    def __get_tag_template(
+            cls, tag_template_id: str,
+            tag_templates: Dict[str, TagTemplate]) -> TagTemplate:
+
+        return tag_templates[tag_template_id] \
+            if tag_template_id in tag_templates else None
+
+    def __make_assembled_entries_for_folder(
+            self, folder_metadata: Dict[str, Any],
+            tag_templates: Dict[str, TagTemplate]) -> List[AssembledEntryData]:
+
+        folder_tag_template = self.__get_tag_template(
+            constants.TAG_TEMPLATE_ID_FOLDER, tag_templates)
 
         assembled_entries = [
-            self.__make_assembled_entry_for_folder(folder_metadata)
+            self.__make_assembled_entry_for_folder(folder_metadata,
+                                                   folder_tag_template)
         ]
 
         return assembled_entries
 
     def __make_assembled_entry_for_folder(
-            self, folder_metadata: Dict[str, Any]) -> AssembledEntryData:
+            self, folder_metadata: Dict[str, Any],
+            tag_template: TagTemplate) -> AssembledEntryData:
 
         entry_id, entry = \
             self.__datacatalog_entry_factory.make_entry_for_folder(

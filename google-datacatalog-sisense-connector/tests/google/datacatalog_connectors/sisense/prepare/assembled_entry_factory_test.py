@@ -51,8 +51,8 @@ class AssembledEntryFactoryTest(unittest.TestCase):
 
         make_assembled_entry_for_folder.return_value = ('id', {})
 
-        assembled_entries = \
-            self.__factory.make_assembled_entries_for_folder(
+        assembled_entries = self.__factory\
+            ._AssembledEntryFactory__make_assembled_entries_for_folder(
                 self.__make_fake_folder())
 
         self.assertEqual(1, len(assembled_entries))
