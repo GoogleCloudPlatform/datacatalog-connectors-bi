@@ -78,9 +78,10 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
 
         self.assertEqual(
             self.__STRING_TYPE,
-            tag_template.fields['parent_entry'].type.primitive_type)
-        self.assertEqual('Data Catalog Entry for the parent Folder',
-                         tag_template.fields['parent_entry'].display_name)
+            tag_template.fields['parent_folder_entry'].type.primitive_type)
+        self.assertEqual(
+            'Data Catalog Entry for the parent Folder',
+            tag_template.fields['parent_folder_entry'].display_name)
 
         self.assertEqual(
             self.__BOOL_TYPE,

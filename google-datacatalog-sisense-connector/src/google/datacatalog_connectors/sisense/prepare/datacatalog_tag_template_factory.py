@@ -75,7 +75,7 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         self._add_primitive_type_field(
             tag_template=tag_template,
-            field_id='parent_entry',
+            field_id='parent_folder_entry',
             field_type=self.__STRING_TYPE,
             display_name='Data Catalog Entry for the parent Folder',
             order=6)

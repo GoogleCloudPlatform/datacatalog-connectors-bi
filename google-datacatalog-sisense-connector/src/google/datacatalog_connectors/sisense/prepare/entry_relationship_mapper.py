@@ -35,4 +35,5 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
                 continue
 
             cls._map_related_entry(assembled_entry_data, cls.__FOLDER,
-                                   'parent_id', 'parent_entry', id_name_pairs)
+                                   'parent_id', 'parent_folder_entry',
+                                   id_name_pairs)
