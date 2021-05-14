@@ -16,7 +16,7 @@
 
 import logging
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from google.cloud.datacatalog import TagTemplate
 from google.datacatalog_connectors.commons import cleanup, ingest
@@ -76,11 +76,10 @@ class MetadataSynchronizer:
         logging.info('===> Converting Sisense metadata'
                      ' into Data Catalog entities model...')
 
-        assembled_assets = self.__assemble_sisense_assets(folders)
+        assembled_assets_dict = self.__assemble_sisense_assets(folders)
         tag_templates_dict = self.__make_tag_templates_dict()
-
         assembled_entries_dict = self.__make_assembled_entries_dict(
-            assembled_assets, tag_templates_dict)
+            assembled_assets_dict, tag_templates_dict)
         logging.info('==== DONE ========================================')
 
         # Ingest metadata into Data Catalog.
@@ -91,45 +90,39 @@ class MetadataSynchronizer:
         logging.info('==== DONE ========================================')
 
     def __scrape_folders(self) -> List[Dict[str, Any]]:
-        """Scrape metadata from all Folders the current user has access to. A
-        custom ``owner`` field is added to the Folder metadata if the
+        """Scrape metadata from all Folders the current user has access to.
+
+        A custom ``owner`` field is added to the Folder metadata if the
         authenticated user is allowed to scrape users' metadata.
 
         Returns:
             A ``list``.
         """
         all_folders = self.__metadata_scraper.scrape_all_folders()
+
         folders_with_owner = [
             folder for folder in all_folders if folder.get('userId')
         ]
         for folder in folders_with_owner:
             try:
-                folder['user'] = self.__scrape_user(folder.get('userId'))
+                folder['user'] = self.__metadata_scraper.scrape_user(
+                    folder.get('userId'))
             except:  # noqa E722
                 logging.warning("error on __scrape_folders:", exc_info=True)
 
         return all_folders
 
-    def __scrape_user(self, user_id: str) -> Dict[str, Any]:
-        """Scrape metadata from a specific user.
-
-        Returns:
-             A User metadata object.
-        """
-        return self.__metadata_scraper.scrape_user(user_id)
-
     def __assemble_sisense_assets(
-            self, folders: List[Dict[str,
-                                     Any]]) -> Dict[str, List[Dict[str, Any]]]:
+            self, folders: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
         """
-        Assemble metadata from all assets the current user has access to.
-        Folders metadata include nested objects such as sub-folders,
+        Assemble metadata considering all assets the current user has access
+        to. Folder metadata include nested objects such as sub-folders,
         dashboards, widgets, and fields.
 
         Returns:
-            A ``dict`` in which keys are top-level asset IDs and values are
-            lists containing all metadata gathered for those assets in a
-            deep-first hierarchy.
+            A ``dict``. Keys are top-level asset ids and values are  dicts
+            containing all metadata gathered for those assets in a hierarchical
+            structure.
         """
         top_level_folders = [
             folder for folder in folders if not folder.get('parentId')
@@ -137,25 +130,30 @@ class MetadataSynchronizer:
 
         top_level_assets_dict = {}
         for folder in top_level_folders:
-            # The root folder's ``oid`` field is not fulfilled.
-            folder_id = folder.get('oid') or folder.get('name')
-            top_level_assets_dict[
-                folder_id] = self.__assemble_folder_from_flat_lists(
-                    folder, folders)
+            assembled_folder = self.__assemble_folder_from_flat_lists(
+                folder, folders)
+            top_level_assets_dict[assembled_folder[0]] = assembled_folder[1]
 
         return top_level_assets_dict
 
+    @classmethod
     def __assemble_folder_from_flat_lists(
-            self, folder: Dict[str, Any],
-            all_folders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+            cls, folder: Dict[str, Any],
+            all_folders: List[Dict[str, Any]]) -> Tuple[str, Dict[str, Any]]:
         """
-        Assemble folder metadata from the given flat asset lists.
-        """
-        folders = [folder]
+        Assemble Folder metadata from the given flat asset lists.
 
+        A custom ``children`` field is added to the Folder metadata in order to
+        store its nested folders.
+
+        Returns:
+            A ``tuple``. The first item is the Folder id and the second is a
+            ``dict`` containing all metadata gathered for the Folder in a
+            hierarchical structure.
+        """
         # The root folder's ``oid`` field is not fulfilled.
         folder_id = folder.get('oid') or folder.get('name')
-        child_folders = [
+        folder['children'] = [
             child for child in all_folders
             if child.get('parentId') == folder_id
         ]
@@ -164,11 +162,7 @@ class MetadataSynchronizer:
         #  fields can be removed from the given lists to improve next
         #  iterations performance and memory usage.
 
-        for child in child_folders:
-            folders.extend(
-                self.__assemble_folder_from_flat_lists(child, all_folders))
-
-        return folders
+        return folder_id, folder
 
     def __make_tag_templates_dict(self) -> Dict[str, TagTemplate]:
         return {
@@ -177,15 +171,15 @@ class MetadataSynchronizer:
         }
 
     def __make_assembled_entries_dict(
-        self, assembled_metadata: Dict[str, List[Dict[str, Any]]],
+        self, assembled_metadata: Dict[str, Dict[str, Any]],
         tag_templates: Dict[str, TagTemplate]
     ) -> Dict[str, List[AssembledEntryData]]:
         """Make Data Catalog entries and tags for the Sisense assets the
         current user has access to.
 
         Returns:
-            A ``dict`` in which keys are the top level asset ids and values are
-            flat lists containing those assets and their nested ones, with all
+            A ``dict``. Keys are the top level asset ids and values are flat
+            lists containing those assets and their nested ones, with all
             related entries and tags.
         """
         assembled_entries = {}
