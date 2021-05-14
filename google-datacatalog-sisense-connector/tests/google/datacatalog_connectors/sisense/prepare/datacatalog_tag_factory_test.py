@@ -33,7 +33,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.com',
                          attrs['_DataCatalogTagFactory__server_address'])
 
-    def test_make_tag_for_app_should_set_all_available_fields(self):
+    def test_make_tag_for_folder_should_set_all_available_fields(self):
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_folder_metadata'
 

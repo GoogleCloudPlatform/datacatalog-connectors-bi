@@ -14,14 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
 from typing import Any, Dict
 
 from google.cloud import datacatalog
 from google.cloud.datacatalog import Tag, TagTemplate
 from google.datacatalog_connectors.commons import prepare
-
-from google.datacatalog_connectors.sisense.prepare import constants
 
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
