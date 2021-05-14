@@ -52,14 +52,6 @@ class AssembledEntryFactory:
 
         return assembled_entries
 
-    @classmethod
-    def __get_tag_template(
-            cls, tag_template_id: str,
-            tag_templates: Dict[str, TagTemplate]) -> TagTemplate:
-
-        return tag_templates[tag_template_id] \
-            if tag_template_id in tag_templates else None
-
     def __make_assembled_entries_for_folder(
             self, folder_metadata: Dict[str, Any],
             tag_templates: Dict[str, TagTemplate]) -> List[AssembledEntryData]:
@@ -72,7 +64,7 @@ class AssembledEntryFactory:
                                                    folder_tag_template)
         ]
 
-        for child_folder in folder_metadata['folders']:
+        for child_folder in folder_metadata.get('folders') or []:
             assembled_entries.append(
                 self.__make_assembled_entry_for_folder(child_folder,
                                                        folder_tag_template))
@@ -96,3 +88,11 @@ class AssembledEntryFactory:
         return prepare.AssembledEntryData(entry_id=entry_id,
                                           entry=entry,
                                           tags=tags)
+
+    @classmethod
+    def __get_tag_template(
+            cls, tag_template_id: str,
+            tag_templates: Dict[str, TagTemplate]) -> TagTemplate:
+
+        return tag_templates[tag_template_id] \
+            if tag_template_id in tag_templates else None
