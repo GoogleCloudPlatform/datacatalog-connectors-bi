@@ -37,13 +37,15 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tag.template = tag_template.name
 
-        # The root folder does not have an ``_id`` field.
-        folder_id = folder_metadata.get('_id') or folder_metadata.get('name')
+        # The root folder's ``oid`` field is not fulfilled.
+        folder_id = folder_metadata.get('oid') or folder_metadata.get('name')
         self._set_string_field(tag, 'id', folder_id)
 
         self._set_string_field(tag, 'name', folder_metadata.get('name'))
+        self._set_string_field(tag, 'parent_id',
+                               folder_metadata.get('parentId'))
 
-        owner = folder_metadata.get('owner')
+        owner = folder_metadata.get('ownerData')
         if owner:
             self._set_string_field(tag, 'owner_username',
                                    owner.get('userName'))
@@ -53,8 +55,8 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             self._set_string_field(tag, 'owner_name',
                                    f'{first_name} {last_name}')
 
-        children = folder_metadata.get('children')
-        child_count = len(children) if children else 0
+        child_folders = folder_metadata.get('folders')
+        child_count = len(child_folders) if child_folders else 0
         self._set_bool_field(tag, 'has_children', child_count > 0)
         if child_count:
             self._set_double_field(tag, 'child_count', child_count)
