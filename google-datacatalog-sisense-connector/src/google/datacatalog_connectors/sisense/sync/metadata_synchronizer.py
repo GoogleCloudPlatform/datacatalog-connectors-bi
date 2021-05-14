@@ -149,7 +149,7 @@ class MetadataSynchronizer:
             self, folder: Dict[str, Any],
             all_folders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Assemble folders metadata from the given flat asset lists.
+        Assemble folder metadata from the given flat asset lists.
         """
         folders = [folder]
 
