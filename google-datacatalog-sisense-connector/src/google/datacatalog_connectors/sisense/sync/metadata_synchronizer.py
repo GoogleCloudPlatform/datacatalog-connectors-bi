@@ -82,6 +82,13 @@ class MetadataSynchronizer:
             assembled_assets_dict, tag_templates_dict)
         logging.info('==== DONE ========================================')
 
+        # Data Catalog entry relationships mapping.
+        logging.info('')
+        logging.info('===> Mapping Data Catalog entry relationships...')
+
+        self.__map_datacatalog_relationships(assembled_entries_dict)
+        logging.info('==== DONE ========================================')
+
         # Ingest metadata into Data Catalog.
         logging.info('')
         logging.info('===> Synchronizing Sisense :: Data Catalog metadata...')
@@ -92,8 +99,11 @@ class MetadataSynchronizer:
     def __scrape_folders(self) -> List[Dict[str, Any]]:
         """Scrape metadata from all Folders the current user has access to.
 
-        A custom ``owner`` field is added to the Folder metadata if the
-        authenticated user is allowed to scrape users' metadata.
+        The incoming Folder objects may be enriched with additional fields in
+        order to expedite/improve the metadata synchronization process:
+        - ``ownerData``: added when the authenticated user is allowed to read
+        users' information; intended to provide ownership-related metadata to
+        the Data Catalog Tags created for the Folder.
 
         Returns:
             A ``list``.
@@ -105,8 +115,8 @@ class MetadataSynchronizer:
         ]
         for folder in folders_with_owner:
             try:
-                folder['user'] = self.__metadata_scraper.scrape_user(
-                    folder.get('userId'))
+                folder['ownerData'] = self.__metadata_scraper.scrape_user(
+                    folder.get('owner'))
             except:  # noqa E722
                 logging.warning("error on __scrape_folders:", exc_info=True)
 
@@ -143,8 +153,9 @@ class MetadataSynchronizer:
         """
         Assemble Folder metadata from the given flat asset lists.
 
-        A custom ``children`` field is added to the Folder metadata in order to
-        store its nested folders.
+        The incoming Folder object may be enriched with additional fields in
+        order to expedite/improve the metadata synchronization process:
+        - ``folders``: stores its child folders.
 
         Returns:
             A ``tuple``. The first item is the Folder id and the second is a
@@ -153,14 +164,16 @@ class MetadataSynchronizer:
         """
         # The root folder's ``oid`` field is not fulfilled.
         folder_id = folder.get('oid') or folder.get('name')
-        folder['children'] = [
-            child for child in all_folders
-            if child.get('parentId') == folder_id
+        folder['folders'] = [
+            child_folder for child_folder in all_folders
+            if child_folder.get('parentId') == folder_id
         ]
+        for child_folder in folder['folders']:
+            cls.__assemble_folder_from_flat_lists(child_folder, all_folders)
 
-        # TODO Check whether the already used folders, dashboards, widgets, and
-        #  fields can be removed from the given lists to improve next
-        #  iterations performance and memory usage.
+        # TODO Check whether the already used folders can be removed from the
+        #  given list to improve next iterations performance and decrease
+        #  memory usage.
 
         return folder_id, folder
 
@@ -189,6 +202,15 @@ class MetadataSynchronizer:
                     .make_assembled_entries_list(assets, tag_templates)
 
         return assembled_entries
+
+    @classmethod
+    def __map_datacatalog_relationships(cls, assembled_entries_dict):
+        all_assembled_entries = []
+        for assembled_entries_data in assembled_entries_dict.values():
+            all_assembled_entries.extend(assembled_entries_data)
+
+        prepare.EntryRelationshipMapper().fulfill_tag_fields(
+            all_assembled_entries)
 
     def __ingest_metadata(self,
                           assembled_entries: Dict[str,
