@@ -137,8 +137,8 @@ class MetadataSynchronizer:
 
         top_level_assets_dict = {}
         for folder in top_level_folders:
-            # The root folder does not have an ``_id`` field.
-            folder_id = folder.get('_id') or folder.get('name')
+            # The root folder's ``oid`` field is not fulfilled.
+            folder_id = folder.get('oid') or folder.get('name')
             top_level_assets_dict[
                 folder_id] = self.__assemble_folder_from_flat_lists(
                     folder, folders)
@@ -153,8 +153,8 @@ class MetadataSynchronizer:
         """
         folders = [folder]
 
-        # The root folder does not have an ``_id`` field.
-        folder_id = folder.get('_id') or folder.get('name')
+        # The root folder's ``oid`` field is not fulfilled.
+        folder_id = folder.get('oid') or folder.get('name')
         child_folders = [
             child for child in all_folders
             if child.get('parentId') == folder_id
