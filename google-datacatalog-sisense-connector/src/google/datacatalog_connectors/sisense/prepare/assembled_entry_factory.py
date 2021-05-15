@@ -56,8 +56,8 @@ class AssembledEntryFactory:
             self, folder_metadata: Dict[str, Any],
             tag_templates: Dict[str, TagTemplate]) -> List[AssembledEntryData]:
 
-        folder_tag_template = self.__get_tag_template(
-            constants.TAG_TEMPLATE_ID_FOLDER, tag_templates)
+        folder_tag_template = tag_templates.get(
+            constants.TAG_TEMPLATE_ID_FOLDER)
 
         assembled_entries = [
             self.__make_assembled_entry_for_folder(folder_metadata,
@@ -88,11 +88,3 @@ class AssembledEntryFactory:
         return prepare.AssembledEntryData(entry_id=entry_id,
                                           entry=entry,
                                           tags=tags)
-
-    @classmethod
-    def __get_tag_template(
-            cls, tag_template_id: str,
-            tag_templates: Dict[str, TagTemplate]) -> TagTemplate:
-
-        return tag_templates[tag_template_id] \
-            if tag_template_id in tag_templates else None

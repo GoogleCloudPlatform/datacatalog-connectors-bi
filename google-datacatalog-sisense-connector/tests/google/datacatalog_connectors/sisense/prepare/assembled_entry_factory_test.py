@@ -68,35 +68,33 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         mock_make_assembled_entries_for_folder.assert_called_once()
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_assembled_entry_for_folder')
-    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_tag_template')
     def test_make_assembled_entries_for_folder_should_process_folder(
-            self, mock_get_tag_template, mock_make_assembled_entry_for_folder):
+            self, mock_make_assembled_entry_for_folder):
 
         folder = self.__make_fake_folder()
 
         tag_template = datacatalog.TagTemplate()
-        mock_get_tag_template.return_value = tag_template
+        tag_templates_dict = {'sisense_folder_metadata': tag_template}
 
         mock_make_assembled_entry_for_folder.return_value = \
             commons_prepare.AssembledEntryData('test-folder', {})
 
         assembled_entries = self.__factory\
             ._AssembledEntryFactory__make_assembled_entries_for_folder(
-                folder, {})
+                folder, tag_templates_dict)
 
         self.assertEqual(1, len(assembled_entries))
         mock_make_assembled_entry_for_folder.assert_called_once_with(
             folder, tag_template)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_assembled_entry_for_folder')
-    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_tag_template')
     def test_make_assembled_entries_for_folder_should_process_child_folders(
-            self, mock_get_tag_template, mock_make_assembled_entry_for_folder):
+            self, mock_make_assembled_entry_for_folder):
 
         folder = self.__make_fake_folder_with_children()
 
         tag_template = datacatalog.TagTemplate()
-        mock_get_tag_template.return_value = tag_template
+        tag_templates_dict = {'sisense_folder_metadata': tag_template}
 
         mock_make_assembled_entry_for_folder.side_effect = [
             commons_prepare.AssembledEntryData('test-parent-folder', {}),
@@ -105,7 +103,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
 
         assembled_entries = self.__factory\
             ._AssembledEntryFactory__make_assembled_entries_for_folder(
-                folder, {})
+                folder, tag_templates_dict)
 
         self.assertEqual(2, len(assembled_entries))
         self.assertEqual(2, mock_make_assembled_entry_for_folder.call_count)
@@ -138,30 +136,6 @@ class AssembledEntryFactoryTest(unittest.TestCase):
                          tags[0].template)
         tag_factory.make_tag_for_folder.assert_called_once_with(
             tag_template, folder)
-
-    def test_get_tag_template_should_return_provided_template(self):
-        tag_template = datacatalog.TagTemplate()
-        tag_template.name = 'tagTemplates/metadata_template'
-
-        tag_templates_dict = {'metadata_template': tag_template}
-
-        metadata_template = self.__factory\
-            ._AssembledEntryFactory__get_tag_template(
-                'metadata_template', tag_templates_dict)
-
-        self.assertEqual(tag_template, metadata_template)
-
-    def test_get_tag_template_should_return_none_if_not_available(self):
-        tag_template = datacatalog.TagTemplate()
-        tag_template.name = 'tagTemplates/metadata_template'
-
-        tag_templates_dict = {'other_metadata_template': tag_template}
-
-        metadata_template = self.__factory\
-            ._AssembledEntryFactory__get_tag_template(
-                'metadata_template', tag_templates_dict)
-
-        self.assertIsNone(metadata_template)
 
     @classmethod
     def __make_fake_folder(cls):
