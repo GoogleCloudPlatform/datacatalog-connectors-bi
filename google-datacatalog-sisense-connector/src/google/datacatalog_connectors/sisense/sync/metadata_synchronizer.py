@@ -89,6 +89,13 @@ class MetadataSynchronizer:
         self.__map_datacatalog_relationships(assembled_entries_dict)
         logging.info('==== DONE ========================================')
 
+        # Data Catalog clean up: delete obsolete data.
+        logging.info('')
+        logging.info('===> Deleting Data Catalog obsolete metadata...')
+
+        self.__delete_obsolete_entries(assembled_entries_dict)
+        logging.info('==== DONE ========================================')
+
         # Ingest metadata into Data Catalog.
         logging.info('')
         logging.info('===> Synchronizing Sisense :: Data Catalog metadata...')
@@ -211,6 +218,18 @@ class MetadataSynchronizer:
 
         prepare.EntryRelationshipMapper().fulfill_tag_fields(
             all_assembled_entries)
+
+    def __delete_obsolete_entries(self, new_assembled_entries_dict):
+        all_assembled_entries = []
+        for assembled_entry_data in new_assembled_entries_dict.values():
+            all_assembled_entries.extend(assembled_entry_data)
+
+        cleanup.DataCatalogMetadataCleaner(
+            self.__project_id, self.__location_id, self.__ENTRY_GROUP_ID). \
+            delete_obsolete_metadata(
+            all_assembled_entries,
+            f'system={self.__SPECIFIED_SYSTEM}'
+            f' tag:server_url:{self.__server_address}')
 
     def __ingest_metadata(self,
                           assembled_entries: Dict[str,
