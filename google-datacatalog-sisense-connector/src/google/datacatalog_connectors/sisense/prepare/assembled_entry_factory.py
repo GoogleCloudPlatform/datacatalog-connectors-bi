@@ -65,9 +65,9 @@ class AssembledEntryFactory:
         ]
 
         for child_folder in folder_metadata.get('folders') or []:
-            assembled_entries.append(
-                self.__make_assembled_entry_for_folder(child_folder,
-                                                       folder_tag_template))
+            assembled_entries.extend(
+                self.__make_assembled_entries_for_folder(
+                    child_folder, tag_templates))
 
         return assembled_entries
 
