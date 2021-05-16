@@ -58,12 +58,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         entry_id, entry = self.__factory.make_entry_for_folder(metadata)
 
-        self.assertEqual('sss_test_server_com_fd_a123_b456', entry_id)
+        self.assertEqual('sss_test_server_com_fd_a123_b457', entry_id)
 
         self.assertEqual(
             'projects/test-project/locations/test-location/'
             'entryGroups/test-entry-group/entries/'
-            'sss_test_server_com_fd_a123_b456', entry.name)
+            'sss_test_server_com_fd_a123_b457', entry.name)
         self.assertEqual('test-system', entry.user_specified_system)
         self.assertEqual('folder', entry.user_specified_type)
         self.assertEqual('Test folder', entry.display_name)

@@ -54,7 +54,8 @@ class RESTAPIHelper:
         self.__set_up_auth()
 
         # Sisense can return the folders in flat (default) or tree structures.
-        # We decided for flat because it simplifies further processing.
+        # We decided for flat because it supports standard pagination handling
+        # (paginating a tree structure would require extra programming effort).
         url = f'{self.__base_api_endpoint}/folders?structure=flat'
         return self.__get_list_using_pagination(base_url=url,
                                                 results_per_page=50)
