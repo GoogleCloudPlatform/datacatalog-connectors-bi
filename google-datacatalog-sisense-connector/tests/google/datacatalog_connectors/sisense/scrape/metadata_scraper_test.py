@@ -64,6 +64,5 @@ class MetadataScraperTest(unittest.TestCase):
 
         user = self.__scraper.scrape_user('user-id')
 
-        self.assertIsNotNone(user)
         self.assertEqual('user-id', user['_id'])
         api_helper.get_user.assert_called_once()

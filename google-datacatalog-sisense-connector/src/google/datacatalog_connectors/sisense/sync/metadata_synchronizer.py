@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import logging
-import re
 from typing import Any, Dict, List, Tuple
 
 from google.cloud.datacatalog import TagTemplate
@@ -48,16 +47,16 @@ class MetadataSynchronizer:
         self.__project_id = datacatalog_project_id
         self.__location_id = datacatalog_location_id
 
+        self.__tag_template_factory = prepare.DataCatalogTagTemplateFactory(
+            project_id=datacatalog_project_id,
+            location_id=datacatalog_location_id)
+
         self.__assembled_entry_factory = prepare.AssembledEntryFactory(
             project_id=datacatalog_project_id,
             location_id=datacatalog_location_id,
             entry_group_id=self.__ENTRY_GROUP_ID,
             user_specified_system=self.__SPECIFIED_SYSTEM,
             server_address=sisense_server_address)
-
-        self.__tag_template_factory = prepare.DataCatalogTagTemplateFactory(
-            project_id=datacatalog_project_id,
-            location_id=datacatalog_location_id)
 
     def run(self) -> None:
         """Coordinate a full scrape > prepare > ingest process."""
@@ -118,7 +117,7 @@ class MetadataSynchronizer:
         all_folders = self.__metadata_scraper.scrape_all_folders()
 
         folders_with_owner = [
-            folder for folder in all_folders if folder.get('userId')
+            folder for folder in all_folders if folder.get('owner')
         ]
         for folder in folders_with_owner:
             try:
@@ -211,7 +210,11 @@ class MetadataSynchronizer:
         return assembled_entries
 
     @classmethod
-    def __map_datacatalog_relationships(cls, assembled_entries_dict):
+    def __map_datacatalog_relationships(
+            cls,
+            assembled_entries_dict: Dict[str,
+                                         List[AssembledEntryData]]) -> None:
+
         all_assembled_entries = []
         for assembled_entries_data in assembled_entries_dict.values():
             all_assembled_entries.extend(assembled_entries_data)
@@ -219,7 +222,11 @@ class MetadataSynchronizer:
         prepare.EntryRelationshipMapper().fulfill_tag_fields(
             all_assembled_entries)
 
-    def __delete_obsolete_entries(self, new_assembled_entries_dict):
+    def __delete_obsolete_entries(
+        self,
+        new_assembled_entries_dict: Dict[str,
+                                         List[AssembledEntryData]]) -> None:
+
         all_assembled_entries = []
         for assembled_entry_data in new_assembled_entries_dict.values():
             all_assembled_entries.extend(assembled_entry_data)

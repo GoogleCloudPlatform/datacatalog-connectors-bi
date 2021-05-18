@@ -18,6 +18,7 @@ import unittest
 from unittest import mock
 
 from google.cloud import datacatalog
+from google.cloud.datacatalog import Entry, Tag
 from google.datacatalog_connectors.commons import \
     prepare as commons_prepare
 
@@ -72,14 +73,14 @@ class EntryRelationshipMapperTest(unittest.TestCase):
         mock_map_related_entry.assert_not_called()
 
     @classmethod
-    def __make_fake_entry(cls, entry_id, entry_type):
+    def __make_fake_entry(cls, entry_id, entry_type) -> Entry:
         entry = datacatalog.Entry()
         entry.name = f'fake_entries/{entry_id}'
         entry.user_specified_type = entry_type
         return entry
 
     @classmethod
-    def __make_fake_tag(cls, string_fields=None, double_fields=None):
+    def __make_fake_tag(cls, string_fields=None, double_fields=None) -> Tag:
         tag = datacatalog.Tag()
 
         if string_fields:

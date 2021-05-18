@@ -16,6 +16,7 @@
 
 import unittest
 from unittest import mock
+from typing import Any, Dict
 
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare as commons_prepare
@@ -138,7 +139,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             tag_template, folder)
 
     @classmethod
-    def __make_fake_folder(cls):
+    def __make_fake_folder(cls) -> Dict[str, Any]:
         return {
             'oid': 'test-folder',
             'type': 'folder',
@@ -146,7 +147,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         }
 
     @classmethod
-    def __make_fake_folder_with_children(cls):
+    def __make_fake_folder_with_children(cls) -> Dict[str, Any]:
         return {
             'oid': 'test-parent-folder',
             'type': 'folder',
