@@ -90,7 +90,6 @@ class RESTAPIHelperTest(unittest.TestCase):
 
         user = self.__helper.get_user('user-id')
 
-        self.assertIsNotNone(user)
         self.assertEqual('user-id', user['_id'])
 
     @mock.patch(f'{__HELPER_MODULE}.authenticator.Authenticator.authenticate')
@@ -147,6 +146,7 @@ class RESTAPIHelperTest(unittest.TestCase):
             'test-url', 2)
 
         self.assertEqual(5, len(results))
+        self.assertEqual(3, mock_get_response_body_or_raise.call_count)
 
         attrs = self.__helper.__dict__
         first_call = mock.call(
@@ -162,8 +162,6 @@ class RESTAPIHelperTest(unittest.TestCase):
             headers=attrs['_RESTAPIHelper__common_headers'],
         )
         mock_requests.get.has_calls([first_call, second_call, third_call])
-
-        self.assertEqual(3, mock_get_response_body_or_raise.call_count)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_response_body_or_raise')
     @mock.patch(f'{__HELPER_MODULE}.requests', mock.MagicMock())

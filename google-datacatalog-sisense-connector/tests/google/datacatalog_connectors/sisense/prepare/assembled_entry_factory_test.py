@@ -16,6 +16,7 @@
 
 import unittest
 from unittest import mock
+from typing import Any, Dict
 
 from google.cloud import datacatalog
 from google.datacatalog_connectors.commons import prepare as commons_prepare
@@ -41,14 +42,14 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             user_specified_system='test-system',
             server_address='https://test.server.com')
 
-        self.__entry_factory = mock_entry_factory.return_value
-        self.__tag_factory = mock_tag_factory.return_value
+        self.__mock_entry_factory = mock_entry_factory.return_value
+        self.__mock_tag_factory = mock_tag_factory.return_value
 
     def test_constructor_should_set_instance_attributes(self):
         attrs = self.__factory.__dict__
 
         self.assertEqual(
-            self.__entry_factory,
+            self.__mock_entry_factory,
             attrs['_AssembledEntryFactory__datacatalog_entry_factory'])
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
@@ -114,12 +115,12 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         tag_template.name = 'tagTemplates/sisense_folder_metadata'
 
         fake_entry = ('test-folder', {})
-        entry_factory = self.__entry_factory
+        entry_factory = self.__mock_entry_factory
         entry_factory.make_entry_for_folder.return_value = fake_entry
 
         fake_tag = datacatalog.Tag()
         fake_tag.template = 'tagTemplates/sisense_folder_metadata'
-        tag_factory = self.__tag_factory
+        tag_factory = self.__mock_tag_factory
         tag_factory.make_tag_for_folder.return_value = fake_tag
 
         assembled_entry = self.__factory\
@@ -138,7 +139,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             tag_template, folder)
 
     @classmethod
-    def __make_fake_folder(cls):
+    def __make_fake_folder(cls) -> Dict[str, Any]:
         return {
             'oid': 'test-folder',
             'type': 'folder',
@@ -146,7 +147,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         }
 
     @classmethod
-    def __make_fake_folder_with_children(cls):
+    def __make_fake_folder_with_children(cls) -> Dict[str, Any]:
         return {
             'oid': 'test-parent-folder',
             'type': 'folder',

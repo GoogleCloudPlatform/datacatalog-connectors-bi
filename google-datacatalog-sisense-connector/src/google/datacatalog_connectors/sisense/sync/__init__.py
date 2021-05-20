@@ -14,6 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .sisense2datacatalog_cli import main
+from .metadata_synchronizer import MetadataSynchronizer
 
-__all__ = ['main']
+__all__ = ('MetadataSynchronizer',)
