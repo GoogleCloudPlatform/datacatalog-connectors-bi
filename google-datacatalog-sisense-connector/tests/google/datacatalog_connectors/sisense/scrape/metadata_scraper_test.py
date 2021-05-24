@@ -38,9 +38,23 @@ class MetadataScraperTest(unittest.TestCase):
         self.assertEqual(self.__mock_api_helper,
                          attrs['_MetadataScraper__api_helper'])
 
+    def test_scrape_all_dashboards_should_delegate_to_api_helper(self):
+        dashboards_metadata = [{
+            'oid': 'dashboard-id',
+        }]
+
+        api_helper = self.__mock_api_helper
+        api_helper.get_all_dashboards.return_value = dashboards_metadata
+
+        dashboards = self.__scraper.scrape_all_dashboards()
+
+        self.assertEqual(1, len(dashboards))
+        self.assertEqual('dashboard-id', dashboards[0]['oid'])
+        api_helper.get_all_dashboards.assert_called_once()
+
     def test_scrape_all_folders_should_delegate_to_api_helper(self):
         folders_metadata = [{
-            '_id': 'folder-id',
+            'oid': 'folder-id',
         }]
 
         api_helper = self.__mock_api_helper
@@ -49,7 +63,7 @@ class MetadataScraperTest(unittest.TestCase):
         folders = self.__scraper.scrape_all_folders()
 
         self.assertEqual(1, len(folders))
-        self.assertEqual('folder-id', folders[0]['_id'])
+        self.assertEqual('folder-id', folders[0]['oid'])
         api_helper.get_all_folders.assert_called_once()
 
     def test_scrape_user_should_delegate_to_api_helper(self):

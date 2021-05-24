@@ -42,6 +42,59 @@ class RESTAPIHelper:
 
         self.__auth_credentials = None
 
+    def get_all_dashboards(self) -> List[Dict[str, Any]]:
+        """Get all Dashboards the user has access to on a given server.
+
+        Returns:
+            A ``list``.
+
+        Raises:
+            Exception: If the API returns any status code than ``200``.
+        """
+        self.__set_up_auth()
+
+        url = f'{self.__base_api_endpoint}/dashboards'
+        response = requests.get(url=url, headers=self.__common_headers)
+        # ``GET /dashboards`` currently does not support pagination.
+        all_dashboards = self.__get_response_body_or_raise(response)
+
+        # ``GET /dashboards`` returns an array containing a mix of summary
+        # objects for dashboards that are shared with the current user and full
+        # objects for dashboards that are owned by the user. Such summary
+        # objects contain only the ``oid`` and ``lastPublish`` fields.
+        #
+        # So, we check the presence of ``_id`` to determine whether an object
+        # refers to a shared dashboard or not. If ``_id`` is absent, we need to
+        # perform extra API calls to ``GET dashboards/{id}``, passing ``oid``
+        # as parameter, in order to get detailed metadata for each shared
+        # dashboard.
+        shared_dashboards = [
+            dashboard for dashboard in all_dashboards
+            if not dashboard.get('_id')
+        ]
+        for shared_dashboard in shared_dashboards:
+            all_dashboards.remove(shared_dashboard)
+        all_dashboards.extend([
+            self.get_dashboard(dashboard.get('oid'))
+            for dashboard in shared_dashboards
+        ])
+
+        return all_dashboards
+
+    def get_dashboard(self, dashboard_id: str) -> Dict[str, Any]:
+        """Get a specific Dashboard.
+
+        Returns:
+            A Dashboard object.
+
+        Raises:
+            Exception: If the API returns any status code than ``200``.
+        """
+        self.__set_up_auth()
+        url = f'{self.__base_api_endpoint}/dashboards/{dashboard_id}'
+        response = requests.get(url=url, headers=self.__common_headers)
+        return self.__get_response_body_or_raise(response)
+
     def get_all_folders(self) -> List[Dict[str, Any]]:
         """Get all Folders the user has access to on a given server.
 
@@ -65,7 +118,7 @@ class RESTAPIHelper:
         """Get a specific User.
 
         Returns:
-            A user object.
+            A User object.
 
         Raises:
             Exception: If the API returns any status code than ``200``.
@@ -90,9 +143,10 @@ class RESTAPIHelper:
             f'{constants.BEARER_TOKEN_PREFIX}' \
             f' {self.__auth_credentials["access_token"]}'
 
-    def __get_list_using_pagination(
-            self, base_url: str,
-            results_per_page: int) -> List[Dict[str, Any]]:
+    def __get_list_using_pagination(self,
+                                    base_url: str,
+                                    results_per_page: int,
+                                    id_field='oid') -> List[Dict[str, Any]]:
         """Get a ``List`` using pagination.
 
         Args:
@@ -134,9 +188,15 @@ class RESTAPIHelper:
         # Set comprehension is used to remove potential duplicates after
         # merging the results, e.g.: the ``rootFolder`` that comes in all
         # ``GET /folders`` pages.
-        results_set = {tuple(result.items()) for result in results}
+        unique_ids = {result.get(id_field) for result in results}
 
-        return [dict(result_tuple) for result_tuple in results_set]
+        unique_results = []
+        for unique_id in unique_ids:
+            unique_results.append(
+                next(result for result in results
+                     if result.get(id_field) == unique_id))
+
+        return unique_results
 
     @classmethod
     def __get_response_body_or_raise(
