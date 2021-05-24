@@ -52,17 +52,65 @@ class RESTAPIHelperTest(unittest.TestCase):
         attrs = self.__helper.__dict__
         self.assertIsNone(attrs['_RESTAPIHelper__auth_credentials'])
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_response_body_or_raise')
+    @mock.patch(f'{__HELPER_MODULE}.requests', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_all_dashboards_should_return_list_on_success(
+            self, mock_get_response_body_or_raise):
+
+        mock_get_response_body_or_raise.return_value = [{
+            '_id': 'dashboard-id'
+        }]
+
+        dashboards = self.__helper.get_all_dashboards()
+
+        self.assertEqual(1, len(dashboards))
+        self.assertEqual('dashboard-id', dashboards[0]['_id'])
+
+    @mock.patch(f'{__HELPER_CLASS}.get_dashboard')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_response_body_or_raise')
+    @mock.patch(f'{__HELPER_MODULE}.requests', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_all_dashboards_should_get_detail_of_shared_dashboards(
+            self, mock_get_response_body_or_raise, mock_get_dashboard):
+
+        mock_get_response_body_or_raise.return_value = [{
+            'oid': 'dashboard-oid'
+        }]
+
+        mock_get_dashboard.return_value = {'_id': 'dashboard-id'}
+
+        dashboards = self.__helper.get_all_dashboards()
+
+        self.assertEqual(1, len(dashboards))
+        self.assertEqual('dashboard-id', dashboards[0]['_id'])
+        mock_get_dashboard.assert_called_once_with('dashboard-oid')
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_response_body_or_raise')
+    @mock.patch(f'{__HELPER_MODULE}.requests', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_dashboard_should_return_object_on_success(
+            self, mock_get_response_body_or_raise):
+
+        mock_get_response_body_or_raise.return_value = {
+            'oid': 'dashboard-id',
+        }
+
+        dashboard = self.__helper.get_dashboard('dashboard-id')
+
+        self.assertEqual('dashboard-id', dashboard['oid'])
+
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_list_using_pagination')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
     def test_get_all_folders_should_return_list_on_success(
             self, mock_get_list_using_pagination):
 
-        mock_get_list_using_pagination.return_value = [{'_id': 'folder-id'}]
+        mock_get_list_using_pagination.return_value = [{'oid': 'folder-id'}]
 
         folders = self.__helper.get_all_folders()
 
         self.assertEqual(1, len(folders))
-        self.assertEqual('folder-id', folders[0]['_id'])
+        self.assertEqual('folder-id', folders[0]['oid'])
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_list_using_pagination')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
@@ -83,14 +131,12 @@ class RESTAPIHelperTest(unittest.TestCase):
             self, mock_get_response_body_or_raise):
 
         mock_get_response_body_or_raise.return_value = {
-            '_id': 'user-id',
-            'firstName': 'Jane',
-            'lastName': 'Doe'
+            'oid': 'user-id',
         }
 
         user = self.__helper.get_user('user-id')
 
-        self.assertEqual('user-id', user['_id'])
+        self.assertEqual('user-id', user['oid'])
 
     @mock.patch(f'{__HELPER_MODULE}.authenticator.Authenticator.authenticate')
     def test_set_up_auth_should_set_credentials_if_not_authenticated(
@@ -131,15 +177,15 @@ class RESTAPIHelperTest(unittest.TestCase):
             self, mock_requests, mock_get_response_body_or_raise):
 
         mock_get_response_body_or_raise.side_effect = [[{
-            '_id': 'object-id-1'
+            'oid': 'object-id-1'
         }, {
-            '_id': 'object-id-2'
+            'oid': 'object-id-2'
         }], [{
-            '_id': 'object-id-3'
+            'oid': 'object-id-3'
         }, {
-            '_id': 'object-id-4'
+            'oid': 'object-id-4'
         }], [{
-            '_id': 'object-id-5'
+            'oid': 'object-id-5'
         }]]
 
         results = self.__helper._RESTAPIHelper__get_list_using_pagination(
@@ -169,11 +215,11 @@ class RESTAPIHelperTest(unittest.TestCase):
             self, mock_get_response_body_or_raise):
 
         mock_get_response_body_or_raise.side_effect = [[{
-            '_id': 'object-id-1'
+            'oid': 'object-id-1'
         }, {
-            '_id': 'object-id-2'
+            'oid': 'object-id-2'
         }], [{
-            '_id': 'object-id-2'
+            'oid': 'object-id-2'
         }]]
 
         results = self.__helper._RESTAPIHelper__get_list_using_pagination(
@@ -185,10 +231,10 @@ class RESTAPIHelperTest(unittest.TestCase):
     def test_get_response_body_or_raise_should_get_on_success(self):
         body = rest_api_helper.RESTAPIHelper\
             ._RESTAPIHelper__get_response_body_or_raise(
-                metadata_scraper_mocks.FakeResponse({'_id': 'object-id'}))
+                metadata_scraper_mocks.FakeResponse({'oid': 'object-id'}))
 
         self.assertIsNotNone(body)
-        self.assertEqual('object-id', body['_id'])
+        self.assertEqual('object-id', body['oid'])
 
     def test_get_response_body_or_raise_should_raise_on_api_error(self):
         self.assertRaises(
