@@ -58,13 +58,16 @@ class RESTAPIHelper:
         # ``GET /dashboards`` currently does not support pagination.
         all_dashboards = self.__get_response_body_or_raise(response)
 
-        # ``GET /dashboards`` returns summary objects for dashboards that
-        # are shared with the current user and we need to perform subsequent
-        # API calls to get their detailed metadata.
+        # ``GET /dashboards`` returns an array containing a mix of summary
+        # objects for dashboards that are shared with the current user and full
+        # objects for dashboards that are owned by the user. Such summary
+        # objects contain only the ``oid`` and ``lastPublish`` fields.
         #
-        # Summary objects currently contain only the ``oid`` and
-        # ``lastPublish`` fields, so we check for the presence of ``_id`` to
-        # determine whether an object refers to a shared dashboard or not.
+        # So, we check the presence of ``_id`` to determine whether an object
+        # refers to a shared dashboard or not. If ``_id`` is absent, we need to
+        # perform extra API calls to ``GET dashboards/{id}``, passing ``oid``
+        # as parameter, in order to get detailed metadata for each shared
+        # dashboard.
         shared_dashboards = [
             dashboard for dashboard in all_dashboards
             if not dashboard.get('_id')
