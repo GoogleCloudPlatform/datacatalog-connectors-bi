@@ -66,8 +66,9 @@ class MetadataSynchronizer:
         logging.info('===> Scraping Sisense metadata...')
 
         logging.info('')
-        logging.info('Objects to be scraped: Folders')
+        logging.info('Objects to be scraped: Folders and Dashboards')
         folders = self.__scrape_folders()
+        dashboards = self.__scrape_dashboards()
         logging.info('==== DONE ========================================')
 
         # Prepare: convert Sisense metadata into Data Catalog entities model.
@@ -127,6 +128,29 @@ class MetadataSynchronizer:
                 logging.warning("error on __scrape_folders:", exc_info=True)
 
         return all_folders
+
+    def __scrape_dashboards(self) -> List[Dict[str, Any]]:
+        """Scrape metadata from all Dashboards the current user has access to.
+
+        The incoming Dashboard objects may be enriched with additional fields
+        in order to expedite/improve the metadata synchronization process:
+        - ``ownerData``: added when the authenticated user is allowed to read
+        users' information; intended to provide ownership-related metadata to
+        the Data Catalog Tags created for the Dashboard.
+
+        Returns:
+            A ``list``.
+        """
+        all_dashboards = self.__metadata_scraper.scrape_all_dashboards()
+
+        for dashboard in all_dashboards:
+            try:
+                dashboard['ownerData'] = self.__metadata_scraper.scrape_user(
+                    dashboard.get('owner'))
+            except:  # noqa E722
+                logging.warning("error on __scrape_dashboards:", exc_info=True)
+
+        return all_dashboards
 
     def __assemble_sisense_assets(
             self, folders: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
