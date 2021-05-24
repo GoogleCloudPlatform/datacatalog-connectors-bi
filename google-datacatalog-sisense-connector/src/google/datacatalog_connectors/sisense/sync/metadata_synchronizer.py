@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from google.cloud.datacatalog import TagTemplate
 from google.datacatalog_connectors.commons import cleanup, ingest
@@ -117,15 +117,12 @@ class MetadataSynchronizer:
         """
         all_folders = self.__metadata_scraper.scrape_all_folders()
 
-        folders_with_owner = [
-            folder for folder in all_folders if folder.get('owner')
-        ]
-        for folder in folders_with_owner:
-            try:
-                folder['ownerData'] = self.__metadata_scraper.scrape_user(
-                    folder.get('owner'))
-            except:  # noqa E722
-                logging.warning("error on __scrape_folders:", exc_info=True)
+        for folder in all_folders:
+            owner_id = folder.get('owner')
+            # The ``rootFolder`` does not have an owner, for instance.
+            owner_data = self.__scrape_user(owner_id) if owner_id else None
+            if owner_data:
+                folder['ownerData'] = owner_data
 
         return all_folders
 
@@ -144,13 +141,23 @@ class MetadataSynchronizer:
         all_dashboards = self.__metadata_scraper.scrape_all_dashboards()
 
         for dashboard in all_dashboards:
-            try:
-                dashboard['ownerData'] = self.__metadata_scraper.scrape_user(
-                    dashboard.get('owner'))
-            except:  # noqa E722
-                logging.warning("error on __scrape_dashboards:", exc_info=True)
+            owner_data = self.__scrape_user(dashboard.get('owner'))
+            if owner_data:
+                dashboard['ownerData'] = owner_data
 
         return all_dashboards
+
+    def __scrape_user(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Scrape metadata from a given User.
+
+        Returns:
+            A ``dict`` if the current user has access to the API endpoint or
+            ``None`` if not.
+        """
+        try:
+            return self.__metadata_scraper.scrape_user(user_id)
+        except:  # noqa E722
+            logging.warning("error on __scrape_user:", exc_info=True)
 
     def __assemble_sisense_assets(
             self, folders: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
