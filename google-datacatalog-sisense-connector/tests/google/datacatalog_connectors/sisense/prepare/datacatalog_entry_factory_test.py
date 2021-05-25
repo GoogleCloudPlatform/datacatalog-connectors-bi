@@ -47,6 +47,75 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.server.com',
                          attrs['_DataCatalogEntryFactory__server_address'])
 
+    def test_make_entry_for_dashboard_should_set_all_available_fields(self):
+        metadata = {
+            '_id': 'a123-b456',
+            'oid': 'a123-b457',
+            'title': 'Test dashboard',
+            'desc': 'Test dashboard description',
+            'created': '2019-09-12T16:30:00.005Z',
+            'lastUpdated': '2019-09-12T16:31:00.005Z',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_dashboard(metadata)
+
+        self.assertEqual('sss_test_server_com_db_a123_b457', entry_id)
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'entryGroups/test-entry-group/entries/'
+            'sss_test_server_com_db_a123_b457', entry.name)
+        self.assertEqual('test-system', entry.user_specified_system)
+        self.assertEqual('dashboard', entry.user_specified_type)
+        self.assertEqual('Test dashboard', entry.display_name)
+        self.assertEqual('Test dashboard description', entry.description)
+        self.assertEqual(
+            'https://test.server.com/app/main#/dashboards/a123-b457',
+            entry.linked_resource)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
+
+        updated_datetime = datetime.strptime('2019-09-12T16:31:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
+
+    def test_make_entry_for_dashboard_should_succeed_on_missing_created_date(
+            self):
+
+        metadata = {
+            '_id': 'a123-b456',
+            'oid': 'a123-b457',
+            'title': 'Test dashboard',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_dashboard(metadata)
+
+        self.assertIsNone(entry.source_system_timestamps.create_time)
+
+    def test_make_entry_for_dashboard_should_use_created_on_no_updated_date(
+            self):
+
+        metadata = {
+            '_id': 'a123-b456',
+            'oid': 'a123-b457',
+            'title': 'Test dashboard',
+            'created': '2019-09-12T16:30:00.005Z',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_dashboard(metadata)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
+
     def test_make_entry_for_folder_should_set_all_available_fields(self):
         metadata = {
             '_id': 'a123-b456',
