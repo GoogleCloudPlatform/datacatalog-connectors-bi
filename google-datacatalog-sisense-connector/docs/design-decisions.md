@@ -1,5 +1,23 @@
 # Design decisions
 
+## Assets identification: `_id` vs `oid`
+
+Many Sisense assets have two unique identifiers: `_id` and `oid`. We asked
+Sisense folks about the purpose of these fields concerning folders and
+dashboards, and got the below answer:
+
+> The `oid` is the ID used for tied dashboard entity and folder entity while
+`_id` is just an ID used within our application database as it is required to
+have a unique ID for each record (collection) basically. This said, if you plan
+to use the API you can ignore the `_id` as it is not used for the application
+logic. The dashboards have a parameter called `parentFolder` which gets the
+folder `oid` in it whenever you create a dashboard inside folder.
+
+That being said, we decided to use `oid` and ignore `_id` when both fields are
+available for the same entity (no matter its type). The chosen ID field is used
+to build linked resources (URLs that connect Data Catalog entries to Sisense UI
+elements) and parent-child relationships through Data Catalog tags.
+
 ## Assets' ownership metadata handling
 
 Folders, dashboards, and widgets have an `owner` field, returned in the format
