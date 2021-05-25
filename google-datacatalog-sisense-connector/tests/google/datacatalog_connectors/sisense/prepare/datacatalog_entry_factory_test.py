@@ -70,8 +70,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('Test dashboard', entry.display_name)
         self.assertEqual('Test dashboard description', entry.description)
         self.assertEqual(
-            'https://test.server.com/app/main#/dashboards'
-            '/a123-b457', entry.linked_resource)
+            'https://test.server.com/app/main#/dashboards/a123-b457',
+            entry.linked_resource)
 
         created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
                                              self.__DATETIME_FORMAT)
