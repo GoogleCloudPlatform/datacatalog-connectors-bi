@@ -40,6 +40,50 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         # Strip schema (http | https) and slashes from the server url.
         self.__server_id = server_address[server_address.find('//') + 2:]
 
+    def make_entry_for_dashboard(
+            self, dashboard_metadata: Dict[str, Any]) -> Tuple[str, Entry]:
+
+        entry = datacatalog.Entry()
+
+        dashboard_id = dashboard_metadata.get('oid')
+
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_DASHBOARD,
+                                        dashboard_id)
+        entry.name = datacatalog.DataCatalogClient.entry_path(
+            self.__project_id, self.__location_id, self.__entry_group_id,
+            generated_id)
+
+        entry.user_specified_system = self.__user_specified_system
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_DASHBOARD
+
+        entry.display_name = self._format_display_name(
+            dashboard_metadata.get('title'))
+        entry.description = dashboard_metadata.get('desc')
+
+        if dashboard_metadata.get('oid'):
+            entry.linked_resource = f'{self.__server_address}' \
+                                    f'/app/main#/dashboards' \
+                                    f'/{dashboard_metadata.get("oid")}'
+
+        if dashboard_metadata.get('created'):
+            created_datetime = datetime.strptime(
+                dashboard_metadata.get('created'),
+                self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+            create_timestamp = timestamp_pb2.Timestamp()
+            create_timestamp.FromDatetime(created_datetime)
+            entry.source_system_timestamps.create_time = create_timestamp
+
+            modified_date = dashboard_metadata.get('lastUpdated')
+            resolved_modified_date = modified_date or dashboard_metadata.get(
+                'created')
+            modified_datetime = datetime.strptime(
+                resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+            update_timestamp = timestamp_pb2.Timestamp()
+            update_timestamp.FromDatetime(modified_datetime)
+            entry.source_system_timestamps.update_time = update_timestamp
+
+        return generated_id, entry
+
     def make_entry_for_folder(
             self, folder_metadata: Dict[str, Any]) -> Tuple[str, Entry]:
 
