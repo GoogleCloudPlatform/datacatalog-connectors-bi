@@ -28,7 +28,7 @@ from google.datacatalog_connectors.sisense.prepare import constants
 class MetadataSynchronizer:
     # Data Catalog constants
     __ENTRY_GROUP_ID = 'sisense'
-    __SPECIFIED_SYSTEM = 'sisense'
+    __SPECIFIED_SYSTEM = 'Sisense'
     # Sisense constants
     __SISENSE_API_VERSION = 'v1'
 
@@ -68,7 +68,7 @@ class MetadataSynchronizer:
         logging.info('')
         logging.info('Objects to be scraped: Folders and Dashboards')
         folders = self.__scrape_folders()
-        dashboards = self.__scrape_dashboards()
+        dashboards = self.__scrape_dashboards(folders)
         logging.info('==== DONE ========================================')
 
         # Prepare: convert Sisense metadata into Data Catalog entities model.
@@ -76,7 +76,8 @@ class MetadataSynchronizer:
         logging.info('===> Converting Sisense metadata'
                      ' into Data Catalog entities model...')
 
-        assembled_assets_dict = self.__assemble_sisense_assets(folders)
+        assembled_assets_dict = self.__assemble_sisense_assets(
+            folders, dashboards)
         tag_templates_dict = self.__make_tag_templates_dict()
         assembled_entries_dict = self.__make_assembled_entries_dict(
             assembled_assets_dict, tag_templates_dict)
@@ -126,7 +127,8 @@ class MetadataSynchronizer:
 
         return all_folders
 
-    def __scrape_dashboards(self) -> List[Dict[str, Any]]:
+    def __scrape_dashboards(
+            self, folders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Scrape metadata from all Dashboards the current user has access to.
 
         The incoming Dashboard objects may be enriched with additional fields
@@ -134,6 +136,7 @@ class MetadataSynchronizer:
         - ``ownerData``: added when the authenticated user is allowed to read
         users' information; intended to provide ownership-related metadata to
         the Data Catalog Tags created for the Dashboard.
+        - ``folderData``: added when the Dashboard has a parent Folder.
 
         Returns:
             A ``list``.
@@ -144,6 +147,11 @@ class MetadataSynchronizer:
             owner_data = self.__scrape_user(dashboard.get('owner'))
             if owner_data:
                 dashboard['ownerData'] = owner_data
+            folder_id = dashboard.get('parentFolder')
+            if folder_id:
+                dashboard['folderData'] = next(
+                    folder for folder in folders
+                    if folder.get('oid') == folder_id)
 
         return all_dashboards
 
@@ -160,9 +168,10 @@ class MetadataSynchronizer:
             logging.warning("error on __scrape_user:", exc_info=True)
 
     def __assemble_sisense_assets(
-            self, folders: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+            self, folders: List[Dict[str, Any]],
+            dashboards: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
         """
-        Assemble metadata considering all assets the current user has access
+        Assemble metadata concerning all assets the current user has access
         to. Folder metadata include nested objects such as sub-folders,
         dashboards, widgets, and fields.
 
@@ -174,25 +183,34 @@ class MetadataSynchronizer:
         top_level_folders = [
             folder for folder in folders if not folder.get('parentId')
         ]
+        top_level_dashboards = [
+            dashboard for dashboard in dashboards
+            if not dashboard.get('parentFolder')
+        ]
 
         top_level_assets_dict = {}
         for folder in top_level_folders:
             assembled_folder = self.__assemble_folder_from_flat_lists(
-                folder, folders)
+                folder, folders, dashboards)
             top_level_assets_dict[assembled_folder[0]] = assembled_folder[1]
+
+        for dashboard in top_level_dashboards:
+            top_level_assets_dict[dashboard.get('oid')] = dashboard
 
         return top_level_assets_dict
 
     @classmethod
     def __assemble_folder_from_flat_lists(
-            cls, folder: Dict[str, Any],
-            all_folders: List[Dict[str, Any]]) -> Tuple[str, Dict[str, Any]]:
+            cls, folder: Dict[str, Any], all_folders: List[Dict[str, Any]],
+            all_dashboards: List[Dict[str,
+                                      Any]]) -> Tuple[str, Dict[str, Any]]:
         """
         Assemble Folder metadata from the given flat asset lists.
 
         The incoming Folder object may be enriched with additional fields in
         order to expedite/improve the metadata synchronization process:
-        - ``folders``: stores its child folders.
+        - ``folders``: stores its child Folders.
+        - ``dashboards``: stores its child Dashboards.
 
         Returns:
             A ``tuple``. The first item is the Folder id and the second is a
@@ -205,12 +223,17 @@ class MetadataSynchronizer:
             child_folder for child_folder in all_folders
             if child_folder.get('parentId') == folder_id
         ]
+        folder['dashboards'] = [
+            dashboard for dashboard in all_dashboards
+            if dashboard.get('parentFolder') == folder_id
+        ]
         for child_folder in folder['folders']:
-            cls.__assemble_folder_from_flat_lists(child_folder, all_folders)
+            cls.__assemble_folder_from_flat_lists(child_folder, all_folders,
+                                                  all_dashboards)
 
-        # TODO Check whether the already used folders can be removed from the
-        #  given list to improve next iterations performance and decrease
-        #  memory usage.
+        # TODO Check whether the already used Folders and Dashboards can be
+        #  removed from the provided lists to improve next iterations
+        #  performance and decrease memory usage.
 
         return folder_id, folder
 
@@ -218,6 +241,8 @@ class MetadataSynchronizer:
         return {
             constants.TAG_TEMPLATE_ID_FOLDER:
                 self.__tag_template_factory.make_tag_template_for_folder(),
+            constants.TAG_TEMPLATE_ID_DASHBOARD:
+                self.__tag_template_factory.make_tag_template_for_dashboard(),
         }
 
     def __make_assembled_entries_dict(
