@@ -102,6 +102,11 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual('Time it was last opened',
                          tag_template.fields['last_opened'].display_name)
 
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['server_url'].type.primitive_type)
+        self.assertEqual('Sisense Server Url',
+                         tag_template.fields['server_url'].display_name)
+
     def test_make_tag_template_for_folder(self):
         tag_template = self.__factory.make_tag_template_for_folder()
 
