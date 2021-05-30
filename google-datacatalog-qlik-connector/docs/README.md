@@ -2,7 +2,8 @@
 
 This directory contains additional documentation on the connector.
 
-- [Developer Resources](developer-resources)
+- [Design decisions](design-decisions.md)
+- [Developer resources](developer-resources)
 
 ---
 
