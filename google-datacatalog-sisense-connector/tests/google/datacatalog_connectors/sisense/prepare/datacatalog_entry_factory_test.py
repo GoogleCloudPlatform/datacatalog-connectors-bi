@@ -66,7 +66,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'entryGroups/test-entry-group/entries/'
             'sss_test_server_com_db_a123_b457', entry.name)
         self.assertEqual('test-system', entry.user_specified_system)
-        self.assertEqual('dashboard', entry.user_specified_type)
+        self.assertEqual('Dashboard', entry.user_specified_type)
         self.assertEqual('Test dashboard', entry.display_name)
         self.assertEqual('Test dashboard description', entry.description)
         self.assertEqual(
@@ -134,7 +134,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'entryGroups/test-entry-group/entries/'
             'sss_test_server_com_fd_a123_b457', entry.name)
         self.assertEqual('test-system', entry.user_specified_system)
-        self.assertEqual('folder', entry.user_specified_type)
+        self.assertEqual('Folder', entry.user_specified_type)
         self.assertEqual('Test folder', entry.display_name)
         self.assertEqual('https://test.server.com/app/main#/home/a123-b457',
                          entry.linked_resource)

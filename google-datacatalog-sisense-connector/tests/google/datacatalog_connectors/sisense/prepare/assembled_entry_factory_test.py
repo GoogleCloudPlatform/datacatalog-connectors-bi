@@ -73,9 +73,9 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             self, mock_make_assembled_entry_for_folder):
 
         folder = self.__make_fake_folder()
-
-        tag_template = datacatalog.TagTemplate()
-        tag_templates_dict = {'sisense_folder_metadata': tag_template}
+        tag_templates_dict = {
+            'sisense_folder_metadata': datacatalog.TagTemplate()
+        }
 
         mock_make_assembled_entry_for_folder.return_value = \
             commons_prepare.AssembledEntryData('test-folder', {})
@@ -86,16 +86,16 @@ class AssembledEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual(1, len(assembled_entries))
         mock_make_assembled_entry_for_folder.assert_called_once_with(
-            folder, tag_template)
+            folder, tag_templates_dict)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_assembled_entry_for_folder')
     def test_make_assembled_entries_for_folder_should_process_child_folders(
             self, mock_make_assembled_entry_for_folder):
 
         folder = self.__make_fake_folder_with_children()
-
-        tag_template = datacatalog.TagTemplate()
-        tag_templates_dict = {'sisense_folder_metadata': tag_template}
+        tag_templates_dict = {
+            'sisense_folder_metadata': datacatalog.TagTemplate()
+        }
 
         mock_make_assembled_entry_for_folder.side_effect = [
             commons_prepare.AssembledEntryData('test-parent-folder', {}),
@@ -113,6 +113,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         folder = self.__make_fake_folder()
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_folder_metadata'
+        tag_templates_dict = {'sisense_folder_metadata': tag_template}
 
         fake_entry = ('test-folder', {})
         entry_factory = self.__mock_entry_factory
@@ -125,7 +126,7 @@ class AssembledEntryFactoryTest(unittest.TestCase):
 
         assembled_entry = self.__factory\
             ._AssembledEntryFactory__make_assembled_entry_for_folder(
-                folder, tag_template)
+                folder, tag_templates_dict)
 
         self.assertEqual('test-folder', assembled_entry.entry_id)
         self.assertEqual({}, assembled_entry.entry)

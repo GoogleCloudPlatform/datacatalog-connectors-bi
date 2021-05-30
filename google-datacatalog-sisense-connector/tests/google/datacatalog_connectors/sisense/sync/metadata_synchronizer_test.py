@@ -142,12 +142,11 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         top_level_assets_dict = \
             self.__synchronizer._MetadataSynchronizer__assemble_sisense_assets(
-                flat_folders)
+                flat_folders, [])
 
         self.assertEqual(1, len(top_level_assets_dict))
-        mock_assemble_folder_from_flat_lists.assert_called_once()
-        mock_assemble_folder_from_flat_lists.assert_called_with(
-            parent_folder, flat_folders)
+        mock_assemble_folder_from_flat_lists.assert_called_once_with(
+            parent_folder, flat_folders, [])
 
     def test_assemble_folder_from_flat_lists_should_build_hierarchy(self):
         child_folder_1_1 = self.__make_fake_folder('test-child-folder-1.1')
@@ -162,7 +161,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         folder_id, assembled_folder = self.__synchronizer\
             ._MetadataSynchronizer__assemble_folder_from_flat_lists(
-                top_level_folder, flat_folders)
+                top_level_folder, flat_folders, [])
 
         self.assertEqual('test-top-level-folder', folder_id)
         self.assertEqual(child_folder_1, assembled_folder['folders'][0])
@@ -199,7 +198,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def test_map_datacatalog_relationships_should_process_all_entries(
             self, mock_entry_relationship_mapper):
 
-        entry = self.__make_fake_entry('folder')
+        entry = self.__make_fake_entry('Folder')
 
         assembled_entries = {
             'test-folder-1': [entry],
@@ -220,7 +219,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
     def test_delete_obsolete_entries_should_delegate_to_metadata_cleaner(
             self, mock_datacatalog_metadata_cleaner):
 
-        entry = self.__make_fake_entry('folder')
+        entry = self.__make_fake_entry('Folder')
 
         assembled_entries = {
             'test-folder-1': [entry],
@@ -236,7 +235,7 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
         self.assertEqual(1, mock_delete_obsolete_metadata.call_count)
         mock_delete_obsolete_metadata.assert_called_with(
-            [entry, entry, entry], 'system=sisense tag:server_url:test-server')
+            [entry, entry, entry], 'system=Sisense tag:server_url:test-server')
 
     @mock.patch(f'{__SYNCR_MODULE}.ingest.DataCatalogMetadataIngestor')
     def test_ingest_metadata_should_delegate_to_metadata_ingestor(
