@@ -31,6 +31,76 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
         self.__project_id = project_id
         self.__location_id = location_id
 
+    def make_tag_template_for_dashboard(self) -> TagTemplate:
+        tag_template = datacatalog.TagTemplate()
+
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=constants.TAG_TEMPLATE_ID_DASHBOARD)
+
+        tag_template.display_name = 'Sisense Dashboard Metadata'
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Id',
+                                       is_required=True,
+                                       order=9)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner username',
+                                       is_required=True,
+                                       order=8)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner name',
+                                       order=7)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='folder_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Folder Id',
+                                       order=6)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='folder_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Folder Name',
+                                       order=5)
+
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='folder_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the Folder',
+            order=4)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='datasource',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Data Source',
+                                       order=3)
+
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='last_publish',
+            field_type=self.__TIMESTAMP_TYPE,
+            display_name='Time it was last published',
+            order=2)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='last_opened',
+                                       field_type=self.__TIMESTAMP_TYPE,
+                                       display_name='Time it was last opened',
+                                       order=1)
+
+        return tag_template
+
     def make_tag_template_for_folder(self) -> TagTemplate:
         tag_template = datacatalog.TagTemplate()
 

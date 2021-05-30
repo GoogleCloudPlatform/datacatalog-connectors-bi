@@ -43,6 +43,65 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual('test-location',
                          attrs['_DataCatalogTagTemplateFactory__location_id'])
 
+    def test_make_tag_template_for_dashboard(self):
+        tag_template = self.__factory.make_tag_template_for_dashboard()
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'tagTemplates/sisense_dashboard_metadata', tag_template.name)
+
+        self.assertEqual('Sisense Dashboard Metadata',
+                         tag_template.display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['id'].type.primitive_type)
+        self.assertEqual('Id', tag_template.fields['id'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['owner_username'].type.primitive_type)
+        self.assertEqual('Owner username',
+                         tag_template.fields['owner_username'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['owner_name'].type.primitive_type)
+        self.assertEqual('Owner name',
+                         tag_template.fields['owner_name'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['folder_id'].type.primitive_type)
+        self.assertEqual('Folder Id',
+                         tag_template.fields['folder_id'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['folder_name'].type.primitive_type)
+        self.assertEqual('Folder Name',
+                         tag_template.fields['folder_name'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['folder_entry'].type.primitive_type)
+        self.assertEqual('Data Catalog Entry for the Folder',
+                         tag_template.fields['folder_entry'].display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['datasource'].type.primitive_type)
+        self.assertEqual('Data Source',
+                         tag_template.fields['datasource'].display_name)
+
+        self.assertEqual(
+            self.__TIMESTAMP_TYPE,
+            tag_template.fields['last_publish'].type.primitive_type)
+        self.assertEqual('Time it was last published',
+                         tag_template.fields['last_publish'].display_name)
+
+        self.assertEqual(
+            self.__TIMESTAMP_TYPE,
+            tag_template.fields['last_opened'].type.primitive_type)
+        self.assertEqual('Time it was last opened',
+                         tag_template.fields['last_opened'].display_name)
+
     def test_make_tag_template_for_folder(self):
         tag_template = self.__factory.make_tag_template_for_folder()
 
