@@ -80,16 +80,19 @@ class MetadataSynchronizerTest(unittest.TestCase):
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_assembled_entries_dict')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tag_templates_dict')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__assemble_sisense_assets')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_dashboards')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_folders')
     def test_run_should_traverse_all_workflow_steps(
-            self, mock_scrape_folders, mock_assemble_sisense_assets,
-            mock_make_tag_templates_dict, mock_make_assembled_entries_dict,
+            self, mock_scrape_folders, mock_scrape_dashboards,
+            mock_assemble_sisense_assets, mock_make_tag_templates_dict,
+            mock_make_assembled_entries_dict,
             mock_map_datacatalog_relationships, mock_delete_obsolete_entries,
             mock_ingest_metadata):
 
         self.__synchronizer.run()
 
         mock_scrape_folders.assert_called_once()
+        mock_scrape_dashboards.assert_called_once()
         mock_assemble_sisense_assets.assert_called_once()
         mock_make_tag_templates_dict.assert_called_once()
         mock_make_assembled_entries_dict.assert_called_once()
@@ -113,16 +116,88 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertIsNotNone(folders[0]['ownerData'])
         mock_scraper.scrape_user.assert_called_once()
 
-    def test_scrape_folders_should_skip_adding_user_data_on_exception(self):
+    def test_scrape_folders_should_skip_adding_owner_data_if_not_available(
+            self):
+
         folder = self.__make_fake_folder()
 
         mock_scraper = self.__mock_metadata_scraper
         mock_scraper.scrape_all_folders.return_value = [folder]
-        mock_scraper.scrape_user.side_effect = Exception()
+        mock_scraper.scrape_user.return_value = None
 
         folders = self.__synchronizer._MetadataSynchronizer__scrape_folders()
 
         self.assertEqual(folder, folders[0])
+        mock_scraper.scrape_user.assert_called_once()
+
+    def test_scrape_dashboards_should_scrape_all_dashboards(self):
+        mock_scraper = self.__mock_metadata_scraper
+        self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])
+        mock_scraper.scrape_all_dashboards.assert_called_once()
+
+    def test_scrape_dashboards_should_add_owner_data_when_dashboard_has_owner(
+            self):
+
+        dashboard = self.__make_fake_dashboard()
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+
+        dashboards = \
+            self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])
+
+        self.assertIsNotNone(dashboards[0]['ownerData'])
+        mock_scraper.scrape_user.assert_called_once()
+
+    def test_scrape_dashboards_should_skip_adding_owner_data_if_not_available(
+            self):
+
+        dashboard = self.__make_fake_dashboard()
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+        mock_scraper.scrape_user.return_value = None
+
+        dashboards = \
+            self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])
+
+        self.assertEqual(dashboard, dashboards[0])
+        mock_scraper.scrape_user.assert_called_once()
+
+    def test_scrape_dashboards_should_add_folder_data_when_dashboard_has_parent(  # noqa: E501
+            self):
+
+        folder = self.__make_fake_folder()
+        dashboard = self.__make_fake_dashboard()
+        dashboard['parentFolder'] = 'test-folder'
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+
+        dashboards = self.__synchronizer\
+            ._MetadataSynchronizer__scrape_dashboards([folder])
+
+        self.assertEqual(folder, dashboards[0]['folderData'])
+
+    def test_scrape_dashboards_should_raise_on_missing_parent_data(self):
+        dashboard = self.__make_fake_dashboard()
+        dashboard['parentFolder'] = 'test-folder'
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+
+        self.assertRaises(
+            StopIteration,
+            self.__synchronizer._MetadataSynchronizer__scrape_dashboards, [])
+
+    def test_scrape_user_should_handle_exception(self):
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_user.side_effect = Exception()
+
+        user = self.__synchronizer._MetadataSynchronizer__scrape_user(
+            'user-id')
+
+        self.assertIsNone(user)
         mock_scraper.scrape_user.assert_called_once()
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__assemble_folder_from_flat_lists')
@@ -148,7 +223,22 @@ class MetadataSynchronizerTest(unittest.TestCase):
         mock_assemble_folder_from_flat_lists.assert_called_once_with(
             parent_folder, flat_folders, [])
 
-    def test_assemble_folder_from_flat_lists_should_build_hierarchy(self):
+    def test_assemble_sisense_assets_should_assemble_dashboard_from_flat_lists(
+            self):
+
+        dashboard = self.__make_fake_dashboard()
+        flat_dashboards = [dashboard]
+
+        top_level_assets_dict = \
+            self.__synchronizer._MetadataSynchronizer__assemble_sisense_assets(
+                [], flat_dashboards)
+
+        self.assertEqual(1, len(top_level_assets_dict))
+        self.assertEqual(dashboard, top_level_assets_dict['test-dashboard'])
+
+    def test_assemble_folder_from_flat_lists_should_build_parent_child_hierarchy(  # noqa: E501
+            self):
+
         child_folder_1_1 = self.__make_fake_folder('test-child-folder-1.1')
         child_folder_1_1['parentId'] = 'test-child-folder-1'
 
@@ -167,6 +257,20 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertEqual(child_folder_1, assembled_folder['folders'][0])
         self.assertEqual(child_folder_1_1,
                          assembled_folder['folders'][0]['folders'][0])
+
+    def test_assemble_folder_from_flat_lists_should_build_folder_dashboards_hierarchy(  # noqa: E501
+            self):
+
+        folder = self.__make_fake_folder()
+        dashboard = self.__make_fake_dashboard()
+        dashboard['parentFolder'] = 'test-folder'
+
+        folder_id, assembled_folder = self.__synchronizer\
+            ._MetadataSynchronizer__assemble_folder_from_flat_lists(
+                folder, [folder], [dashboard])
+
+        self.assertEqual('test-folder', folder_id)
+        self.assertEqual(dashboard, assembled_folder['dashboards'][0])
 
     def test_make_tag_templates_dict_should_make_template_for_folder(self):
         mock_template_factory = self.__mock_tag_template_factory
@@ -261,6 +365,13 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
     @classmethod
     def __make_fake_folder(cls, oid='test-folder') -> Dict[str, Any]:
+        return {
+            'oid': oid,
+            'owner': 'test-owner',
+        }
+
+    @classmethod
+    def __make_fake_dashboard(cls, oid='test-dashboard') -> Dict[str, Any]:
         return {
             'oid': oid,
             'owner': 'test-owner',
