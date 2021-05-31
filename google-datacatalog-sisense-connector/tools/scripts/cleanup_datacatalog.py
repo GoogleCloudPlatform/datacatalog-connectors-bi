@@ -70,6 +70,9 @@ def __delete_entries_and_groups(project_ids: List[str]) -> None:
 def __delete_tag_templates(project_id: str, location_id: str) -> None:
     __delete_tag_template(
         datacatalog.DataCatalogClient.tag_template_path(
+            project_id, location_id, 'sisense_dashboard_metadata'))
+    __delete_tag_template(
+        datacatalog.DataCatalogClient.tag_template_path(
             project_id, location_id, 'sisense_folder_metadata'))
 
 

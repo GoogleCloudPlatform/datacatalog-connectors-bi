@@ -30,6 +30,29 @@ class EntryRelationshipMapperTest(unittest.TestCase):
     __MAPPER_MODULE = f'{__PREPARE_PACKAGE}.entry_relationship_mapper'
     __MAPPER_CLASS = f'{__MAPPER_MODULE}.EntryRelationshipMapper'
 
+    def test_fulfill_tag_fields_should_resolve_dashboard_folder_mapping(self):
+        folder_id = 'parent-folder'
+        folder_entry = self.__make_fake_entry(folder_id, 'folder')
+        folder_tag = self.__make_fake_tag(string_fields=(('id', folder_id),))
+
+        dashboard_id = 'test-dashboard'
+        dashboard_entry = self.__make_fake_entry(dashboard_id, 'dashboard')
+        string_fields = ('id', dashboard_id), ('folder_id', folder_id)
+        dashboard_tag = self.__make_fake_tag(string_fields=string_fields)
+
+        folder_assembled_entry = commons_prepare.AssembledEntryData(
+            folder_id, folder_entry, [folder_tag])
+        dashboard_assembled_entry = commons_prepare.AssembledEntryData(
+            dashboard_id, dashboard_entry, [dashboard_tag])
+
+        prepare.EntryRelationshipMapper().fulfill_tag_fields(
+            [folder_assembled_entry, dashboard_assembled_entry])
+
+        self.assertEqual(
+            f'https://console.cloud.google.com/datacatalog/'
+            f'{folder_entry.name}',
+            dashboard_tag.fields['folder_entry'].string_value)
+
     def test_fulfill_tag_fields_should_resolve_parent_folder_mapping(self):
         parent_folder_id = 'parent-folder'
         parent_folder_entry = self.__make_fake_entry(parent_folder_id,

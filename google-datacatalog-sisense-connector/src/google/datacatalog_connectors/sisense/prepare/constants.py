@@ -25,6 +25,9 @@ ENTRY_ID_PART_FOLDER = 'fd_'
 SISENSE_ASSET_TYPE_FOLDER = 'folder'
 
 # The ID of the Tag Template created to store additional metadata for
+# Dashboard-related Entries.
+TAG_TEMPLATE_ID_DASHBOARD = 'sisense_dashboard_metadata'
+# The ID of the Tag Template created to store additional metadata for
 # Folder-related Entries.
 TAG_TEMPLATE_ID_FOLDER = 'sisense_folder_metadata'
 

@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
 from typing import Any, Dict
 
 from google.cloud import datacatalog
@@ -26,6 +27,54 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
     def __init__(self, server_address: str):
         self.__server_address = server_address
+
+    def make_tag_for_dashboard(self, tag_template: TagTemplate,
+                               dashboard_metadata: Dict[str, Any]) -> Tag:
+
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id', dashboard_metadata.get('oid'))
+
+        owner = dashboard_metadata.get('ownerData')
+        if owner:
+            self._set_string_field(tag, 'owner_username',
+                                   owner.get('userName'))
+
+            first_name = owner.get('firstName') or ''
+            last_name = owner.get('lastName') or ''
+            self._set_string_field(tag, 'owner_name',
+                                   f'{first_name} {last_name}')
+
+        folder = dashboard_metadata.get('folderData')
+        if folder:
+            # The root folder's ``oid`` field is not fulfilled.
+            folder_id = folder.get('oid') or folder.get('name')
+            self._set_string_field(tag, 'folder_id', folder_id)
+            self._set_string_field(tag, 'folder_name', folder.get('name'))
+
+        datasource = dashboard_metadata.get('datasource')
+        if datasource:
+            self._set_string_field(tag, 'datasource', datasource.get('title'))
+
+        last_publish_time = dashboard_metadata.get('lastPublish')
+        if last_publish_time:
+            self._set_timestamp_field(
+                tag, 'last_publish',
+                datetime.strptime(last_publish_time,
+                                  self.__INCOMING_TIMESTAMP_UTC_FORMAT))
+
+        last_opened_time = dashboard_metadata.get('lastOpened')
+        if last_opened_time:
+            self._set_timestamp_field(
+                tag, 'last_opened',
+                datetime.strptime(last_opened_time,
+                                  self.__INCOMING_TIMESTAMP_UTC_FORMAT))
+
+        self._set_string_field(tag, 'server_url', self.__server_address)
+
+        return tag
 
     def make_tag_for_folder(self, tag_template: TagTemplate,
                             folder_metadata: Dict[str, Any]) -> Tag:

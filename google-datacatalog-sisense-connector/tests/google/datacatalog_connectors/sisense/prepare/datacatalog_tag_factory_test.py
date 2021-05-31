@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
 import unittest
 
 from google.cloud import datacatalog
@@ -23,6 +24,7 @@ from google.datacatalog_connectors.sisense.prepare import \
 
 
 class DataCatalogEntryFactoryTest(unittest.TestCase):
+    __DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 
     def setUp(self):
         self.__factory = datacatalog_tag_factory.DataCatalogTagFactory(
@@ -32,6 +34,57 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         attrs = self.__factory.__dict__
         self.assertEqual('https://test.com',
                          attrs['_DataCatalogTagFactory__server_address'])
+
+    def test_make_tag_for_dashboard_should_set_all_available_fields(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_dashboard_metadata'
+
+        metadata = {
+            'oid': 'test-dashboard',
+            'folderData': {
+                'oid': 'parent-folder',
+                'name': 'Parent Folder',
+            },
+            'ownerData': {
+                'userName': 'johndoe@test.com',
+                'firstName': 'John',
+                'lastName': 'Doe',
+            },
+            'datasource': {
+                'title': 'Test Data Source',
+            },
+            'lastPublish': '2021-05-01T13:00:15.400Z',
+            'lastOpened': '2021-05-02T23:00:22.939Z',
+        }
+
+        tag = self.__factory.make_tag_for_dashboard(tag_template, metadata)
+
+        self.assertEqual('tagTemplates/sisense_dashboard_metadata',
+                         tag.template)
+
+        self.assertEqual('test-dashboard', tag.fields['id'].string_value)
+        self.assertEqual('parent-folder', tag.fields['folder_id'].string_value)
+        self.assertEqual('Parent Folder',
+                         tag.fields['folder_name'].string_value)
+        self.assertEqual('johndoe@test.com',
+                         tag.fields['owner_username'].string_value)
+        self.assertEqual('John Doe', tag.fields['owner_name'].string_value)
+        self.assertEqual('Test Data Source',
+                         tag.fields['datasource'].string_value)
+
+        publish_datetime = datetime.strptime('2021-05-01T13:00:15.400+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            publish_datetime.timestamp(),
+            tag.fields['last_publish'].timestamp_value.timestamp())
+
+        opened_datetime = datetime.strptime('2021-05-02T23:00:22.939+0000',
+                                            self.__DATETIME_FORMAT)
+        self.assertEqual(opened_datetime.timestamp(),
+                         tag.fields['last_opened'].timestamp_value.timestamp())
+
+        self.assertEqual('https://test.com',
+                         tag.fields['server_url'].string_value)
 
     def test_make_tag_for_folder_should_set_all_available_fields(self):
         tag_template = datacatalog.TagTemplate()
@@ -55,6 +108,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         tag = self.__factory.make_tag_for_folder(tag_template, metadata)
+
+        self.assertEqual('tagTemplates/sisense_folder_metadata', tag.template)
 
         self.assertEqual('test-folder', tag.fields['id'].string_value)
         self.assertEqual('Test folder', tag.fields['name'].string_value)
