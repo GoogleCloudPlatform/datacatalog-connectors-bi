@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import unittest
+from unittest import mock
 
 from google.cloud import datacatalog
 from google.cloud.datacatalog import Entry, Tag
