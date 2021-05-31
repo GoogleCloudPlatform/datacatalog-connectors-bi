@@ -126,28 +126,27 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        order=11)
 
         self._add_primitive_type_field(tag_template=tag_template,
-                                       field_id='name',
-                                       field_type=self.__STRING_TYPE,
-                                       display_name='Name',
-                                       is_required=True,
-                                       order=10)
-
-        self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='owner_username',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Owner username',
-                                       order=9)
+                                       order=10)
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='owner_name',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Owner name',
-                                       order=8)
+                                       order=9)
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='parent_id',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Id of Parent',
+                                       order=8)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='parent_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Parent Folder',
                                        order=7)
 
         self._add_primitive_type_field(
