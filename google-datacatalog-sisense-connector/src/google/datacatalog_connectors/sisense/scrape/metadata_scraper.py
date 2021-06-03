@@ -52,7 +52,7 @@ class MetadataScraper:
 
         return folders
 
-    def scrape_user(self, user_id) -> Dict[str, Any]:
+    def scrape_user(self, user_id: str) -> Dict[str, Any]:
         self.__log_scrape_start(f'Scraping User metadata (Id: {user_id})...')
         user = self.__api_helper.get_user(user_id)
 
@@ -62,10 +62,11 @@ class MetadataScraper:
 
         return user
 
-    def scrape_widgets(self, dashboard_id) -> List[Dict[str, Any]]:
+    def scrape_widgets(self, dashboard: Dict[str,
+                                             Any]) -> List[Dict[str, Any]]:
         self.__log_scrape_start(f'Scraping Widgets metadata'
-                                f' (Dashboard Id: {dashboard_id})...')
-        widgets = self.__api_helper.get_widgets(dashboard_id)
+                                f' (Dashboard: {dashboard.get("title")})...')
+        widgets = self.__api_helper.get_widgets(dashboard.get('oid'))
 
         logging.info('')
         logging.info('  %s Widgets found:', len(widgets))

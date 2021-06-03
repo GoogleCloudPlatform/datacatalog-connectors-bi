@@ -89,7 +89,7 @@ class MetadataScraperTest(unittest.TestCase):
         api_helper = self.__mock_api_helper
         api_helper.get_widgets.return_value = widgets_metadata
 
-        widgets = self.__scraper.scrape_widgets('dashboard-id')
+        widgets = self.__scraper.scrape_widgets({'oid': 'dashboard-id'})
 
         self.assertEqual(1, len(widgets))
         self.assertEqual('widget-id', widgets[0]['oid'])
