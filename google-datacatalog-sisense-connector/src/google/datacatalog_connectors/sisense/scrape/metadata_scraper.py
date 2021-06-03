@@ -62,6 +62,19 @@ class MetadataScraper:
 
         return user
 
+    def scrape_widgets(self, dashboard_id) -> List[Dict[str, Any]]:
+        self.__log_scrape_start(f'Scraping Widgets metadata'
+                                f' (Dashboard Id: {dashboard_id})...')
+        widgets = self.__api_helper.get_widgets(dashboard_id)
+
+        logging.info('')
+        logging.info('  %s Widgets found:', len(widgets))
+        for widget in widgets:
+            logging.info('    - %s, %s [%s]', widget.get('title'),
+                         widget.get('type'), widget.get('oid'))
+
+        return widgets
+
     @classmethod
     def __log_scrape_start(cls, message: str, *args: Any) -> None:
         logging.info('')
