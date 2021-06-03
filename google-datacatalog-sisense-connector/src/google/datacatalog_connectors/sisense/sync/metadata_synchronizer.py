@@ -66,9 +66,10 @@ class MetadataSynchronizer:
         logging.info('===> Scraping Sisense metadata...')
 
         logging.info('')
-        logging.info('Objects to be scraped: Folders and Dashboards')
+        logging.info('Objects to be scraped: Folders, Dashboards, and Widgets')
         folders = self.__scrape_folders()
         dashboards = self.__scrape_dashboards(folders)
+        widgets = self.__scrape_widgets(dashboards)
         logging.info('==== DONE ========================================')
 
         # Prepare: convert Sisense metadata into Data Catalog entities model.
@@ -107,7 +108,7 @@ class MetadataSynchronizer:
     def __scrape_folders(self) -> List[Dict[str, Any]]:
         """Scrape metadata from all Folders the current user has access to.
 
-        The incoming Folder objects may be enriched with additional fields in
+        The outgoing Folder objects may be enriched with additional fields in
         order to expedite/improve the metadata synchronization process:
         - ``ownerData``: added when the authenticated user is allowed to read
         users' information; intended to provide ownership-related metadata to
@@ -136,7 +137,7 @@ class MetadataSynchronizer:
             self, folders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Scrape metadata from all Dashboards the current user has access to.
 
-        The incoming Dashboard objects may be enriched with additional fields
+        The outgoing Dashboard objects may be enriched with additional fields
         in order to expedite/improve the metadata synchronization process:
         - ``ownerData``: added when the authenticated user is allowed to read
         users' information; intended to provide ownership-related metadata to
@@ -159,6 +160,48 @@ class MetadataSynchronizer:
                     if folder.get('oid') == folder_id)
 
         return all_dashboards
+
+    def __scrape_widgets(
+            self, dashboards: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Scrape metadata from all Widgets the current user has access to.
+
+        The outgoing Dashboard objects are enriched with additional fields in
+        order to expedite/improve the metadata synchronization process:
+        - ``widgets``: always added.
+
+        Returns:
+            A ``list``.
+        """
+        for dashboard in dashboards:
+            dashboard['widgets'] = self.__scrape_widgets_for_dashboard(
+                dashboard)
+
+        return dashboards
+
+    def __scrape_widgets_for_dashboard(
+            self, dashboard: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Scrape metadata from all Widgets the current user has access to for
+        a given Dashboard.
+
+        The outgoing Widget objects are enriched with additional fields in
+        order to expedite/improve the metadata synchronization process:
+        - ``ownerData``: added when the authenticated user is allowed to read
+        users' information; intended to provide ownership-related metadata to
+        the Data Catalog Tags created for the Widget.
+        - ``dashboardData``: always added.
+
+        Returns:
+            A ``list``.
+        """
+        widgets = self.__metadata_scraper.scrape_widgets(dashboard.get('oid'))
+
+        for widget in widgets:
+            owner_data = self.__scrape_user(widget.get('owner'))
+            if owner_data:
+                widget['ownerData'] = owner_data
+            widget['dashboardData'] = dashboard
+
+        return widgets
 
     def __scrape_user(self, user_id: str) -> Optional[Dict[str, Any]]:
         """Scrape metadata from a given User.
@@ -212,7 +255,7 @@ class MetadataSynchronizer:
         """
         Assemble Folder metadata from the given flat asset lists.
 
-        The incoming Folder object may be enriched with additional fields in
+        The outgoing Folder object may be enriched with additional fields in
         order to expedite/improve the metadata synchronization process:
         - ``folders``: stores its child Folders.
         - ``dashboards``: stores its child Dashboards.
