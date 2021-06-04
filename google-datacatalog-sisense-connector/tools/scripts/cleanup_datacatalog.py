@@ -28,7 +28,7 @@ __datacatalog = datacatalog.DataCatalogClient()
 def __delete_entries_and_groups(project_ids: List[str]) -> None:
     entry_name_pattern = '(?P<entry_group_name>.+?)/entries/(.+?)'
 
-    query = 'system=sisense'
+    query = 'system=Sisense'
 
     scope = datacatalog.SearchCatalogRequest.Scope()
     scope.include_project_ids.extend(project_ids)

@@ -32,11 +32,11 @@ class EntryRelationshipMapperTest(unittest.TestCase):
 
     def test_fulfill_tag_fields_should_resolve_dashboard_folder_mapping(self):
         folder_id = 'parent-folder'
-        folder_entry = self.__make_fake_entry(folder_id, 'folder')
+        folder_entry = self.__make_fake_entry(folder_id, 'Folder')
         folder_tag = self.__make_fake_tag(string_fields=(('id', folder_id),))
 
         dashboard_id = 'test-dashboard'
-        dashboard_entry = self.__make_fake_entry(dashboard_id, 'dashboard')
+        dashboard_entry = self.__make_fake_entry(dashboard_id, 'Dashboard')
         string_fields = ('id', dashboard_id), ('folder_id', folder_id)
         dashboard_tag = self.__make_fake_tag(string_fields=string_fields)
 
@@ -56,12 +56,12 @@ class EntryRelationshipMapperTest(unittest.TestCase):
     def test_fulfill_tag_fields_should_resolve_parent_folder_mapping(self):
         parent_folder_id = 'parent-folder'
         parent_folder_entry = self.__make_fake_entry(parent_folder_id,
-                                                     'folder')
+                                                     'Folder')
         parent_folder_tag = self.__make_fake_tag(
             string_fields=(('id', parent_folder_id),))
 
         folder_id = 'test-folder'
-        folder_entry = self.__make_fake_entry(folder_id, 'folder')
+        folder_entry = self.__make_fake_entry(folder_id, 'Folder')
         string_fields = ('id', folder_id), ('parent_id', parent_folder_id)
         folder_tag = self.__make_fake_tag(string_fields=string_fields)
 

@@ -21,6 +21,8 @@ ENTRY_ID_PREFIX = 'sss_'
 ENTRY_ID_PART_DASHBOARD = 'db_'
 ENTRY_ID_PART_FOLDER = 'fd_'
 
+# The Sisense type for Dashboard assets.
+SISENSE_ASSET_TYPE_DASHBOARD = 'dashboard'
 # The Sisense type for Folder assets.
 SISENSE_ASSET_TYPE_FOLDER = 'folder'
 
@@ -32,6 +34,6 @@ TAG_TEMPLATE_ID_DASHBOARD = 'sisense_dashboard_metadata'
 TAG_TEMPLATE_ID_FOLDER = 'sisense_folder_metadata'
 
 # The user specified type of Dashboard-related Entries.
-USER_SPECIFIED_TYPE_DASHBOARD = 'dashboard'
+USER_SPECIFIED_TYPE_DASHBOARD = 'Dashboard'
 # The user specified type of Folder-related Entries.
-USER_SPECIFIED_TYPE_FOLDER = 'folder'
+USER_SPECIFIED_TYPE_FOLDER = 'Folder'
