@@ -52,7 +52,6 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        field_id='owner_username',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Owner username',
-                                       is_required=True,
                                        order=9)
 
         self._add_primitive_type_field(tag_template=tag_template,
