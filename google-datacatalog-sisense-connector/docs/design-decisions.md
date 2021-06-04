@@ -42,10 +42,10 @@ but the API behaves differently depending on the asset type:
 That being said, we decided to avoid expanding the objects and use the 
 `GET /users/{id}` endpoint to retrieve information on each asset owner. A cache
 can be used to decrease the number of API calls. There is a tradeoff for this
-approach: the endpoint needs admin license rights in the API version we are
-using as reference, `Windows 8.2.5.11026 v1`, and we get a `403 - Access denied`
-when the authenticated user does not have such permission. In this case, we
-are going to skip fulfilling the assets' ownership metadata.
+approach: the endpoint needs admin license rights in the REST API version we
+are taking for reference, `Windows 8.2.5 v1`, and we get a
+`403 - Access denied` when the authenticated user does not have such
+permission. We skip fulfilling the assets' ownership metadata when it happens.
 
 ---
 
