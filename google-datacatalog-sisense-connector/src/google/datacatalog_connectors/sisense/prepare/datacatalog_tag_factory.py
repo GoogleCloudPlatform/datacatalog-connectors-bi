@@ -87,9 +87,10 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         folder_id = folder_metadata.get('oid') or folder_metadata.get('name')
         self._set_string_field(tag, 'id', folder_id)
 
-        self._set_string_field(tag, 'name', folder_metadata.get('name'))
-        self._set_string_field(tag, 'parent_id',
-                               folder_metadata.get('parentId'))
+        parent = folder_metadata.get('parentFolderData')
+        if parent:
+            self._set_string_field(tag, 'parent_id', parent.get('oid'))
+            self._set_string_field(tag, 'parent_name', parent.get('name'))
 
         owner = folder_metadata.get('ownerData')
         if owner:

@@ -120,10 +120,6 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
                          tag_template.fields['id'].type.primitive_type)
         self.assertEqual('Id', tag_template.fields['id'].display_name)
 
-        self.assertEqual(self.__STRING_TYPE,
-                         tag_template.fields['name'].type.primitive_type)
-        self.assertEqual('Name', tag_template.fields['name'].display_name)
-
         self.assertEqual(
             self.__STRING_TYPE,
             tag_template.fields['owner_username'].type.primitive_type)
@@ -139,6 +135,12 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
                          tag_template.fields['parent_id'].type.primitive_type)
         self.assertEqual('Id of Parent',
                          tag_template.fields['parent_id'].display_name)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['parent_name'].type.primitive_type)
+        self.assertEqual('Parent Folder',
+                         tag_template.fields['parent_name'].display_name)
 
         self.assertEqual(
             self.__STRING_TYPE,

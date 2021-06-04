@@ -93,11 +93,14 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         metadata = {
             'oid': 'test-folder',
             'name': 'Test folder',
-            'parentId': 'parent-folder',
             'ownerData': {
                 'userName': 'johndoe@test.com',
                 'firstName': 'John',
                 'lastName': 'Doe',
+            },
+            'parentFolderData': {
+                'oid': 'parent-folder',
+                'name': 'Parent folder',
             },
             'folders': [{
                 'oid': 'child-folder',
@@ -112,8 +115,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('tagTemplates/sisense_folder_metadata', tag.template)
 
         self.assertEqual('test-folder', tag.fields['id'].string_value)
-        self.assertEqual('Test folder', tag.fields['name'].string_value)
         self.assertEqual('parent-folder', tag.fields['parent_id'].string_value)
+        self.assertEqual('Parent folder',
+                         tag.fields['parent_name'].string_value)
         self.assertEqual('johndoe@test.com',
                          tag.fields['owner_username'].string_value)
         self.assertEqual('John Doe', tag.fields['owner_name'].string_value)

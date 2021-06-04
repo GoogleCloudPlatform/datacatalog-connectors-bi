@@ -130,6 +130,22 @@ class MetadataSynchronizerTest(unittest.TestCase):
         self.assertEqual(folder, folders[0])
         mock_scraper.scrape_user.assert_called_once()
 
+    def test_scrape_folders_should_add_parent_data_when_folder_has_parent(
+            self):
+
+        parent_folder = self.__make_fake_folder()
+        child_folder = self.__make_fake_folder('test-child-folder')
+        child_folder['parentId'] = 'test-folder'
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_all_folders.return_value = [
+            parent_folder, child_folder
+        ]
+
+        folders = self.__synchronizer._MetadataSynchronizer__scrape_folders()
+
+        self.assertEqual(parent_folder, folders[1]['parentFolderData'])
+
     def test_scrape_dashboards_should_scrape_all_dashboards(self):
         mock_scraper = self.__mock_metadata_scraper
         self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])

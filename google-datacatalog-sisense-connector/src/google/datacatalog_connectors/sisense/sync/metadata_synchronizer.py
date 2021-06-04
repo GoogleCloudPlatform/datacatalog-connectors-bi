@@ -112,6 +112,7 @@ class MetadataSynchronizer:
         - ``ownerData``: added when the authenticated user is allowed to read
         users' information; intended to provide ownership-related metadata to
         the Data Catalog Tags created for the Folder.
+        - ``parentFolderData``: added when the Folder has a parent.
 
         Returns:
             A ``list``.
@@ -124,6 +125,10 @@ class MetadataSynchronizer:
             owner_data = self.__scrape_user(owner_id) if owner_id else None
             if owner_data:
                 folder['ownerData'] = owner_data
+            parent_id = folder.get('parentId')
+            if parent_id:
+                folder['parentFolderData'] = next(
+                    fdr for fdr in all_folders if fdr.get('oid') == parent_id)
 
         return all_folders
 
