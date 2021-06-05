@@ -71,9 +71,9 @@ class MetadataScraper:
         logging.info('')
         logging.info('  %s Widgets found:', len(widgets))
         for widget in widgets:
-            logging.info('    - %s, %s [%s]',
-                         widget.get('title') or 'Unnamed', widget.get('type'),
-                         widget.get('oid'))
+            logging.info('    - %s [%s, %s]',
+                         widget.get('title') or 'Unnamed', widget.get('oid'),
+                         widget.get('type'))
 
         return widgets
 
