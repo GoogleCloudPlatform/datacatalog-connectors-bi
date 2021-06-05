@@ -128,6 +128,21 @@ class RESTAPIHelper:
         response = requests.get(url=url, headers=self.__common_headers)
         return self.__get_response_body_or_raise(response)
 
+    def get_widgets(self, dashboard_id) -> List[Dict[str, Any]]:
+        """Get all Widgets belonging to a given Dashboard.
+
+        Returns:
+            A ``list``.
+
+        Raises:
+            Exception: If the API returns any status code than ``200``.
+        """
+        self.__set_up_auth()
+
+        url = f'{self.__base_api_endpoint}/dashboards/{dashboard_id}/widgets'
+        return self.__get_list_using_pagination(base_url=url,
+                                                results_per_page=50)
+
     def __set_up_auth(self) -> None:
         if self.__auth_credentials:
             return

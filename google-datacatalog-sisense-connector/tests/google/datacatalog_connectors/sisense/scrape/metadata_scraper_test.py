@@ -80,3 +80,17 @@ class MetadataScraperTest(unittest.TestCase):
 
         self.assertEqual('user-id', user['_id'])
         api_helper.get_user.assert_called_once()
+
+    def test_scrape_widgets_should_delegate_to_api_helper(self):
+        widgets_metadata = [{
+            'oid': 'widget-id',
+        }]
+
+        api_helper = self.__mock_api_helper
+        api_helper.get_widgets.return_value = widgets_metadata
+
+        widgets = self.__scraper.scrape_widgets({'oid': 'dashboard-id'})
+
+        self.assertEqual(1, len(widgets))
+        self.assertEqual('widget-id', widgets[0]['oid'])
+        api_helper.get_widgets.assert_called_once_with('dashboard-id')

@@ -138,6 +138,31 @@ class RESTAPIHelperTest(unittest.TestCase):
 
         self.assertEqual('user-id', user['oid'])
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_list_using_pagination')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_widgets_should_return_list_on_success(
+            self, mock_get_list_using_pagination):
+
+        mock_get_list_using_pagination.return_value = [{'oid': 'widget-id'}]
+
+        widgets = self.__helper.get_widgets('dashboard-id')
+
+        self.assertEqual(1, len(widgets))
+        self.assertEqual('widget-id', widgets[0]['oid'])
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_list_using_pagination')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__set_up_auth', lambda *args: None)
+    def test_get_widgets_should_use_pagination(self,
+                                               mock_get_list_using_pagination):
+
+        self.__helper.get_widgets('dashboard-id')
+
+        mock_get_list_using_pagination.assert_called_once_with(
+            base_url='test-server/api/test-version'
+            '/dashboards/dashboard-id/widgets',
+            results_per_page=50,
+        )
+
     @mock.patch(f'{__HELPER_MODULE}.authenticator.Authenticator.authenticate')
     def test_set_up_auth_should_set_credentials_if_not_authenticated(
             self, mock_authenticate):
