@@ -193,7 +193,7 @@ class MetadataSynchronizer:
         Returns:
             A ``list``.
         """
-        widgets = self.__metadata_scraper.scrape_widgets(dashboard.get('oid'))
+        widgets = self.__metadata_scraper.scrape_widgets(dashboard)
 
         for widget in widgets:
             owner_data = self.__scrape_user(widget.get('owner'))
