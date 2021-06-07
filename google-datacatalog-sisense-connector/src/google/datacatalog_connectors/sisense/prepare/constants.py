@@ -20,6 +20,7 @@ ENTRY_ID_PREFIX = 'sss_'
 # ENTRY_ID_PREFIX when generating Sisense Entry IDs.
 ENTRY_ID_PART_DASHBOARD = 'db_'
 ENTRY_ID_PART_FOLDER = 'fd_'
+ENTRY_ID_PART_WIDGET = 'wg_'
 
 # The Sisense type for Dashboard assets.
 SISENSE_ASSET_TYPE_DASHBOARD = 'dashboard'
@@ -37,3 +38,5 @@ TAG_TEMPLATE_ID_FOLDER = 'sisense_folder_metadata'
 USER_SPECIFIED_TYPE_DASHBOARD = 'Dashboard'
 # The user specified type of Folder-related Entries.
 USER_SPECIFIED_TYPE_FOLDER = 'Folder'
+# The user specified type of Widget-related Entries.
+USER_SPECIFIED_TYPE_WIDGET = 'Widget'

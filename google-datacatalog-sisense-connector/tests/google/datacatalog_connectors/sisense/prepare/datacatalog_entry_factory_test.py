@@ -193,3 +193,79 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
+
+    def test_make_entry_for_widget_should_set_all_available_fields(self):
+        metadata = {
+            '_id': 'a123-b456',
+            'oid': 'a123-b457',
+            'title': 'Test widget',
+            'desc': 'Test widget description',
+            'created': '2019-09-12T16:30:00.005Z',
+            'lastUpdated': '2019-09-12T16:31:00.005Z',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_widget(metadata)
+
+        self.assertEqual('sss_test_server_com_wg_a123_b457', entry_id)
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'entryGroups/test-entry-group/entries/'
+            'sss_test_server_com_wg_a123_b457', entry.name)
+        self.assertEqual('test-system', entry.user_specified_system)
+        self.assertEqual('Widget', entry.user_specified_type)
+        self.assertEqual('Test widget', entry.display_name)
+        self.assertEqual('Test widget description', entry.description)
+        self.assertEqual('', entry.linked_resource)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.create_time.timestamp())
+
+        updated_datetime = datetime.strptime('2019-09-12T16:31:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            updated_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
+
+    def test_make_entry_for_widget_should_set_unnamed_on_missing_title(self):
+
+        metadata = {
+            '_id': 'a123-b456',
+            'oid': 'a123-b457',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_widget(metadata)
+
+        self.assertEqual('Unnamed', entry.display_name)
+
+    def test_make_entry_for_widget_should_succeed_on_missing_created_date(
+            self):
+
+        metadata = {
+            '_id': 'a123-b456',
+            'oid': 'a123-b457',
+            'title': 'Test widget',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_widget(metadata)
+
+        self.assertIsNone(entry.source_system_timestamps.create_time)
+
+    def test_make_entry_for_widget_should_use_created_on_no_updated_date(self):
+        metadata = {
+            '_id': 'a123-b456',
+            'oid': 'a123-b457',
+            'title': 'Test widget',
+            'created': '2019-09-12T16:30:00.005Z',
+        }
+
+        entry_id, entry = self.__factory.make_entry_for_widget(metadata)
+
+        created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
+                                             self.__DATETIME_FORMAT)
+        self.assertEqual(
+            created_datetime.timestamp(),
+            entry.source_system_timestamps.update_time.timestamp())
