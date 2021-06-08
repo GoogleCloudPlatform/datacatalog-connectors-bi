@@ -27,6 +27,7 @@ from google.datacatalog_connectors.sisense.prepare import constants
 
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+    __UNNAMED = 'Unnamed'
 
     def __init__(self, project_id: str, location_id: str, entry_group_id: str,
                  user_specified_system: str, server_address: str):
@@ -60,10 +61,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             dashboard_metadata.get('title'))
         entry.description = dashboard_metadata.get('desc')
 
-        if dashboard_metadata.get('oid'):
-            entry.linked_resource = f'{self.__server_address}' \
-                                    f'/app/main#/dashboards' \
-                                    f'/{dashboard_metadata.get("oid")}'
+        entry.linked_resource = f'{self.__server_address}' \
+                                f'/app/main#/dashboards/{dashboard_id}'
 
         if dashboard_metadata.get('created'):
             created_datetime = datetime.strptime(
@@ -119,6 +118,50 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
             modified_date = folder_metadata.get('lastUpdated')
             resolved_modified_date = modified_date or folder_metadata.get(
+                'created')
+            modified_datetime = datetime.strptime(
+                resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+            update_timestamp = timestamp_pb2.Timestamp()
+            update_timestamp.FromDatetime(modified_datetime)
+            entry.source_system_timestamps.update_time = update_timestamp
+
+        return generated_id, entry
+
+    def make_entry_for_widget(
+            self, widget_metadata: Dict[str, Any]) -> Tuple[str, Entry]:
+
+        entry = datacatalog.Entry()
+
+        widget_id = widget_metadata.get('oid')
+
+        generated_id = self.__format_id(constants.ENTRY_ID_PART_WIDGET,
+                                        widget_id)
+        entry.name = datacatalog.DataCatalogClient.entry_path(
+            self.__project_id, self.__location_id, self.__entry_group_id,
+            generated_id)
+
+        entry.user_specified_system = self.__user_specified_system
+        entry.user_specified_type = constants.USER_SPECIFIED_TYPE_WIDGET
+
+        entry.display_name = self._format_display_name(
+            widget_metadata.get('title') or self.__UNNAMED)
+        entry.description = widget_metadata.get('desc')
+
+        entry.linked_resource = f'{self.__server_address}' \
+                                f'/app/main#/dashboards' \
+                                f'/{widget_metadata.get("dashboardid")}' \
+                                f'/widgets/{widget_id}'
+
+        if widget_metadata.get('created'):
+            created_datetime = datetime.strptime(
+                widget_metadata.get('created'),
+                self.__INCOMING_TIMESTAMP_UTC_FORMAT)
+            create_timestamp = timestamp_pb2.Timestamp()
+            create_timestamp.FromDatetime(created_datetime)
+            entry.source_system_timestamps.create_time = create_timestamp
+
+            modified_date = widget_metadata.get('lastUpdated')
+            resolved_modified_date = modified_date or widget_metadata.get(
                 'created')
             modified_datetime = datetime.strptime(
                 resolved_modified_date, self.__INCOMING_TIMESTAMP_UTC_FORMAT)
