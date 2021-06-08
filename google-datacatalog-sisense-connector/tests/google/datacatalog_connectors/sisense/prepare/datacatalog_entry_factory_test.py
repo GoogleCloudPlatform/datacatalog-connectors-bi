@@ -202,6 +202,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'desc': 'Test widget description',
             'created': '2019-09-12T16:30:00.005Z',
             'lastUpdated': '2019-09-12T16:31:00.005Z',
+            'dashboardid': 'a123',
         }
 
         entry_id, entry = self.__factory.make_entry_for_widget(metadata)
@@ -216,7 +217,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('Widget', entry.user_specified_type)
         self.assertEqual('Test widget', entry.display_name)
         self.assertEqual('Test widget description', entry.description)
-        self.assertEqual('', entry.linked_resource)
+        self.assertEqual(
+            'https://test.server.com/app/main#/dashboards/a123'
+            '/widgets/a123-b457', entry.linked_resource)
 
         created_datetime = datetime.strptime('2019-09-12T16:30:00.005+0000',
                                              self.__DATETIME_FORMAT)

@@ -132,8 +132,10 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         entry = datacatalog.Entry()
 
+        widget_id = widget_metadata.get('oid')
+
         generated_id = self.__format_id(constants.ENTRY_ID_PART_WIDGET,
-                                        widget_metadata.get('oid'))
+                                        widget_id)
         entry.name = datacatalog.DataCatalogClient.entry_path(
             self.__project_id, self.__location_id, self.__entry_group_id,
             generated_id)
@@ -144,6 +146,11 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         entry.display_name = self._format_display_name(
             widget_metadata.get('title') or self.__UNNAMED)
         entry.description = widget_metadata.get('desc')
+
+        entry.linked_resource = f'{self.__server_address}' \
+                                f'/app/main#/dashboards' \
+                                f'/{widget_metadata.get("dashboardid")}' \
+                                f'/widgets/{widget_id}'
 
         if widget_metadata.get('created'):
             created_datetime = datetime.strptime(
