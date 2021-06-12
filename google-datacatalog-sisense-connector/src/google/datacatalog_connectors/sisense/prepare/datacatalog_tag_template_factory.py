@@ -240,9 +240,9 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        order=5)
 
         self._add_primitive_type_field(tag_template=tag_template,
-                                       field_id='dashboard_name',
+                                       field_id='dashboard_title',
                                        field_type=self.__STRING_TYPE,
-                                       display_name='Dashboard Name',
+                                       display_name='Dashboard Title',
                                        is_required=True,
                                        order=4)
 

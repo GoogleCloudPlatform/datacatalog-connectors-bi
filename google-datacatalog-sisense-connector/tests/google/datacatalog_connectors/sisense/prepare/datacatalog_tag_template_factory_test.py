@@ -247,10 +247,10 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
 
         self.assertEqual(
             self.__STRING_TYPE,
-            tag_template.fields['dashboard_name'].type.primitive_type)
-        self.assertEqual('Dashboard Name',
-                         tag_template.fields['dashboard_name'].display_name)
-        self.assertTrue(tag_template.fields['dashboard_name'].is_required)
+            tag_template.fields['dashboard_title'].type.primitive_type)
+        self.assertEqual('Dashboard Title',
+                         tag_template.fields['dashboard_title'].display_name)
+        self.assertTrue(tag_template.fields['dashboard_title'].is_required)
 
         self.assertEqual(
             self.__STRING_TYPE,
