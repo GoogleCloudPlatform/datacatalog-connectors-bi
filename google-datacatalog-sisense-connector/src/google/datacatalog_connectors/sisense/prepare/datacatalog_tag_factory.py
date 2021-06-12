@@ -144,8 +144,10 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'dashboard_title', dashboard.get('title'))
 
         datasource = widget_metadata.get('datasource')
-        if datasource:
+        if isinstance(datasource, dict):
             self._set_string_field(tag, 'datasource', datasource.get('title'))
+        elif isinstance(datasource, str):
+            self._set_string_field(tag, 'datasource', datasource)
 
         self._set_string_field(tag, 'server_url', self.__server_address)
 

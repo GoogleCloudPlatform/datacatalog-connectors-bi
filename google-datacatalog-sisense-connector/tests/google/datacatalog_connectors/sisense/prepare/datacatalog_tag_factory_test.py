@@ -170,3 +170,17 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                          tag.fields['datasource'].string_value)
         self.assertEqual('https://test.com',
                          tag.fields['server_url'].string_value)
+
+    def test_make_tag_for_widget_should_set_datasource_from_string(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_widget_metadata'
+
+        metadata = {
+            'dashboardData': {},
+            'datasource': 'Test Data Source',
+        }
+
+        tag = self.__factory.make_tag_for_widget(tag_template, metadata)
+
+        self.assertEqual('Test Data Source',
+                         tag.fields['datasource'].string_value)
