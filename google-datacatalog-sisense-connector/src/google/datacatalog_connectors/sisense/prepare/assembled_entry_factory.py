@@ -51,8 +51,8 @@ class AssembledEntryFactory:
                     asset_metadata, tag_templates))
         elif constants.SISENSE_ASSET_TYPE_DASHBOARD == asset_metadata.get(
                 'type'):
-            assembled_entries.append(
-                self.__make_assembled_entry_for_dashboard(
+            assembled_entries.extend(
+                self.__make_assembled_entries_for_dashboard(
                     asset_metadata, tag_templates))
 
         return assembled_entries
@@ -71,8 +71,8 @@ class AssembledEntryFactory:
                 self.__make_assembled_entries_for_folder(
                     child_folder, tag_templates))
         for dashboard in folder_metadata.get('dashboards') or []:
-            assembled_entries.append(
-                self.__make_assembled_entry_for_dashboard(
+            assembled_entries.extend(
+                self.__make_assembled_entries_for_dashboard(
                     dashboard, tag_templates))
 
         return assembled_entries
@@ -96,6 +96,21 @@ class AssembledEntryFactory:
                                           entry=entry,
                                           tags=tags)
 
+    def __make_assembled_entries_for_dashboard(
+            self, dashboard_metadata: Dict[str, Any],
+            tag_templates: Dict[str, TagTemplate]) -> List[AssembledEntryData]:
+
+        assembled_entries = [
+            self.__make_assembled_entry_for_dashboard(dashboard_metadata,
+                                                      tag_templates)
+        ]
+
+        for widget in dashboard_metadata.get('widgets') or []:
+            assembled_entries.append(
+                self.__make_assembled_entry_for_widget(widget, tag_templates))
+
+        return assembled_entries
+
     def __make_assembled_entry_for_dashboard(
             self, dashboard_metadata: Dict[str, Any],
             tag_templates: Dict[str, TagTemplate]) -> AssembledEntryData:
@@ -110,6 +125,25 @@ class AssembledEntryFactory:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_dashboard(
                     tag_template, dashboard_metadata))
+
+        return prepare.AssembledEntryData(entry_id=entry_id,
+                                          entry=entry,
+                                          tags=tags)
+
+    def __make_assembled_entry_for_widget(
+            self, widget_metadata: Dict[str, Any],
+            tag_templates: Dict[str, TagTemplate]) -> AssembledEntryData:
+
+        entry_id, entry = \
+            self.__datacatalog_entry_factory.make_entry_for_widget(
+                widget_metadata)
+
+        tags = []
+        tag_template = tag_templates.get(constants.TAG_TEMPLATE_ID_WIDGET)
+        if tag_template:
+            tags.append(
+                self.__datacatalog_tag_factory.make_tag_for_widget(
+                    tag_template, widget_metadata))
 
         return prepare.AssembledEntryData(entry_id=entry_id,
                                           entry=entry,

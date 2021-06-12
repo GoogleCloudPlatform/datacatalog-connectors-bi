@@ -69,7 +69,6 @@ class MetadataSynchronizer:
         logging.info('Objects to be scraped: Folders, Dashboards, and Widgets')
         folders = self.__scrape_folders()
         dashboards = self.__scrape_dashboards(folders)
-        widgets = self.__scrape_widgets(dashboards)
         logging.info('==== DONE ========================================')
 
         # Prepare: convert Sisense metadata into Data Catalog entities model.
@@ -137,12 +136,13 @@ class MetadataSynchronizer:
             self, folders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Scrape metadata from all Dashboards the current user has access to.
 
-        The outgoing Dashboard objects may be enriched with additional fields
+        The outgoing Dashboard objects are enriched with additional fields
         in order to expedite/improve the metadata synchronization process:
         - ``ownerData``: added when the authenticated user is allowed to read
         users' information; intended to provide ownership-related metadata to
         the Data Catalog Tags created for the Dashboard.
         - ``folderData``: added when the Dashboard has a parent Folder.
+        - ``widgets``: always added.
 
         Returns:
             A ``list``.
@@ -158,28 +158,12 @@ class MetadataSynchronizer:
                 dashboard['folderData'] = next(
                     folder for folder in folders
                     if folder.get('oid') == folder_id)
+            dashboard['widgets'] = self.__scrape_widgets(dashboard)
 
         return all_dashboards
 
-    def __scrape_widgets(
-            self, dashboards: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Scrape metadata from all Widgets the current user has access to.
-
-        The outgoing Dashboard objects are enriched with additional fields in
-        order to expedite/improve the metadata synchronization process:
-        - ``widgets``: always added.
-
-        Returns:
-            A ``list``.
-        """
-        for dashboard in dashboards:
-            dashboard['widgets'] = self.__scrape_widgets_for_dashboard(
-                dashboard)
-
-        return dashboards
-
-    def __scrape_widgets_for_dashboard(
-            self, dashboard: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def __scrape_widgets(self, dashboard: Dict[str,
+                                               Any]) -> List[Dict[str, Any]]:
         """Scrape metadata from all Widgets the current user has access to for
         a given Dashboard.
 
@@ -291,6 +275,8 @@ class MetadataSynchronizer:
                 self.__tag_template_factory.make_tag_template_for_folder(),
             constants.TAG_TEMPLATE_ID_DASHBOARD:
                 self.__tag_template_factory.make_tag_template_for_dashboard(),
+            constants.TAG_TEMPLATE_ID_WIDGET:
+                self.__tag_template_factory.make_tag_template_for_widget(),
         }
 
     def __make_assembled_entries_dict(
