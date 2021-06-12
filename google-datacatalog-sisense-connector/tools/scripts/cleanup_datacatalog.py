@@ -74,6 +74,9 @@ def __delete_tag_templates(project_id: str, location_id: str) -> None:
     __delete_tag_template(
         datacatalog.DataCatalogClient.tag_template_path(
             project_id, location_id, 'sisense_folder_metadata'))
+    __delete_tag_template(
+        datacatalog.DataCatalogClient.tag_template_path(
+            project_id, location_id, 'sisense_widget_metadata'))
 
 
 def __delete_tag_template(name: str) -> None:
