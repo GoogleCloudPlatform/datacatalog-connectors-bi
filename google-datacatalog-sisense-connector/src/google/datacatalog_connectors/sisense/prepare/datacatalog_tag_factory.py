@@ -117,3 +117,38 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'server_url', self.__server_address)
 
         return tag
+
+    def make_tag_for_widget(self, tag_template: TagTemplate,
+                            widget_metadata: Dict[str, Any]) -> Tag:
+
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        self._set_string_field(tag, 'id', widget_metadata.get('oid'))
+        self._set_string_field(tag, 'type', widget_metadata.get('type'))
+        self._set_string_field(tag, 'subtype', widget_metadata.get('subtype'))
+
+        owner = widget_metadata.get('ownerData')
+        if owner:
+            self._set_string_field(tag, 'owner_username',
+                                   owner.get('userName'))
+
+            first_name = owner.get('firstName') or ''
+            last_name = owner.get('lastName') or ''
+            self._set_string_field(tag, 'owner_name',
+                                   f'{first_name} {last_name}')
+
+        dashboard = widget_metadata.get('dashboardData')
+        self._set_string_field(tag, 'dashboard_id', dashboard.get('oid'))
+        self._set_string_field(tag, 'dashboard_title', dashboard.get('title'))
+
+        datasource = widget_metadata.get('datasource')
+        if isinstance(datasource, dict):
+            self._set_string_field(tag, 'datasource', datasource.get('title'))
+        elif isinstance(datasource, str):
+            self._set_string_field(tag, 'datasource', datasource)
+
+        self._set_string_field(tag, 'server_url', self.__server_address)
+
+        return tag

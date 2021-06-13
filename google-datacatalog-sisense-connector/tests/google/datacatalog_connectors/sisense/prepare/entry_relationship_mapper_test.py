@@ -95,6 +95,30 @@ class EntryRelationshipMapperTest(unittest.TestCase):
 
         mock_map_related_entry.assert_not_called()
 
+    def test_fulfill_tag_fields_should_resolve_widget_dashboard_mapping(self):
+        dashboard_id = 'parent-dashboard'
+        dashboard_entry = self.__make_fake_entry(dashboard_id, 'Dashboard')
+        dashboard_tag = self.__make_fake_tag(string_fields=(('id',
+                                                             dashboard_id),))
+
+        widget_id = 'test-widget'
+        widget_entry = self.__make_fake_entry(widget_id, 'Widget')
+        string_fields = ('id', widget_id), ('dashboard_id', dashboard_id)
+        widget_tag = self.__make_fake_tag(string_fields=string_fields)
+
+        dashboard_assembled_entry = commons_prepare.AssembledEntryData(
+            dashboard_id, dashboard_entry, [dashboard_tag])
+        widget_assembled_entry = commons_prepare.AssembledEntryData(
+            widget_id, widget_entry, [widget_tag])
+
+        prepare.EntryRelationshipMapper().fulfill_tag_fields(
+            [dashboard_assembled_entry, widget_assembled_entry])
+
+        self.assertEqual(
+            f'https://console.cloud.google.com/datacatalog/'
+            f'{dashboard_entry.name}',
+            widget_tag.fields['dashboard_entry'].string_value)
+
     @classmethod
     def __make_fake_entry(cls, entry_id, entry_type) -> Entry:
         entry = datacatalog.Entry()

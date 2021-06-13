@@ -189,3 +189,82 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
                                        order=1)
 
         return tag_template
+
+    def make_tag_template_for_widget(self) -> TagTemplate:
+        tag_template = datacatalog.TagTemplate()
+
+        tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
+            project=self.__project_id,
+            location=self.__location_id,
+            tag_template=constants.TAG_TEMPLATE_ID_WIDGET)
+
+        tag_template.display_name = 'Sisense Widget Metadata'
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Id',
+                                       is_required=True,
+                                       order=10)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='type',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Type',
+                                       is_required=True,
+                                       order=9)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='subtype',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Subtype',
+                                       order=8)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_username',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner username',
+                                       order=7)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='owner_name',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Owner name',
+                                       order=6)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='dashboard_id',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Dashboard Id',
+                                       is_required=True,
+                                       order=5)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='dashboard_title',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Dashboard Title',
+                                       is_required=True,
+                                       order=4)
+
+        self._add_primitive_type_field(
+            tag_template=tag_template,
+            field_id='dashboard_entry',
+            field_type=self.__STRING_TYPE,
+            display_name='Data Catalog Entry for the Dashboard',
+            is_required=True,
+            order=3)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='datasource',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Data Source',
+                                       order=2)
+
+        self._add_primitive_type_field(tag_template=tag_template,
+                                       field_id='server_url',
+                                       field_type=self.__STRING_TYPE,
+                                       display_name='Sisense Server Url',
+                                       is_required=True,
+                                       order=1)
+
+        return tag_template

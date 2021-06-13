@@ -128,3 +128,59 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('https://test.com',
                          tag.fields['server_url'].string_value)
+
+    def test_make_tag_for_widget_should_set_all_available_fields(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_widget_metadata'
+
+        metadata = {
+            'oid': 'test-widget',
+            'type': 'indicator',
+            'subtype': 'indicator/numeric',
+            'dashboardData': {
+                'oid': 'dashboard-id',
+                'title': 'Dashboard Title',
+            },
+            'ownerData': {
+                'userName': 'johndoe@test.com',
+                'firstName': 'John',
+                'lastName': 'Doe',
+            },
+            'datasource': {
+                'title': 'Test Data Source',
+            },
+        }
+
+        tag = self.__factory.make_tag_for_widget(tag_template, metadata)
+
+        self.assertEqual('tagTemplates/sisense_widget_metadata', tag.template)
+
+        self.assertEqual('test-widget', tag.fields['id'].string_value)
+        self.assertEqual('indicator', tag.fields['type'].string_value)
+        self.assertEqual('indicator/numeric',
+                         tag.fields['subtype'].string_value)
+        self.assertEqual('dashboard-id',
+                         tag.fields['dashboard_id'].string_value)
+        self.assertEqual('Dashboard Title',
+                         tag.fields['dashboard_title'].string_value)
+        self.assertEqual('johndoe@test.com',
+                         tag.fields['owner_username'].string_value)
+        self.assertEqual('John Doe', tag.fields['owner_name'].string_value)
+        self.assertEqual('Test Data Source',
+                         tag.fields['datasource'].string_value)
+        self.assertEqual('https://test.com',
+                         tag.fields['server_url'].string_value)
+
+    def test_make_tag_for_widget_should_set_datasource_from_string(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_widget_metadata'
+
+        metadata = {
+            'dashboardData': {},
+            'datasource': 'Test Data Source',
+        }
+
+        tag = self.__factory.make_tag_for_widget(tag_template, metadata)
+
+        self.assertEqual('Test Data Source',
+                         tag.fields['datasource'].string_value)

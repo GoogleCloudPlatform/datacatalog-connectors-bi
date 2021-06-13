@@ -22,10 +22,12 @@ from google.datacatalog_connectors.sisense.prepare import constants
 class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
     __DASHBOARD = constants.USER_SPECIFIED_TYPE_DASHBOARD
     __FOLDER = constants.USER_SPECIFIED_TYPE_FOLDER
+    __WIDGET = constants.USER_SPECIFIED_TYPE_WIDGET
 
     def fulfill_tag_fields(self, assembled_entries_data):
         resolvers = (self.__resolve_dashboard_mappings,
-                     self.__resolve_folder_mappings)
+                     self.__resolve_folder_mappings,
+                     self.__resolve_widget_mappings)
 
         self._fulfill_tag_fields(assembled_entries_data, resolvers)
 
@@ -49,4 +51,15 @@ class EntryRelationshipMapper(prepare.BaseEntryRelationshipMapper):
 
             cls._map_related_entry(assembled_entry_data, cls.__FOLDER,
                                    'parent_id', 'parent_folder_entry',
+                                   id_name_pairs)
+
+    @classmethod
+    def __resolve_widget_mappings(cls, assembled_entries_data, id_name_pairs):
+        for assembled_entry_data in assembled_entries_data:
+            entry = assembled_entry_data.entry
+            if not entry.user_specified_type == cls.__WIDGET:
+                continue
+
+            cls._map_related_entry(assembled_entry_data, cls.__DASHBOARD,
+                                   'dashboard_id', 'dashboard_entry',
                                    id_name_pairs)
