@@ -100,87 +100,99 @@ class MetadataSynchronizerTest(unittest.TestCase):
         mock_delete_obsolete_entries.assert_called_once()
         mock_ingest_metadata.assert_called_once()
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user', mock.MagicMock())
     def test_scrape_folders_should_scrape_all_folders(self):
         mock_scraper = self.__mock_metadata_scraper
         self.__synchronizer._MetadataSynchronizer__scrape_folders()
         mock_scraper.scrape_all_folders.assert_called_once()
 
-    def test_scrape_folders_should_add_owner_data_when_folder_has_owner(self):
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user')
+    def test_scrape_folders_should_add_owner_data_if_available(
+            self, mock_scrape_user):
+
         folder = self.__make_fake_folder()
 
         mock_scraper = self.__mock_metadata_scraper
-        mock_scraper.scrape_all_folders.return_value = [folder]
+        mock_scraper.scrape_all_folders.return_value = [folder.copy()]
 
         folders = self.__synchronizer._MetadataSynchronizer__scrape_folders()
 
         self.assertIsNotNone(folders[0]['ownerData'])
-        mock_scraper.scrape_user.assert_called_once()
+        mock_scrape_user.assert_called_once()
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user')
     def test_scrape_folders_should_skip_adding_owner_data_if_not_available(
-            self):
+            self, mock_scrape_user):
 
         folder = self.__make_fake_folder()
 
         mock_scraper = self.__mock_metadata_scraper
-        mock_scraper.scrape_all_folders.return_value = [folder]
-        mock_scraper.scrape_user.return_value = None
+        mock_scraper.scrape_all_folders.return_value = [folder.copy()]
+        mock_scrape_user.return_value = None
 
         folders = self.__synchronizer._MetadataSynchronizer__scrape_folders()
 
         self.assertEqual(folder, folders[0])
-        mock_scraper.scrape_user.assert_called_once()
+        mock_scrape_user.assert_called_once()
 
-    def test_scrape_folders_should_add_parent_data_when_folder_has_parent(
-            self):
-
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user', lambda *args: None)
+    def test_scrape_folders_should_add_parent_data_if_folder_has_parent(self):
         parent_folder = self.__make_fake_folder()
         child_folder = self.__make_fake_folder('test-child-folder')
         child_folder['parentId'] = 'test-folder'
 
         mock_scraper = self.__mock_metadata_scraper
         mock_scraper.scrape_all_folders.return_value = [
-            parent_folder, child_folder
+            parent_folder.copy(), child_folder.copy()
         ]
 
         folders = self.__synchronizer._MetadataSynchronizer__scrape_folders()
 
-        self.assertEqual(parent_folder, folders[1]['parentFolderData'])
+        self.assertDictEqual(parent_folder, folders[1]['parentFolderData'])
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_widgets', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user', mock.MagicMock())
     def test_scrape_dashboards_should_scrape_all_dashboards(self):
         mock_scraper = self.__mock_metadata_scraper
         self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])
         mock_scraper.scrape_all_dashboards.assert_called_once()
 
-    def test_scrape_dashboards_should_add_owner_data_when_dashboard_has_owner(
-            self):
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_widgets', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user')
+    def test_scrape_dashboards_should_add_owner_data_if_available(
+            self, mock_scrape_user):
 
         dashboard = self.__make_fake_dashboard()
 
         mock_scraper = self.__mock_metadata_scraper
-        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard.copy()]
 
         dashboards = \
             self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])
 
         self.assertIsNotNone(dashboards[0]['ownerData'])
-        mock_scraper.scrape_user.assert_called_once()
+        mock_scrape_user.assert_called_once()
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_widgets', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user')
     def test_scrape_dashboards_should_skip_adding_owner_data_if_not_available(
-            self):
+            self, mock_scrape_user):
 
         dashboard = self.__make_fake_dashboard()
 
         mock_scraper = self.__mock_metadata_scraper
-        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
-        mock_scraper.scrape_user.return_value = None
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard.copy()]
+        mock_scrape_user.return_value = None
 
         dashboards = \
             self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])
 
-        self.assertEqual(dashboard, dashboards[0])
-        mock_scraper.scrape_user.assert_called_once()
+        self.assertNotIn('ownerData', dashboards[0])
+        mock_scrape_user.assert_called_once()
 
-    def test_scrape_dashboards_should_add_folder_data_when_dashboard_has_parent(  # noqa: E501
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_widgets', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user', mock.MagicMock())
+    def test_scrape_dashboards_should_add_folder_data_if_dashboard_has_parent(
             self):
 
         folder = self.__make_fake_folder()
@@ -188,23 +200,93 @@ class MetadataSynchronizerTest(unittest.TestCase):
         dashboard['parentFolder'] = 'test-folder'
 
         mock_scraper = self.__mock_metadata_scraper
-        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard.copy()]
 
         dashboards = self.__synchronizer\
             ._MetadataSynchronizer__scrape_dashboards([folder])
 
         self.assertEqual(folder, dashboards[0]['folderData'])
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_widgets', mock.MagicMock())
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user', mock.MagicMock())
     def test_scrape_dashboards_should_raise_on_missing_parent_data(self):
         dashboard = self.__make_fake_dashboard()
         dashboard['parentFolder'] = 'test-folder'
 
         mock_scraper = self.__mock_metadata_scraper
-        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard.copy()]
 
         self.assertRaises(
             StopIteration,
             self.__synchronizer._MetadataSynchronizer__scrape_dashboards, [])
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_widgets')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user', mock.MagicMock())
+    def test_scrape_dashboards_should_add_widgets(self, mock_scrape_widgets):
+        dashboard = self.__make_fake_dashboard()
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_all_dashboards.return_value = [dashboard]
+
+        dashboards = \
+            self.__synchronizer._MetadataSynchronizer__scrape_dashboards([])
+
+        self.assertIn('widgets', dashboards[0])
+        mock_scrape_widgets.assert_called_once_with(dashboard)
+
+    def test_scrape_widgets_should_scrape_widgets_for_dashboard(self):
+        dashboard = self.__make_fake_dashboard()
+        mock_scraper = self.__mock_metadata_scraper
+
+        self.__synchronizer._MetadataSynchronizer__scrape_widgets(dashboard)
+
+        mock_scraper.scrape_widgets.assert_called_once_with(dashboard)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user')
+    def test_scrape_widgets_should_add_owner_data_if_available(
+            self, mock_scrape_user):
+
+        widget = self.__make_fake_widget()
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_widgets.return_value = [widget.copy()]
+
+        widgets = \
+            self.__synchronizer._MetadataSynchronizer__scrape_widgets({})
+
+        self.assertIsNotNone(widgets[0]['ownerData'])
+        mock_scrape_user.assert_called_once()
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user')
+    def test_scrape_widgets_should_skip_adding_owner_data_if_not_available(
+            self, mock_scrape_user):
+
+        widget = self.__make_fake_widget()
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_widgets.return_value = [widget.copy()]
+        mock_scrape_user.return_value = None
+
+        widgets = \
+            self.__synchronizer._MetadataSynchronizer__scrape_widgets({})
+
+        self.assertNotIn('ownerData', widgets[0])
+        mock_scrape_user.assert_called_once()
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__scrape_user')
+    def test_scrape_widgets_should_add_dashboard_data(self, mock_scrape_user):
+
+        dashboard = self.__make_fake_dashboard()
+        widget = self.__make_fake_widget()
+
+        mock_scraper = self.__mock_metadata_scraper
+        mock_scraper.scrape_widgets.return_value = [widget.copy()]
+        mock_scrape_user.return_value = None
+
+        widgets = self.__synchronizer._MetadataSynchronizer__scrape_widgets(
+            dashboard)
+
+        self.assertEqual(dashboard, widgets[0]['dashboardData'])
 
     def test_scrape_user_should_handle_exception(self):
         mock_scraper = self.__mock_metadata_scraper
@@ -388,6 +470,13 @@ class MetadataSynchronizerTest(unittest.TestCase):
 
     @classmethod
     def __make_fake_dashboard(cls, oid='test-dashboard') -> Dict[str, Any]:
+        return {
+            'oid': oid,
+            'owner': 'test-owner',
+        }
+
+    @classmethod
+    def __make_fake_widget(cls, oid='test-widget') -> Dict[str, Any]:
         return {
             'oid': oid,
             'owner': 'test-owner',

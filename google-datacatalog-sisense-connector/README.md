@@ -4,6 +4,7 @@ Package for ingesting [Sisense](https://www.sisense.com/) metadata into Google
 Cloud Data Catalog, currently supporting below asset types:
 - Folder
 - Dashboard
+- Widget
 
 **Disclaimer: This is not an officially supported Google product.**
 

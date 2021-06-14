@@ -69,32 +69,27 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         mock_make_assembled_entries_for_folder.assert_called_once()
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
-                f'__make_assembled_entry_for_dashboard')
+                f'__make_assembled_entries_for_dashboard')
     def test_make_assembled_entries_list_should_process_dashboards(
-            self, mock_make_assembled_entry_for_dashboard):
+            self, mock_make_assembled_entries_for_dashboard):
 
         dashboard = self.__make_fake_dashboard()
 
-        mock_make_assembled_entry_for_dashboard.return_value = \
-            commons_prepare.AssembledEntryData('test-dashboard', {})
+        mock_make_assembled_entries_for_dashboard.return_value = \
+            [commons_prepare.AssembledEntryData('test-dashboard', {})]
 
         assembled_entries = self.__factory.make_assembled_entries_list(
             dashboard, {})
 
         self.assertEqual(1, len(assembled_entries))
-        mock_make_assembled_entry_for_dashboard.assert_called_once()
+        mock_make_assembled_entries_for_dashboard.assert_called_once()
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_assembled_entry_for_folder')
     def test_make_assembled_entries_for_folder_should_process_folder(
             self, mock_make_assembled_entry_for_folder):
 
         folder = self.__make_fake_folder()
-        tag_templates_dict = {
-            'sisense_folder_metadata': datacatalog.TagTemplate()
-        }
-
-        mock_make_assembled_entry_for_folder.return_value = \
-            commons_prepare.AssembledEntryData('test-folder', {})
+        tag_templates_dict = {}
 
         assembled_entries = self.__factory\
             ._AssembledEntryFactory__make_assembled_entries_for_folder(
@@ -108,19 +103,14 @@ class AssembledEntryFactoryTest(unittest.TestCase):
     def test_make_assembled_entries_for_folder_should_process_child_folders(
             self, mock_make_assembled_entry_for_folder):
 
-        folder = self.__make_fake_folder_with_children()
-        tag_templates_dict = {
-            'sisense_folder_metadata': datacatalog.TagTemplate()
-        }
-
-        mock_make_assembled_entry_for_folder.side_effect = [
-            commons_prepare.AssembledEntryData('test-parent-folder', {}),
-            commons_prepare.AssembledEntryData('test-folder', {}),
-        ]
+        child_folder = self.__make_fake_folder()
+        parent_folder = self.__make_fake_folder()
+        parent_folder['folders'] = [child_folder]
+        tag_templates_dict = {}
 
         assembled_entries = self.__factory\
             ._AssembledEntryFactory__make_assembled_entries_for_folder(
-                folder, tag_templates_dict)
+                parent_folder, tag_templates_dict)
 
         self.assertEqual(2, len(assembled_entries))
         self.assertEqual(2, mock_make_assembled_entry_for_folder.call_count)
@@ -132,24 +122,20 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             self, mock_make_assembled_entry_for_folder,
             mock_make_assembled_entry_for_dashboard):
 
-        folder = self.__make_fake_folder_with_nested_dashboard()
-        tag_templates_dict = {
-            'sisense_folder_metadata': datacatalog.TagTemplate()
-        }
-
-        mock_make_assembled_entry_for_folder.return_value = \
-            commons_prepare.AssembledEntryData('test-folder', {})
-
-        mock_make_assembled_entry_for_dashboard.return_value = \
-            commons_prepare.AssembledEntryData('test-dashboard', {})
+        dashboard = self.__make_fake_dashboard()
+        folder = self.__make_fake_folder()
+        folder['dashboards'] = [dashboard]
+        tag_templates_dict = {}
 
         assembled_entries = self.__factory\
             ._AssembledEntryFactory__make_assembled_entries_for_folder(
                 folder, tag_templates_dict)
 
         self.assertEqual(2, len(assembled_entries))
-        mock_make_assembled_entry_for_folder.assert_called_once()
-        mock_make_assembled_entry_for_dashboard.assert_called_once()
+        mock_make_assembled_entry_for_folder.assert_called_once_with(
+            folder, tag_templates_dict)
+        mock_make_assembled_entry_for_dashboard.assert_called_once_with(
+            dashboard, tag_templates_dict)
 
     def test_make_assembled_entry_for_folder_should_make_entry_and_tags(self):
         folder = self.__make_fake_folder()
@@ -180,6 +166,44 @@ class AssembledEntryFactoryTest(unittest.TestCase):
                          tags[0].template)
         tag_factory.make_tag_for_folder.assert_called_once_with(
             tag_template, folder)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
+                f'__make_assembled_entry_for_dashboard')
+    def test_make_assembled_entries_for_dashboard_should_process_dashboard(
+            self, mock_make_assembled_entry_for_dashboard):
+
+        dashboard = self.__make_fake_dashboard()
+        tag_templates_dict = {}
+
+        assembled_entries = self.__factory\
+            ._AssembledEntryFactory__make_assembled_entries_for_dashboard(
+                dashboard, tag_templates_dict)
+
+        self.assertEqual(1, len(assembled_entries))
+        mock_make_assembled_entry_for_dashboard.assert_called_once_with(
+            dashboard, tag_templates_dict)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_assembled_entry_for_widget')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
+                f'__make_assembled_entry_for_dashboard')
+    def test_make_assembled_entries_for_dashboard_should_process_nested_widgets(  # noqa: E501
+            self, mock_make_assembled_entry_for_dashboard,
+            mock_make_assembled_entry_for_widget):
+
+        widget = self.__make_fake_widget()
+        dashboard = self.__make_fake_dashboard()
+        dashboard['widgets'] = [widget]
+        tag_templates_dict = {}
+
+        assembled_entries = self.__factory\
+            ._AssembledEntryFactory__make_assembled_entries_for_dashboard(
+                dashboard, tag_templates_dict)
+
+        self.assertEqual(2, len(assembled_entries))
+        mock_make_assembled_entry_for_dashboard.assert_called_once_with(
+            dashboard, tag_templates_dict)
+        mock_make_assembled_entry_for_widget.assert_called_once_with(
+            widget, tag_templates_dict)
 
     def test_make_assembled_entry_for_dashboard_should_make_entry_and_tags(
             self):
@@ -214,21 +238,43 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         tag_factory.make_tag_for_dashboard.assert_called_once_with(
             tag_template, dashboard)
 
+    def test_make_assembled_entry_for_widget_should_make_entry_and_tags(self):
+
+        widget = self.__make_fake_widget()
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_widget_metadata'
+        tag_templates_dict = {'sisense_widget_metadata': tag_template}
+
+        fake_entry = ('test-widget', {})
+        entry_factory = self.__mock_entry_factory
+        entry_factory.make_entry_for_widget.return_value = fake_entry
+
+        fake_tag = datacatalog.Tag()
+        fake_tag.template = 'tagTemplates/sisense_widget_metadata'
+        tag_factory = self.__mock_tag_factory
+        tag_factory.make_tag_for_widget.return_value = fake_tag
+
+        assembled_entry = self.__factory\
+            ._AssembledEntryFactory__make_assembled_entry_for_widget(
+                widget, tag_templates_dict)
+
+        self.assertEqual('test-widget', assembled_entry.entry_id)
+        self.assertEqual({}, assembled_entry.entry)
+        entry_factory.make_entry_for_widget.assert_called_once_with(widget)
+
+        tags = assembled_entry.tags
+        self.assertEqual(1, len(tags))
+        self.assertEqual('tagTemplates/sisense_widget_metadata',
+                         tags[0].template)
+        tag_factory.make_tag_for_widget.assert_called_once_with(
+            tag_template, widget)
+
     @classmethod
     def __make_fake_folder(cls) -> Dict[str, Any]:
         return {
             'oid': 'test-folder',
             'type': 'folder',
             'name': 'Test folder',
-        }
-
-    @classmethod
-    def __make_fake_folder_with_children(cls) -> Dict[str, Any]:
-        return {
-            'oid': 'test-parent-folder',
-            'type': 'folder',
-            'name': 'Test parent folder',
-            'folders': [cls.__make_fake_folder()]
         }
 
     @classmethod
@@ -240,10 +286,9 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         }
 
     @classmethod
-    def __make_fake_folder_with_nested_dashboard(cls) -> Dict[str, Any]:
+    def __make_fake_widget(cls) -> Dict[str, Any]:
         return {
-            'oid': 'test-folder',
-            'type': 'folder',
-            'name': 'Test folder',
-            'dashboards': [cls.__make_fake_dashboard()]
+            'oid': 'test-widget',
+            'type': 'indicator',
+            'title': 'Test widget',
         }
