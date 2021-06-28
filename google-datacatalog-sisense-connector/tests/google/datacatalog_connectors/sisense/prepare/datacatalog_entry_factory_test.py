@@ -137,6 +137,34 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_schema_for_dashboard_should_make_filters_column(
+            self, mock_make_column_schema_for_jaql):
+
+        jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
+        metadata = {'filters': [{'jaql': jaql_metadata}]}
+
+        column_schema = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column_schema
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_dashboard(
+                metadata)
+
+        self.assertEqual('filters', schema.columns[0].column)
+        mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
+        self.assertEqual(column_schema, schema.columns[0].subcolumns[0])
+
+    def test_make_schema_for_dashboard_should_skip_if_no_filters(self):
+
+        metadata = {'filters': []}
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_dashboard(
+                metadata)
+
+        self.assertIsNone(schema)
+
     def test_make_entry_for_folder_should_set_all_available_fields(self):
         metadata = {
             '_id': 'a123-b456',
@@ -308,3 +336,59 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_schema_for_widget_should_make_filters_column(
+            self, mock_make_column_schema_for_jaql):
+
+        jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name': 'filters',
+                    'items': [{
+                        'jaql': jaql_metadata
+                    }]
+                }]
+            }
+        }
+
+        column_schema = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column_schema
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
+                metadata)
+
+        self.assertEqual('filters', schema.columns[0].column)
+        mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
+        self.assertEqual(column_schema, schema.columns[0].subcolumns[0])
+
+    def test_make_schema_for_widget_should_skip_if_no_panels(self):
+        metadata = {'metadata': {'panels': []}}
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
+                metadata)
+
+        self.assertIsNone(schema)
+
+    def test_make_schema_for_widget_should_skip_if_no_filters(self):
+        metadata = {'metadata': {'panels': [{'name': 'filters', 'items': []}]}}
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
+                metadata)
+
+        self.assertIsNone(schema)
+
+    def test_make_column_schema_for_jaql_should_set_all_available_fields(self):
+        metadata = {'datatype': 'datetime', 'title': 'TEST'}
+
+        column = \
+            self.__factory\
+                ._DataCatalogEntryFactory__make_column_schema_for_jaql(
+                    metadata)
+
+        self.assertEqual('TEST', column.column)
+        self.assertEqual('datetime', column.type)

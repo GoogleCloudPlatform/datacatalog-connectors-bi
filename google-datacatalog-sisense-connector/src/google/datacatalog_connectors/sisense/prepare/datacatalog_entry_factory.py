@@ -201,8 +201,8 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def __make_schema_for_widget(
             cls, widget_metadata: Dict[str, Any]) -> Optional[Schema]:
 
-        if not widget_metadata.get(
-                'metadata') and widget_metadata['metadata'].get('panels'):
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
             return
 
         panels = widget_metadata['metadata']['panels']
