@@ -78,7 +78,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         return tag
 
     def make_tags_for_dashboard_filters(
-            self, tag_template: TagTemplate,
+            self, jaql_tag_template: TagTemplate,
             dashboard_metadata: Dict[str, Any]) -> List[Tag]:
 
         tags = []
@@ -87,12 +87,21 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             return tags
 
         for dashboard_filter in dashboard_metadata['filters']:
-            jaql = dashboard_filter.get('jaql')
-            tag = self.make_tag_for_jaql_object(tag_template, jaql)
-            tag.column = f'filters.{jaql.get("title")}'
-            tags.append(tag)
+            tags.append(
+                self.__make_jaql_tag_for_dashboard_filter(
+                    jaql_tag_template, dashboard_filter))
 
         return tags
+
+    def __make_jaql_tag_for_dashboard_filter(
+            self, tag_template: TagTemplate,
+            filter_metadata: Dict[str, Any]) -> Tag:
+
+        jaql = filter_metadata.get('jaql')
+        tag = self.__make_tag_for_jaql(tag_template, jaql)
+        tag.column = f'filters.{jaql.get("title")}'
+
+        return tag
 
     def make_tag_for_folder(self, tag_template: TagTemplate,
                             folder_metadata: Dict[str, Any]) -> Tag:
@@ -193,10 +202,10 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             # decided to scrape table and column metadata from the dimension
             # when the appropriate fields are not available to avoid losing
             # relevant lineage information. A regex is used to do so.
-            dim_matches = re.search(r'^\[(?P<table>.*)\.(?P<column>.*)]$',
-                                    dimension)
-            dim_table = dim_matches.group('table')
-            dim_column = dim_matches.group('column')
+            dim_match = re.search(r'^\[(?P<table>.*)\.(?P<column>.*)]$',
+                                  dimension)
+            dim_table = dim_match.group('table')
+            dim_column = dim_match.group('column')
 
         self._set_string_field(tag, 'table',
                                jaql_metadata.get('table') or dim_table)
