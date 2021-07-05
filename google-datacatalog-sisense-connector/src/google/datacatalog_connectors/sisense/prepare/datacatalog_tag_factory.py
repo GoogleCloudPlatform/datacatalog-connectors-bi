@@ -189,4 +189,6 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'formula', jaql_metadata.get('formula'))
         self._set_string_field(tag, 'aggregation', jaql_metadata.get('agg'))
 
+        self._set_string_field(tag, 'server_url', self.__server_address)
+
         return tag
