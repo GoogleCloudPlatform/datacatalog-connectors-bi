@@ -200,14 +200,14 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
                          tag_template.fields['server_url'].display_name)
         self.assertTrue(tag_template.fields['server_url'].is_required)
 
-    def test_make_tag_template_for_jaql_query(self):
-        tag_template = self.__factory.make_tag_template_for_jaql_query()
+    def test_make_tag_template_for_jaql_object(self):
+        tag_template = self.__factory.make_tag_template_for_jaql_object()
 
         self.assertEqual(
             'projects/test-project/locations/test-location/'
-            'tagTemplates/sisense_jaql_query_metadata', tag_template.name)
+            'tagTemplates/sisense_jaql_object_metadata', tag_template.name)
 
-        self.assertEqual('Sisense JAQL Query Metadata',
+        self.assertEqual('Sisense JAQL Object Metadata',
                          tag_template.display_name)
 
         self.assertEqual(self.__STRING_TYPE,
@@ -238,12 +238,6 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
         self.assertEqual('Aggregation',
                          tag_template.fields['aggregation'].display_name)
         self.assertFalse(tag_template.fields['aggregation'].is_required)
-
-        self.assertEqual(self.__STRING_TYPE,
-                         tag_template.fields['datatype'].type.primitive_type)
-        self.assertEqual('Datatype',
-                         tag_template.fields['datatype'].display_name)
-        self.assertFalse(tag_template.fields['datatype'].is_required)
 
         self.assertEqual(self.__STRING_TYPE,
                          tag_template.fields['server_url'].type.primitive_type)

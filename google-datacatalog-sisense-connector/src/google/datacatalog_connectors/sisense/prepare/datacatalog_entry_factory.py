@@ -238,5 +238,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         column = datacatalog.ColumnSchema()
         column.column = jaql_metadata.get('title')
-        column.type = jaql_metadata.get('datatype')
+        column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
+            'type')
+
         return column

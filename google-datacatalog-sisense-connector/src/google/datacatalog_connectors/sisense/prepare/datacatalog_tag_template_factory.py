@@ -190,50 +190,44 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         return tag_template
 
-    def make_tag_template_for_jaql_query(self) -> TagTemplate:
+    def make_tag_template_for_jaql_object(self) -> TagTemplate:
         tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=constants.TAG_TEMPLATE_ID_JAQL_QUERY)
+            tag_template=constants.TAG_TEMPLATE_ID_JAQL_OBJECT)
 
-        tag_template.display_name = 'Sisense JAQL Query Metadata'
+        tag_template.display_name = 'Sisense JAQL Object Metadata'
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='table',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Table',
-                                       order=7)
+                                       order=6)
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='column',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Column',
-                                       order=6)
+                                       order=5)
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='dimension',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Dimension',
-                                       order=5)
+                                       order=4)
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='formula',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Formula',
-                                       order=4)
+                                       order=3)
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='aggregation',
                                        field_type=self.__STRING_TYPE,
                                        display_name='Aggregation',
-                                       order=3)
-
-        self._add_primitive_type_field(tag_template=tag_template,
-                                       field_id='datatype',
-                                       field_type=self.__STRING_TYPE,
-                                       display_name='Datatype',
                                        order=2)
 
         self._add_primitive_type_field(tag_template=tag_template,

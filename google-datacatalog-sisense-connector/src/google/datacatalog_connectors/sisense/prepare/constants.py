@@ -33,9 +33,9 @@ TAG_TEMPLATE_ID_DASHBOARD = 'sisense_dashboard_metadata'
 # The ID of the Tag Template created to store additional metadata for
 # Folder-related Entries.
 TAG_TEMPLATE_ID_FOLDER = 'sisense_folder_metadata'
-# The ID of the Tag Template created to store additional metadata for
-# JAQL Query-related Entries.
-TAG_TEMPLATE_ID_JAQL_QUERY = 'sisense_jaql_query_metadata'
+# The ID of the Tag Template created to store lineage metadata for
+# JAQL Object-related entities.
+TAG_TEMPLATE_ID_JAQL_OBJECT = 'sisense_jaql_object_metadata'
 # The ID of the Tag Template created to store additional metadata for
 # Widget-related Entries.
 TAG_TEMPLATE_ID_WIDGET = 'sisense_widget_metadata'
