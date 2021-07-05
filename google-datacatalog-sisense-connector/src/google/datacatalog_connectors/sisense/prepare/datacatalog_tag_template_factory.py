@@ -190,15 +190,15 @@ class DataCatalogTagTemplateFactory(prepare.BaseTagTemplateFactory):
 
         return tag_template
 
-    def make_tag_template_for_jaql_object(self) -> TagTemplate:
+    def make_tag_template_for_jaql(self) -> TagTemplate:
         tag_template = datacatalog.TagTemplate()
 
         tag_template.name = datacatalog.DataCatalogClient.tag_template_path(
             project=self.__project_id,
             location=self.__location_id,
-            tag_template=constants.TAG_TEMPLATE_ID_JAQL_OBJECT)
+            tag_template=constants.TAG_TEMPLATE_ID_JAQL)
 
-        tag_template.display_name = 'Sisense JAQL Object Metadata'
+        tag_template.display_name = 'Sisense JAQL Metadata'
 
         self._add_primitive_type_field(tag_template=tag_template,
                                        field_id='table',
