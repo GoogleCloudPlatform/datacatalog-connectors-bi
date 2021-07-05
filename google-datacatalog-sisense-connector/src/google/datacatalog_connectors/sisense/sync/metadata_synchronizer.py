@@ -275,6 +275,8 @@ class MetadataSynchronizer:
                 self.__tag_template_factory.make_tag_template_for_folder(),
             constants.TAG_TEMPLATE_ID_DASHBOARD:
                 self.__tag_template_factory.make_tag_template_for_dashboard(),
+            constants.TAG_TEMPLATE_ID_JAQL:
+                self.__tag_template_factory.make_tag_template_for_jaql(),
             constants.TAG_TEMPLATE_ID_WIDGET:
                 self.__tag_template_factory.make_tag_template_for_widget(),
         }

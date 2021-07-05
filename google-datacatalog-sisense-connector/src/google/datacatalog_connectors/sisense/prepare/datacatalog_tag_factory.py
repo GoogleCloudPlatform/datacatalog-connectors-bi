@@ -16,7 +16,7 @@
 
 from datetime import datetime
 import re
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from google.cloud import datacatalog
 from google.cloud.datacatalog import Tag, TagTemplate
@@ -76,6 +76,23 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'server_url', self.__server_address)
 
         return tag
+
+    def make_tags_for_dashboard_filters(
+            self, tag_template: TagTemplate,
+            dashboard_metadata: Dict[str, Any]) -> List[Tag]:
+
+        tags = []
+
+        if not dashboard_metadata.get('filters'):
+            return tags
+
+        for dashboard_filter in dashboard_metadata['filters']:
+            jaql = dashboard_filter.get('jaql')
+            tag = self.make_tag_for_jaql_object(tag_template, jaql)
+            tag.column = f'filters.{jaql.get("title")}'
+            tags.append(tag)
+
+        return tags
 
     def make_tag_for_folder(self, tag_template: TagTemplate,
                             folder_metadata: Dict[str, Any]) -> Tag:
