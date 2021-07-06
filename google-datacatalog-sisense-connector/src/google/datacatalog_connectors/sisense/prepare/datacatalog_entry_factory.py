@@ -94,7 +94,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         filters_column = datacatalog.ColumnSchema()
         filters_column.column = 'filters'
-        filters_column.type = 'array of filters'
+        filters_column.type = 'array'
         filters_column.description = 'The Dashboard filters'
 
         for dashboard_filter in dashboard_metadata['filters']:
@@ -214,7 +214,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         filters_column = datacatalog.ColumnSchema()
         filters_column.column = 'filters'
-        filters_column.type = 'array of filters'
+        filters_column.type = 'array'
         filters_column.description = 'The Widget filters'
 
         for widget_filter in filters:
