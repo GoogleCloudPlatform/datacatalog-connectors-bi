@@ -16,12 +16,20 @@
 
 from datetime import datetime
 import unittest
+from unittest import mock
+
+from google.cloud import datacatalog
 
 from google.datacatalog_connectors.sisense.prepare import \
     datacatalog_entry_factory
 
 
 class DataCatalogEntryFactoryTest(unittest.TestCase):
+    __FACTORY_PACKAGE = 'google.datacatalog_connectors.sisense.prepare'
+    __FACTORY_MODULE = f'{__FACTORY_PACKAGE}.datacatalog_entry_factory'
+    __FACTORY_CLASS = f'{__FACTORY_MODULE}.DataCatalogEntryFactory'
+    __PRIVATE_METHOD_PREFIX = f'{__FACTORY_CLASS}._DataCatalogEntryFactory'
+
     __DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 
     def setUp(self):
@@ -47,7 +55,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.server.com',
                          attrs['_DataCatalogEntryFactory__server_address'])
 
-    def test_make_entry_for_dashboard_should_set_all_available_fields(self):
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_dashboard')
+    def test_make_entry_for_dashboard_should_set_all_available_fields(
+            self, mock_make_schema_for_dashboard):
+
         metadata = {
             '_id': 'a123-b456',
             'oid': 'a123-b457',
@@ -56,6 +67,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'created': '2019-09-12T16:30:00.005Z',
             'lastUpdated': '2019-09-12T16:31:00.005Z',
         }
+
+        schema = datacatalog.Schema()
+        mock_make_schema_for_dashboard.return_value = schema
 
         entry_id, entry = self.__factory.make_entry_for_dashboard(metadata)
 
@@ -85,6 +99,11 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             updated_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+        mock_make_schema_for_dashboard.assert_called_once_with(metadata)
+        self.assertEqual(schema, entry.schema)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_dashboard',
+                lambda *args: datacatalog.Schema())
     def test_make_entry_for_dashboard_should_succeed_on_missing_created_date(
             self):
 
@@ -98,6 +117,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertIsNone(entry.source_system_timestamps.create_time)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_dashboard',
+                lambda *args: datacatalog.Schema())
     def test_make_entry_for_dashboard_should_use_created_on_no_updated_date(
             self):
 
@@ -115,6 +136,34 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_schema_for_dashboard_should_make_filters_column(
+            self, mock_make_column_schema_for_jaql):
+
+        jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
+        metadata = {'filters': [{'jaql': jaql_metadata}]}
+
+        column_schema = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column_schema
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_dashboard(
+                metadata)
+
+        self.assertEqual('filters', schema.columns[0].column)
+        mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
+        self.assertEqual(column_schema, schema.columns[0].subcolumns[0])
+
+    def test_make_schema_for_dashboard_should_skip_if_no_filters(self):
+
+        metadata = {'filters': []}
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_dashboard(
+                metadata)
+
+        self.assertIsNone(schema)
 
     def test_make_entry_for_folder_should_set_all_available_fields(self):
         metadata = {
@@ -194,7 +243,10 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
-    def test_make_entry_for_widget_should_set_all_available_fields(self):
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_widget')
+    def test_make_entry_for_widget_should_set_all_available_fields(
+            self, mock_make_schema_for_widget):
+
         metadata = {
             '_id': 'a123-b456',
             'oid': 'a123-b457',
@@ -204,6 +256,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'lastUpdated': '2019-09-12T16:31:00.005Z',
             'dashboardid': 'a123',
         }
+
+        schema = datacatalog.Schema()
+        mock_make_schema_for_widget.return_value = schema
 
         entry_id, entry = self.__factory.make_entry_for_widget(metadata)
 
@@ -233,6 +288,11 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             updated_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+        mock_make_schema_for_widget.assert_called_once_with(metadata)
+        self.assertEqual(schema, entry.schema)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_widget',
+                lambda *args: datacatalog.Schema())
     def test_make_entry_for_widget_should_set_unnamed_on_missing_title(self):
 
         metadata = {
@@ -244,6 +304,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('Unnamed', entry.display_name)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_widget',
+                lambda *args: datacatalog.Schema())
     def test_make_entry_for_widget_should_succeed_on_missing_created_date(
             self):
 
@@ -257,6 +319,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertIsNone(entry.source_system_timestamps.create_time)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_widget',
+                lambda *args: datacatalog.Schema())
     def test_make_entry_for_widget_should_use_created_on_no_updated_date(self):
         metadata = {
             '_id': 'a123-b456',
@@ -272,3 +336,59 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual(
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_schema_for_widget_should_make_filters_column(
+            self, mock_make_column_schema_for_jaql):
+
+        jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name': 'filters',
+                    'items': [{
+                        'jaql': jaql_metadata
+                    }]
+                }]
+            }
+        }
+
+        column_schema = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column_schema
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
+                metadata)
+
+        self.assertEqual('filters', schema.columns[0].column)
+        mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
+        self.assertEqual(column_schema, schema.columns[0].subcolumns[0])
+
+    def test_make_schema_for_widget_should_skip_if_no_panels(self):
+        metadata = {'metadata': {'panels': []}}
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
+                metadata)
+
+        self.assertIsNone(schema)
+
+    def test_make_schema_for_widget_should_skip_if_no_filters(self):
+        metadata = {'metadata': {'panels': [{'name': 'filters', 'items': []}]}}
+
+        schema = \
+            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
+                metadata)
+
+        self.assertIsNone(schema)
+
+    def test_make_column_schema_for_jaql_should_set_all_available_fields(self):
+        metadata = {'datatype': 'datetime', 'title': 'TEST'}
+
+        column = \
+            self.__factory\
+                ._DataCatalogEntryFactory__make_column_schema_for_jaql(
+                    metadata)
+
+        self.assertEqual('TEST', column.column)
+        self.assertEqual('datetime', column.type)

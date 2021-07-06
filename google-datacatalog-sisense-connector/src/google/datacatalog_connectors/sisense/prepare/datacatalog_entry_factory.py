@@ -15,10 +15,10 @@
 # limitations under the License.
 
 from datetime import datetime
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import Entry
+from google.cloud.datacatalog import ColumnSchema, Entry, Schema
 from google.protobuf import timestamp_pb2
 from google.datacatalog_connectors.commons import prepare
 
@@ -81,7 +81,31 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             update_timestamp.FromDatetime(modified_datetime)
             entry.source_system_timestamps.update_time = update_timestamp
 
+        entry.schema = self.__make_schema_for_dashboard(dashboard_metadata)
+
         return generated_id, entry
+
+    @classmethod
+    def __make_schema_for_dashboard(
+            cls, dashboard_metadata: Dict[str, Any]) -> Optional[Schema]:
+
+        if not dashboard_metadata.get('filters'):
+            return
+
+        filters_column = datacatalog.ColumnSchema()
+        filters_column.column = 'filters'
+        filters_column.type = 'array'
+        filters_column.description = 'The Dashboard filters'
+
+        for dashboard_filter in dashboard_metadata['filters']:
+            filters_column.subcolumns.append(
+                cls.__make_column_schema_for_jaql(
+                    dashboard_filter.get('jaql')))
+
+        schema = datacatalog.Schema()
+        schema.columns.append(filters_column)
+
+        return schema
 
     def make_entry_for_folder(
             self, folder_metadata: Dict[str, Any]) -> Tuple[str, Entry]:
@@ -169,10 +193,50 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             update_timestamp.FromDatetime(modified_datetime)
             entry.source_system_timestamps.update_time = update_timestamp
 
+        entry.schema = self.__make_schema_for_widget(widget_metadata)
+
         return generated_id, entry
+
+    @classmethod
+    def __make_schema_for_widget(
+            cls, widget_metadata: Dict[str, Any]) -> Optional[Schema]:
+
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
+            return
+
+        panels = widget_metadata['metadata']['panels']
+        filters = next((panel.get('items')
+                        for panel in panels
+                        if panel.get('name') == 'filters'), None)
+        if not filters:
+            return
+
+        filters_column = datacatalog.ColumnSchema()
+        filters_column.column = 'filters'
+        filters_column.type = 'array'
+        filters_column.description = 'The Widget filters'
+
+        for widget_filter in filters:
+            filters_column.subcolumns.append(
+                cls.__make_column_schema_for_jaql(widget_filter.get('jaql')))
+
+        schema = datacatalog.Schema()
+        schema.columns.append(filters_column)
+
+        return schema
 
     def __format_id(self, source_type_identifier, source_id):
         prefixed_id = f'{constants.ENTRY_ID_PREFIX}' \
                       f'{self.__server_id}_' \
                       f'{source_type_identifier}{source_id}'
         return self._format_id(prefixed_id)
+
+    @classmethod
+    def __make_column_schema_for_jaql(
+            cls, jaql_metadata: Dict[str, Any]) -> ColumnSchema:
+
+        column = datacatalog.ColumnSchema()
+        column.column = jaql_metadata.get('title')
+        column.type = jaql_metadata.get('datatype')
+        return column
