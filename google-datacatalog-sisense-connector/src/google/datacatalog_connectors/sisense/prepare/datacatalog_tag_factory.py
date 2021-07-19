@@ -178,8 +178,8 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             # relevant lineage information. A regex is used to do so.
             dim_matches = re.search(r'^\[(?P<table>.*)\.(?P<column>.*)]$',
                                     dimension)
-            dim_table = dim_matches.groups('table')
-            dim_column = dim_matches.groups('column')
+            dim_table = dim_matches.group('table')
+            dim_column = dim_matches.group('column')
 
         self._set_string_field(tag, 'table',
                                jaql_metadata.get('table') or dim_table)
