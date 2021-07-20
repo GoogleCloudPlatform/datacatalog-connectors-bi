@@ -200,6 +200,50 @@ class DataCatalogTagTemplateFactoryTest(unittest.TestCase):
                          tag_template.fields['server_url'].display_name)
         self.assertTrue(tag_template.fields['server_url'].is_required)
 
+    def test_make_tag_template_for_jaql(self):
+        tag_template = self.__factory.make_tag_template_for_jaql()
+
+        self.assertEqual(
+            'projects/test-project/locations/test-location/'
+            'tagTemplates/sisense_jaql_metadata', tag_template.name)
+
+        self.assertEqual('Sisense JAQL Metadata', tag_template.display_name)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['table'].type.primitive_type)
+        self.assertEqual('Table', tag_template.fields['table'].display_name)
+        self.assertFalse(tag_template.fields['table'].is_required)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['column'].type.primitive_type)
+        self.assertEqual('Column', tag_template.fields['column'].display_name)
+        self.assertFalse(tag_template.fields['column'].is_required)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['dimension'].type.primitive_type)
+        self.assertEqual('Dimension',
+                         tag_template.fields['dimension'].display_name)
+        self.assertFalse(tag_template.fields['dimension'].is_required)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['formula'].type.primitive_type)
+        self.assertEqual('Formula',
+                         tag_template.fields['formula'].display_name)
+        self.assertFalse(tag_template.fields['formula'].is_required)
+
+        self.assertEqual(
+            self.__STRING_TYPE,
+            tag_template.fields['aggregation'].type.primitive_type)
+        self.assertEqual('Aggregation',
+                         tag_template.fields['aggregation'].display_name)
+        self.assertFalse(tag_template.fields['aggregation'].is_required)
+
+        self.assertEqual(self.__STRING_TYPE,
+                         tag_template.fields['server_url'].type.primitive_type)
+        self.assertEqual('Sisense Server Url',
+                         tag_template.fields['server_url'].display_name)
+        self.assertTrue(tag_template.fields['server_url'].is_required)
+
     def test_make_tag_template_for_widget(self):
         tag_template = self.__factory.make_tag_template_for_widget()
 

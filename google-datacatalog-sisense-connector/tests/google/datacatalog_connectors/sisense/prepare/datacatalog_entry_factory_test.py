@@ -392,3 +392,14 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
+
+    def test_make_column_schema_for_jaql_should_use_type_field_fallback(self):
+        metadata = {'type': 'datetime', 'title': 'TEST'}
+
+        column = \
+            self.__factory\
+                ._DataCatalogEntryFactory__make_column_schema_for_jaql(
+                    metadata)
+
+        self.assertEqual('TEST', column.column)
+        self.assertEqual('datetime', column.type)

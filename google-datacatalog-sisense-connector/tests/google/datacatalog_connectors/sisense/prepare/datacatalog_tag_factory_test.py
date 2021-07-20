@@ -129,6 +129,53 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.com',
                          tag.fields['server_url'].string_value)
 
+    def test_make_tag_for_jaql_should_set_all_available_fields(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'dim': '[table_a.column_a]',
+            'formula': 'GrowthPastYear([AVG COST])',
+            'agg': 'avg',
+        }
+
+        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
+            tag_template, metadata)
+
+        self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
+
+        self.assertEqual('table_a', tag.fields['table'].string_value)
+        self.assertEqual('column_a', tag.fields['column'].string_value)
+        self.assertEqual('[table_a.column_a]',
+                         tag.fields['dimension'].string_value)
+        self.assertEqual('GrowthPastYear([AVG COST])',
+                         tag.fields['formula'].string_value)
+        self.assertEqual('avg', tag.fields['aggregation'].string_value)
+        self.assertEqual('https://test.com',
+                         tag.fields['server_url'].string_value)
+
+    def test_make_tag_for_jaql_should_read_table_and_column_fields(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'table': 'table_a',
+            'column': 'column_a',
+            'dim': '[table_b.column_b]',
+        }
+
+        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
+            tag_template, metadata)
+
+        self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
+
+        # The ``table`` field takes priority over ``dim``.
+        self.assertEqual('table_a', tag.fields['table'].string_value)
+        # The ``column`` field takes priority over ``dim``.
+        self.assertEqual('column_a', tag.fields['column'].string_value)
+        self.assertEqual('[table_b.column_b]',
+                         tag.fields['dimension'].string_value)
+
     def test_make_tag_for_widget_should_set_all_available_fields(self):
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_widget_metadata'

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from datetime import datetime
+import re
 from typing import Any, Dict
 
 from google.cloud import datacatalog
@@ -148,6 +149,45 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             self._set_string_field(tag, 'datasource', datasource.get('title'))
         elif isinstance(datasource, str):
             self._set_string_field(tag, 'datasource', datasource)
+
+        self._set_string_field(tag, 'server_url', self.__server_address)
+
+        return tag
+
+    def __make_tag_for_jaql(self, tag_template: TagTemplate,
+                            jaql_metadata: Dict[str, Any]) -> Tag:
+
+        tag = datacatalog.Tag()
+
+        tag.template = tag_template.name
+
+        dim_table = None
+        dim_column = None
+        dimension = jaql_metadata.get('dim')
+        if dimension:
+            self._set_string_field(tag, 'dimension', dimension)
+
+            # According to the Sisense Support Team, JAQL objects should
+            # contain the ``table`` and ``column`` fields, but we have seen
+            # some cases in which it does not happen -- e.g.: dashboards that
+            # were created a long time ago and migrated from version to
+            # version, as well as from platform to platform (Windows to Linux),
+            # have the ``dim`` field, but not ``table`` and ``column``. So, we
+            # decided to scrape table and column metadata from the dimension
+            # when the appropriate fields are not available to avoid losing
+            # relevant lineage information. A regex is used to do so.
+            dim_matches = re.search(r'^\[(?P<table>.*)\.(?P<column>.*)]$',
+                                    dimension)
+            dim_table = dim_matches.group('table')
+            dim_column = dim_matches.group('column')
+
+        self._set_string_field(tag, 'table',
+                               jaql_metadata.get('table') or dim_table)
+        self._set_string_field(tag, 'column',
+                               jaql_metadata.get('column') or dim_column)
+
+        self._set_string_field(tag, 'formula', jaql_metadata.get('formula'))
+        self._set_string_field(tag, 'aggregation', jaql_metadata.get('agg'))
 
         self._set_string_field(tag, 'server_url', self.__server_address)
 
