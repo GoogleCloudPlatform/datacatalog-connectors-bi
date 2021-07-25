@@ -180,6 +180,64 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         return tag
 
+    def make_tags_for_widget_fields(
+            self, jaql_tag_template: TagTemplate,
+            widget_metadata: Dict[str, Any]) -> List[Tag]:
+
+        tags = []
+
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
+            return tags
+
+        panels = widget_metadata['metadata']['panels']
+        filters = next((panel.get('items')
+                        for panel in panels
+                        if panel.get('name') == 'filters'), None)
+        if not filters:
+            return tags
+
+        for widget_filter in filters:
+            tags.append(
+                self.__make_jaql_tag_for_widget_filter(jaql_tag_template,
+                                                       widget_filter))
+
+        return tags
+
+    def make_tags_for_widget_filters(
+            self, jaql_tag_template: TagTemplate,
+            widget_metadata: Dict[str, Any]) -> List[Tag]:
+
+        tags = []
+
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
+            return tags
+
+        panels = widget_metadata['metadata']['panels']
+        filters = next((panel.get('items')
+                        for panel in panels
+                        if panel.get('name') == 'filters'), None)
+        if not filters:
+            return tags
+
+        for widget_filter in filters:
+            tags.append(
+                self.__make_jaql_tag_for_widget_filter(jaql_tag_template,
+                                                       widget_filter))
+
+        return tags
+
+    def __make_jaql_tag_for_widget_filter(
+            self, tag_template: TagTemplate,
+            filter_metadata: Dict[str, Any]) -> Tag:
+
+        jaql = filter_metadata.get('jaql')
+        tag = self.__make_tag_for_jaql(tag_template, jaql)
+        tag.column = f'filters.{jaql.get("title")}'
+
+        return tag
+
     def __make_tag_for_jaql(self, tag_template: TagTemplate,
                             jaql_metadata: Dict[str, Any]) -> Tag:
 
