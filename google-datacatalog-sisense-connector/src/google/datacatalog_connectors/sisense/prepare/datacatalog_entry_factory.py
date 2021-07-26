@@ -22,19 +22,14 @@ from google.cloud.datacatalog import ColumnSchema, Entry, Schema
 from google.protobuf import timestamp_pb2
 from google.datacatalog_connectors.commons import prepare
 
-from google.datacatalog_connectors.sisense.prepare import constants
+from google.datacatalog_connectors.sisense.prepare import \
+    constants, sisense_connector_strings_helper
 
 
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
     __UNNAMED = 'Unnamed'
     __WIDGET_FILTERS_PANEL_NAME = 'filters'
-
-    # TODO Move these constants to the ``BaseEntryFactory`` super class.
-    # Column names must contain only unicode characters excluding dots and
-    # control characters and be at most 300 bytes long when encoded in UTF-8.
-    __COLUMN_NAME_INVALID_CHARS_REGEX_PATTERN = r'[\.]+'
-    __COLUMN_NAME_UTF8_MAX_LENGTH = 300
 
     def __init__(self, project_id: str, location_id: str, entry_group_id: str,
                  user_specified_system: str, server_address: str):
@@ -283,32 +278,10 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             cls, jaql_metadata: Dict[str, Any]) -> ColumnSchema:
 
         column = datacatalog.ColumnSchema()
-        column.column = cls.__format_column_name(jaql_metadata.get('title'))
+        column.column = sisense_connector_strings_helper\
+            .SisenseConnectorStringsHelper\
+            .format_column_name(jaql_metadata.get('title'))
         column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
             'type') or 'unknown'
 
         return column
-
-    # TODO Move this method to the ``BaseEntryFactory`` super class.
-    @classmethod
-    def __format_column_name(cls, column_name, normalize=True):
-        """
-        Formats the column_name to fit the string bytes limit enforced by
-        Data Catalog, and optionally normalizes it by applying a regex pattern
-        that replaces unsupported characters with underscore.
-
-        Warning: truncating and normalizing column names may lead to slightly
-        different names from the source system columns.
-
-        :param column_name: the value to be formatted.
-        :param normalize: enables the normalize logic.
-
-        :return: The formatted column name.
-        """
-        formatted_column_name = column_name
-        if normalize:
-            formatted_column_name = cls._BaseEntryFactory__normalize_string(
-                cls.__COLUMN_NAME_INVALID_CHARS_REGEX_PATTERN, column_name)
-
-        return prepare.DataCatalogStringsHelper.truncate_string(
-            formatted_column_name, cls.__COLUMN_NAME_UTF8_MAX_LENGTH)
