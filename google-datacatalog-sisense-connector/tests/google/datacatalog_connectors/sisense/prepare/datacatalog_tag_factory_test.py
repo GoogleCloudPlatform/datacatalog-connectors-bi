@@ -137,10 +137,11 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'dim': '[table_a.column_a]',
             'formula': 'GrowthPastYear([AVG COST])',
             'agg': 'avg',
+            'title': 'TEST',
         }
 
         tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
-            tag_template, metadata)
+            tag_template, metadata, 'test')
 
         self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
 
@@ -162,10 +163,11 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'table': 'table_a',
             'column': 'column_a',
             'dim': '[table_b.column_b]',
+            'title': 'TEST',
         }
 
         tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
-            tag_template, metadata)
+            tag_template, metadata, 'test')
 
         self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
 
