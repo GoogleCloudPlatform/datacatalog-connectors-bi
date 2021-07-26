@@ -28,6 +28,13 @@ from google.datacatalog_connectors.sisense.prepare import constants
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
     __UNNAMED = 'Unnamed'
+    __WIDGET_FILTERS_PANEL_NAME = 'filters'
+
+    # TODO Move these constants to the ``BaseEntryFactory`` super class.
+    # Column names must contain only unicode characters excluding dots and
+    # control characters and be at most 300 bytes long when encoded in UTF-8.
+    __COLUMN_NAME_INVALID_CHARS_REGEX_PATTERN = r'[\.]+'
+    __COLUMN_NAME_UTF8_MAX_LENGTH = 300
 
     def __init__(self, project_id: str, location_id: str, entry_group_id: str,
                  user_specified_system: str, server_address: str):
@@ -201,14 +208,56 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def __make_schema_for_widget(
             cls, widget_metadata: Dict[str, Any]) -> Optional[Schema]:
 
+        schema = datacatalog.Schema()
+
+        fields_column = cls.__make_fields_column_for_widget(widget_metadata)
+        if fields_column:
+            schema.columns.append(fields_column)
+
+        filters_column = cls.__make_filters_column_for_widget(widget_metadata)
+        if filters_column:
+            schema.columns.append(filters_column)
+
+        return schema
+
+    @classmethod
+    def __make_fields_column_for_widget(
+            cls, widget_metadata: Dict[str, Any]) -> Optional[ColumnSchema]:
+
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
+            return
+
+        fields_column = datacatalog.ColumnSchema()
+        fields_column.column = 'fields'
+        fields_column.type = 'array'
+        fields_column.description = 'The Widget fields'
+
+        panels = widget_metadata['metadata']['panels']
+        fields = [
+            panel for panel in panels
+            if not panel.get('name') == cls.__WIDGET_FILTERS_PANEL_NAME
+        ]
+        for field in fields:
+            for item in field.get('items'):
+                fields_column.subcolumns.append(
+                    cls.__make_column_schema_for_jaql(item.get('jaql')))
+
+        return fields_column
+
+    @classmethod
+    def __make_filters_column_for_widget(
+            cls, widget_metadata: Dict[str, Any]) -> Optional[ColumnSchema]:
+
         if not (widget_metadata.get('metadata') and
                 widget_metadata['metadata'].get('panels')):
             return
 
         panels = widget_metadata['metadata']['panels']
-        filters = next((panel.get('items')
-                        for panel in panels
-                        if panel.get('name') == 'filters'), None)
+        filters = next(
+            (panel.get('items')
+             for panel in panels
+             if panel.get('name') == cls.__WIDGET_FILTERS_PANEL_NAME), None)
         if not filters:
             return
 
@@ -221,10 +270,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             filters_column.subcolumns.append(
                 cls.__make_column_schema_for_jaql(widget_filter.get('jaql')))
 
-        schema = datacatalog.Schema()
-        schema.columns.append(filters_column)
-
-        return schema
+        return filters_column
 
     def __format_id(self, source_type_identifier, source_id):
         prefixed_id = f'{constants.ENTRY_ID_PREFIX}' \
@@ -232,13 +278,37 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
                       f'{source_type_identifier}{source_id}'
         return self._format_id(prefixed_id)
 
+    # TODO Move this method to the ``BaseEntryFactory`` super class.
+    @classmethod
+    def __format_column_name(cls, column_name, normalize=True):
+        """
+        Formats the column_name to fit the string bytes limit enforced by
+        Data Catalog, and optionally normalizes it by applying a regex pattern
+        that replaces unsupported characters with underscore.
+
+        Warning: truncating and normalizing column names may lead to slightly
+        different names from the source system columns.
+
+        :param column_name: the value to be formatted.
+        :param normalize: enables the normalize logic.
+
+        :return: The formatted column name.
+        """
+        formatted_column_name = column_name
+        if normalize:
+            formatted_column_name = cls._BaseEntryFactory__normalize_string(
+                cls.__COLUMN_NAME_INVALID_CHARS_REGEX_PATTERN, column_name)
+
+        return prepare.DataCatalogStringsHelper.truncate_string(
+            formatted_column_name, cls.__COLUMN_NAME_UTF8_MAX_LENGTH)
+
     @classmethod
     def __make_column_schema_for_jaql(
             cls, jaql_metadata: Dict[str, Any]) -> ColumnSchema:
 
         column = datacatalog.ColumnSchema()
-        column.column = jaql_metadata.get('title')
+        column.column = cls.__format_column_name(jaql_metadata.get('title'))
         column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
-            'type')
+            'type') or 'unknown'
 
         return column
