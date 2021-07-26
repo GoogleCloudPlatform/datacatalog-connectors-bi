@@ -29,7 +29,6 @@ from google.datacatalog_connectors.sisense.prepare import \
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
     __UNNAMED = 'Unnamed'
-    __WIDGET_FILTERS_PANEL_NAME = 'filters'
 
     def __init__(self, project_id: str, location_id: str, entry_group_id: str,
                  user_specified_system: str, server_address: str):
@@ -95,11 +94,12 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             return
 
         filters_column = datacatalog.ColumnSchema()
-        filters_column.column = 'filters'
+        filters_column.column = constants.DASHBOARD_ENTRY_FILTERS_COLUMN_NAME
         filters_column.type = 'array'
         filters_column.description = 'The Dashboard filters'
 
-        for dashboard_filter in dashboard_metadata['filters']:
+        for dashboard_filter in dashboard_metadata[
+                constants.DASHBOARD_FILTERS_FIELD_NAME]:
             filters_column.subcolumns.append(
                 cls.__make_column_schema_for_jaql(
                     dashboard_filter.get('jaql')))
@@ -224,14 +224,14 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             return
 
         fields_column = datacatalog.ColumnSchema()
-        fields_column.column = 'fields'
+        fields_column.column = constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME
         fields_column.type = 'array'
         fields_column.description = 'The Widget fields'
 
         panels = widget_metadata['metadata']['panels']
         fields = [
             panel for panel in panels
-            if not panel.get('name') == cls.__WIDGET_FILTERS_PANEL_NAME
+            if not panel.get('name') == constants.WIDGET_FILTERS_PANEL_NAME
         ]
         for field in fields:
             for item in field.get('items'):
@@ -252,12 +252,13 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         filters = next(
             (panel.get('items')
              for panel in panels
-             if panel.get('name') == cls.__WIDGET_FILTERS_PANEL_NAME), None)
+             if panel.get('name') == constants.WIDGET_FILTERS_PANEL_NAME),
+            None)
         if not filters:
             return
 
         filters_column = datacatalog.ColumnSchema()
-        filters_column.column = 'filters'
+        filters_column.column = constants.WIDGET_ENTRY_FILTERS_COLUMN_NAME
         filters_column.type = 'array'
         filters_column.description = 'The Widget filters'
 

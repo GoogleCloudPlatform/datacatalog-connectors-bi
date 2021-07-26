@@ -22,6 +22,8 @@ from google.cloud import datacatalog
 from google.cloud.datacatalog import Tag, TagTemplate
 from google.datacatalog_connectors.commons import prepare
 
+from google.datacatalog_connectors.sisense.prepare import constants
+
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
@@ -83,25 +85,17 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tags = []
 
-        if not dashboard_metadata.get('filters'):
+        if not dashboard_metadata.get(constants.DASHBOARD_FILTERS_FIELD_NAME):
             return tags
 
-        for dashboard_filter in dashboard_metadata['filters']:
+        for dashboard_filter in dashboard_metadata[
+                constants.DASHBOARD_FILTERS_FIELD_NAME]:
             tags.append(
-                self.__make_jaql_tag_for_dashboard_filter(
-                    jaql_tag_template, dashboard_filter))
+                self.__make_tag_for_jaql(
+                    jaql_tag_template, dashboard_filter.get('jaql'),
+                    constants.DASHBOARD_ENTRY_FILTERS_COLUMN_NAME))
 
         return tags
-
-    def __make_jaql_tag_for_dashboard_filter(
-            self, tag_template: TagTemplate,
-            filter_metadata: Dict[str, Any]) -> Tag:
-
-        jaql = filter_metadata.get('jaql')
-        tag = self.__make_tag_for_jaql(tag_template, jaql)
-        tag.column = f'filters.{jaql.get("title")}'
-
-        return tag
 
     def make_tag_for_folder(self, tag_template: TagTemplate,
                             folder_metadata: Dict[str, Any]) -> Tag:
@@ -191,16 +185,18 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             return tags
 
         panels = widget_metadata['metadata']['panels']
-        filters = next((panel.get('items')
-                        for panel in panels
-                        if panel.get('name') == 'filters'), None)
-        if not filters:
+        fields = [
+            panel for panel in panels
+            if not panel.get('name') == constants.WIDGET_FILTERS_PANEL_NAME
+        ]
+        if not fields:
             return tags
 
-        for widget_filter in filters:
+        for field in fields:
             tags.append(
-                self.__make_jaql_tag_for_widget_filter(jaql_tag_template,
-                                                       widget_filter))
+                self.__make_tag_for_jaql(
+                    jaql_tag_template, field.get('jaql'),
+                    constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME))
 
         return tags
 
@@ -215,31 +211,25 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             return tags
 
         panels = widget_metadata['metadata']['panels']
-        filters = next((panel.get('items')
-                        for panel in panels
-                        if panel.get('name') == 'filters'), None)
+        filters = next(
+            (panel.get('items')
+             for panel in panels
+             if panel.get('name') == constants.WIDGET_FILTERS_PANEL_NAME),
+            None)
         if not filters:
             return tags
 
         for widget_filter in filters:
             tags.append(
-                self.__make_jaql_tag_for_widget_filter(jaql_tag_template,
-                                                       widget_filter))
+                self.__make_tag_for_jaql(
+                    jaql_tag_template, widget_filter.get('jaql'),
+                    constants.WIDGET_ENTRY_FILTERS_COLUMN_NAME))
 
         return tags
 
-    def __make_jaql_tag_for_widget_filter(
-            self, tag_template: TagTemplate,
-            filter_metadata: Dict[str, Any]) -> Tag:
-
-        jaql = filter_metadata.get('jaql')
-        tag = self.__make_tag_for_jaql(tag_template, jaql)
-        tag.column = f'filters.{jaql.get("title")}'
-
-        return tag
-
     def __make_tag_for_jaql(self, tag_template: TagTemplate,
-                            jaql_metadata: Dict[str, Any]) -> Tag:
+                            jaql_metadata: Dict[str, Any],
+                            column_prefix: str) -> Tag:
 
         tag = datacatalog.Tag()
 
@@ -274,5 +264,7 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'aggregation', jaql_metadata.get('agg'))
 
         self._set_string_field(tag, 'server_url', self.__server_address)
+
+        tag.column = f'{column_prefix}.{jaql_metadata.get("title")}'
 
         return tag

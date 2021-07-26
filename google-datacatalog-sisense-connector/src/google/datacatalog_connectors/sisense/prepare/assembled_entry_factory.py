@@ -154,6 +154,9 @@ class AssembledEntryFactory:
         jaql_tag_template = tag_templates.get(constants.TAG_TEMPLATE_ID_JAQL)
         if jaql_tag_template:
             tags.extend(
+                self.__datacatalog_tag_factory.make_tags_for_widget_fields(
+                    jaql_tag_template, widget_metadata))
+            tags.extend(
                 self.__datacatalog_tag_factory.make_tags_for_widget_filters(
                     jaql_tag_template, widget_metadata))
 
