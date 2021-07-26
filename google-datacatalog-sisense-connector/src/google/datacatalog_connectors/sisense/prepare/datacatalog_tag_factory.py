@@ -22,7 +22,8 @@ from google.cloud import datacatalog
 from google.cloud.datacatalog import Tag, TagTemplate
 from google.datacatalog_connectors.commons import prepare
 
-from google.datacatalog_connectors.sisense.prepare import constants
+from google.datacatalog_connectors.sisense.prepare import \
+    constants, sisense_connector_strings_helper
 
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
@@ -193,10 +194,11 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             return tags
 
         for field in fields:
-            tags.append(
-                self.__make_tag_for_jaql(
-                    jaql_tag_template, field.get('jaql'),
-                    constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME))
+            for item in field.get('items'):
+                tags.append(
+                    self.__make_tag_for_jaql(
+                        jaql_tag_template, item.get('jaql'),
+                        constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME))
 
         return tags
 
@@ -265,6 +267,9 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         self._set_string_field(tag, 'server_url', self.__server_address)
 
-        tag.column = f'{column_prefix}.{jaql_metadata.get("title")}'
+        title = jaql_metadata.get('title')
+        subcolumn_name = sisense_connector_strings_helper\
+            .SisenseConnectorStringsHelper.format_column_name(title)
+        tag.column = f'{column_prefix}.{subcolumn_name}'
 
         return tag
