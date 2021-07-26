@@ -278,6 +278,17 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
                       f'{source_type_identifier}{source_id}'
         return self._format_id(prefixed_id)
 
+    @classmethod
+    def __make_column_schema_for_jaql(
+            cls, jaql_metadata: Dict[str, Any]) -> ColumnSchema:
+
+        column = datacatalog.ColumnSchema()
+        column.column = cls.__format_column_name(jaql_metadata.get('title'))
+        column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
+            'type') or 'unknown'
+
+        return column
+
     # TODO Move this method to the ``BaseEntryFactory`` super class.
     @classmethod
     def __format_column_name(cls, column_name, normalize=True):
@@ -301,14 +312,3 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         return prepare.DataCatalogStringsHelper.truncate_string(
             formatted_column_name, cls.__COLUMN_NAME_UTF8_MAX_LENGTH)
-
-    @classmethod
-    def __make_column_schema_for_jaql(
-            cls, jaql_metadata: Dict[str, Any]) -> ColumnSchema:
-
-        column = datacatalog.ColumnSchema()
-        column.column = cls.__format_column_name(jaql_metadata.get('title'))
-        column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
-            'type') or 'unknown'
-
-        return column

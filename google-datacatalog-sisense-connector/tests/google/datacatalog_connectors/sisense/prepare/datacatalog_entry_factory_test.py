@@ -25,6 +25,7 @@ from google.datacatalog_connectors.sisense.prepare import \
 
 
 class DataCatalogEntryFactoryTest(unittest.TestCase):
+    __COMMONS_PREP_PACKAGE = 'google.datacatalog_connectors.commons.prepare'
     __FACTORY_PACKAGE = 'google.datacatalog_connectors.sisense.prepare'
     __FACTORY_MODULE = f'{__FACTORY_PACKAGE}.datacatalog_entry_factory'
     __FACTORY_CLASS = f'{__FACTORY_MODULE}.DataCatalogEntryFactory'
@@ -337,8 +338,85 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_filters_column_for_widget',
+                lambda *args: None)
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_fields_column_for_widget')
+    def test_make_schema_for_widget_make_fields_column(
+            self, mock_make_fields_column_for_widget):
+
+        metadata = {'metadata': {'panels': [{}]}}
+
+        column = datacatalog.ColumnSchema()
+        column.column = 'test'
+        mock_make_fields_column_for_widget.return_value = column
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_schema_for_widget(metadata)
+
+        mock_make_fields_column_for_widget.assert_called_once_with(metadata)
+        self.assertEqual(column, schema.columns[0])
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_filters_column_for_widget')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_fields_column_for_widget',
+                lambda *args: None)
+    def test_make_schema_for_widget_make_filters_column(
+            self, mock_make_filters_column_for_widget):
+
+        metadata = {'metadata': {'panels': [{}]}}
+
+        column = datacatalog.ColumnSchema()
+        column.column = 'test'
+        mock_make_filters_column_for_widget.return_value = column
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_schema_for_widget(metadata)
+
+        mock_make_filters_column_for_widget.assert_called_once_with(metadata)
+        self.assertEqual(column, schema.columns[0])
+
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
-    def test_make_schema_for_widget_should_make_filters_column(
+    def test_make_fields_column_for_widget_should_return_column(
+            self, mock_make_column_schema_for_jaql):
+
+        jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name': 'test',
+                    'items': [{
+                        'jaql': jaql_metadata
+                    }]
+                }]
+            }
+        }
+
+        column = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_fields_column_for_widget(metadata)
+
+        mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
+        self.assertEqual(column, schema.subcolumns[0])
+
+    def test_make_fields_column_for_widget_should_skip_if_no_panels(self):
+        metadata = {'metadata': {'panels': []}}
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_fields_column_for_widget(metadata)
+
+        self.assertIsNone(schema)
+
+    def test_make_fields_column_for_widget_should_skip_if_only_filters(self):
+        metadata = {'metadata': {'panels': [{'name': 'filters', 'items': []}]}}
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_fields_column_for_widget(metadata)
+
+        self.assertIsNone(schema)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_filters_column_for_widget_should_return_column(
             self, mock_make_column_schema_for_jaql):
 
         jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
@@ -353,35 +431,33 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             }
         }
 
-        column_schema = datacatalog.ColumnSchema()
-        mock_make_column_schema_for_jaql.return_value = column_schema
+        column = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column
 
-        schema = \
-            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
-                metadata)
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_filters_column_for_widget(metadata)
 
-        self.assertEqual('filters', schema.columns[0].column)
         mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
-        self.assertEqual(column_schema, schema.columns[0].subcolumns[0])
+        self.assertEqual(column, schema.subcolumns[0])
 
-    def test_make_schema_for_widget_should_skip_if_no_panels(self):
+    def test_make_filters_column_for_widget_should_skip_if_no_panels(self):
         metadata = {'metadata': {'panels': []}}
 
-        schema = \
-            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
-                metadata)
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_filters_column_for_widget(metadata)
 
         self.assertIsNone(schema)
 
-    def test_make_schema_for_widget_should_skip_if_no_filters(self):
-        metadata = {'metadata': {'panels': [{'name': 'filters', 'items': []}]}}
+    def test_make_filters_column_for_widget_should_skip_if_no_filters(self):
+        metadata = {'metadata': {'panels': [{'name': 'test', 'items': []}]}}
 
-        schema = \
-            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
-                metadata)
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_filters_column_for_widget(metadata)
 
         self.assertIsNone(schema)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__format_column_name',
+                lambda *args: args[0])
     def test_make_column_schema_for_jaql_should_set_all_available_fields(self):
         metadata = {'datatype': 'datetime', 'title': 'TEST'}
 
@@ -393,6 +469,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__format_column_name',
+                lambda *args: args[0])
     def test_make_column_schema_for_jaql_should_use_type_field_fallback(self):
         metadata = {'type': 'datetime', 'title': 'TEST'}
 
@@ -403,3 +481,43 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
+
+    # TODO Move all format_column_name tests to the ``BaseEntryFactory`` super
+    #  class.
+    @mock.patch(f'{__COMMONS_PREP_PACKAGE}.DataCatalogStringsHelper'
+                f'.truncate_string', lambda *args: args[0])
+    def test_format_column_name_should_not_change_compliant_string(self):
+        formatted_column_name = self.__factory\
+            ._DataCatalogEntryFactory__format_column_name('# (test)')
+
+        self.assertEqual('# (test)', formatted_column_name)
+
+    @mock.patch(f'{__COMMONS_PREP_PACKAGE}.DataCatalogStringsHelper'
+                f'.truncate_string', lambda *args: args[0])
+    def test_format_column_name_should_normalize_non_compliant_string(self):
+        formatted_column_name = self.__factory\
+            ._DataCatalogEntryFactory__format_column_name('#.(test)')
+
+        self.assertEqual('#_(test)', formatted_column_name)
+
+    @mock.patch(f'{__COMMONS_PREP_PACKAGE}.DataCatalogStringsHelper'
+                f'.truncate_string', lambda *args: args[0])
+    def test_format_column_name_can_optionally_avoid_normalizing_string(self):
+        formatted_column_name = self.__factory\
+            ._DataCatalogEntryFactory__format_column_name('#.(test)', False)
+
+        self.assertEqual('#.(test)', formatted_column_name)
+
+    @mock.patch(f'{__COMMONS_PREP_PACKAGE}'
+                f'.DataCatalogStringsHelper.truncate_string')
+    def test_format_column_name_should_return_truncated_string(
+            self, mock_truncate_string):
+
+        expected_value = 'truncated_str...'
+        mock_truncate_string.return_value = expected_value
+
+        formatted_column_name = self.__factory\
+            ._DataCatalogEntryFactory__format_column_name('# (test) # (test)')
+
+        mock_truncate_string.assert_called_once_with('# (test) # (test)', 300)
+        self.assertEqual(expected_value, formatted_column_name)
