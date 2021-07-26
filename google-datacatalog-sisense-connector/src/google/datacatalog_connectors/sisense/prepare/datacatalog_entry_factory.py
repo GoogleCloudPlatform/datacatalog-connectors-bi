@@ -218,7 +218,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         if filters_column:
             schema.columns.append(filters_column)
 
-        return schema
+        return schema if schema.columns else None
 
     @classmethod
     def __make_fields_column_for_widget(
@@ -243,7 +243,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
                 fields_column.subcolumns.append(
                     cls.__make_column_schema_for_jaql(item.get('jaql')))
 
-        return fields_column
+        return fields_column if fields_column.subcolumns else None
 
     @classmethod
     def __make_filters_column_for_widget(
@@ -270,7 +270,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             filters_column.subcolumns.append(
                 cls.__make_column_schema_for_jaql(widget_filter.get('jaql')))
 
-        return filters_column
+        return filters_column if filters_column.subcolumns else None
 
     def __format_id(self, source_type_identifier, source_id):
         prefixed_id = f'{constants.ENTRY_ID_PREFIX}' \
