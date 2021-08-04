@@ -22,12 +22,14 @@ from google.cloud.datacatalog import ColumnSchema, Entry, Schema
 from google.protobuf import timestamp_pb2
 from google.datacatalog_connectors.commons import prepare
 
-from google.datacatalog_connectors.sisense.prepare import constants
+from google.datacatalog_connectors.sisense.prepare import \
+    constants, sisense_connector_strings_helper
 
 
 class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     __INCOMING_TIMESTAMP_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
     __UNNAMED = 'Unnamed'
+    __WIDGET_FILTERS_PANEL_NAME = 'filters'
 
     def __init__(self, project_id: str, location_id: str, entry_group_id: str,
                  user_specified_system: str, server_address: str):
@@ -201,14 +203,56 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
     def __make_schema_for_widget(
             cls, widget_metadata: Dict[str, Any]) -> Optional[Schema]:
 
+        schema = datacatalog.Schema()
+
+        fields_column = cls.__make_fields_column_for_widget(widget_metadata)
+        if fields_column:
+            schema.columns.append(fields_column)
+
+        filters_column = cls.__make_filters_column_for_widget(widget_metadata)
+        if filters_column:
+            schema.columns.append(filters_column)
+
+        return schema if schema.columns else None
+
+    @classmethod
+    def __make_fields_column_for_widget(
+            cls, widget_metadata: Dict[str, Any]) -> Optional[ColumnSchema]:
+
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
+            return
+
+        fields_column = datacatalog.ColumnSchema()
+        fields_column.column = 'fields'
+        fields_column.type = 'array'
+        fields_column.description = 'The Widget fields'
+
+        panels = widget_metadata['metadata']['panels']
+        fields = [
+            panel for panel in panels
+            if not panel.get('name') == cls.__WIDGET_FILTERS_PANEL_NAME
+        ]
+        for field in fields:
+            for item in field.get('items'):
+                fields_column.subcolumns.append(
+                    cls.__make_column_schema_for_jaql(item.get('jaql')))
+
+        return fields_column if fields_column.subcolumns else None
+
+    @classmethod
+    def __make_filters_column_for_widget(
+            cls, widget_metadata: Dict[str, Any]) -> Optional[ColumnSchema]:
+
         if not (widget_metadata.get('metadata') and
                 widget_metadata['metadata'].get('panels')):
             return
 
         panels = widget_metadata['metadata']['panels']
-        filters = next((panel.get('items')
-                        for panel in panels
-                        if panel.get('name') == 'filters'), None)
+        filters = next(
+            (panel.get('items')
+             for panel in panels
+             if panel.get('name') == cls.__WIDGET_FILTERS_PANEL_NAME), None)
         if not filters:
             return
 
@@ -221,10 +265,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             filters_column.subcolumns.append(
                 cls.__make_column_schema_for_jaql(widget_filter.get('jaql')))
 
-        schema = datacatalog.Schema()
-        schema.columns.append(filters_column)
-
-        return schema
+        return filters_column if filters_column.subcolumns else None
 
     def __format_id(self, source_type_identifier, source_id):
         prefixed_id = f'{constants.ENTRY_ID_PREFIX}' \
@@ -237,8 +278,10 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             cls, jaql_metadata: Dict[str, Any]) -> ColumnSchema:
 
         column = datacatalog.ColumnSchema()
-        column.column = jaql_metadata.get('title')
+        column.column = sisense_connector_strings_helper\
+            .SisenseConnectorStringsHelper\
+            .format_column_name(jaql_metadata.get('title'))
         column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
-            'type')
+            'type') or 'unknown'
 
         return column

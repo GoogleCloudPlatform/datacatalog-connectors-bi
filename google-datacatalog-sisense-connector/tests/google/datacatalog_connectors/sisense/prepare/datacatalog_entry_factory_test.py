@@ -337,8 +337,85 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             created_datetime.timestamp(),
             entry.source_system_timestamps.update_time.timestamp())
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_filters_column_for_widget',
+                lambda *args: None)
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_fields_column_for_widget')
+    def test_make_schema_for_widget_make_fields_column(
+            self, mock_make_fields_column_for_widget):
+
+        metadata = {'metadata': {'panels': [{}]}}
+
+        column = datacatalog.ColumnSchema()
+        column.column = 'test'
+        mock_make_fields_column_for_widget.return_value = column
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_schema_for_widget(metadata)
+
+        mock_make_fields_column_for_widget.assert_called_once_with(metadata)
+        self.assertEqual(column, schema.columns[0])
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_filters_column_for_widget')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_fields_column_for_widget',
+                lambda *args: None)
+    def test_make_schema_for_widget_make_filters_column(
+            self, mock_make_filters_column_for_widget):
+
+        metadata = {'metadata': {'panels': [{}]}}
+
+        column = datacatalog.ColumnSchema()
+        column.column = 'test'
+        mock_make_filters_column_for_widget.return_value = column
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_schema_for_widget(metadata)
+
+        mock_make_filters_column_for_widget.assert_called_once_with(metadata)
+        self.assertEqual(column, schema.columns[0])
+
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
-    def test_make_schema_for_widget_should_make_filters_column(
+    def test_make_fields_column_for_widget_should_return_column(
+            self, mock_make_column_schema_for_jaql):
+
+        jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name': 'test',
+                    'items': [{
+                        'jaql': jaql_metadata
+                    }]
+                }]
+            }
+        }
+
+        column = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_fields_column_for_widget(metadata)
+
+        mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
+        self.assertEqual(column, schema.subcolumns[0])
+
+    def test_make_fields_column_for_widget_should_skip_if_no_panels(self):
+        metadata = {'metadata': {'panels': []}}
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_fields_column_for_widget(metadata)
+
+        self.assertIsNone(schema)
+
+    def test_make_fields_column_for_widget_should_skip_if_only_filters(self):
+        metadata = {'metadata': {'panels': [{'name': 'filters', 'items': []}]}}
+
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_fields_column_for_widget(metadata)
+
+        self.assertIsNone(schema)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_filters_column_for_widget_should_return_column(
             self, mock_make_column_schema_for_jaql):
 
         jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
@@ -353,35 +430,34 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             }
         }
 
-        column_schema = datacatalog.ColumnSchema()
-        mock_make_column_schema_for_jaql.return_value = column_schema
+        column = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column
 
-        schema = \
-            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
-                metadata)
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_filters_column_for_widget(metadata)
 
-        self.assertEqual('filters', schema.columns[0].column)
         mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
-        self.assertEqual(column_schema, schema.columns[0].subcolumns[0])
+        self.assertEqual(column, schema.subcolumns[0])
 
-    def test_make_schema_for_widget_should_skip_if_no_panels(self):
+    def test_make_filters_column_for_widget_should_skip_if_no_panels(self):
         metadata = {'metadata': {'panels': []}}
 
-        schema = \
-            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
-                metadata)
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_filters_column_for_widget(metadata)
 
         self.assertIsNone(schema)
 
-    def test_make_schema_for_widget_should_skip_if_no_filters(self):
-        metadata = {'metadata': {'panels': [{'name': 'filters', 'items': []}]}}
+    def test_make_filters_column_for_widget_should_skip_if_no_filters(self):
+        metadata = {'metadata': {'panels': [{'name': 'test', 'items': []}]}}
 
-        schema = \
-            self.__factory._DataCatalogEntryFactory__make_schema_for_widget(
-                metadata)
+        schema = self.__factory\
+            ._DataCatalogEntryFactory__make_filters_column_for_widget(metadata)
 
         self.assertIsNone(schema)
 
+    @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
+                f'.SisenseConnectorStringsHelper.format_column_name',
+                lambda *args: args[0])
     def test_make_column_schema_for_jaql_should_set_all_available_fields(self):
         metadata = {'datatype': 'datetime', 'title': 'TEST'}
 
@@ -393,6 +469,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
 
+    @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
+                f'.SisenseConnectorStringsHelper.format_column_name',
+                lambda *args: args[0])
     def test_make_column_schema_for_jaql_should_use_type_field_fallback(self):
         metadata = {'type': 'datetime', 'title': 'TEST'}
 
