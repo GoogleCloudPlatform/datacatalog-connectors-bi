@@ -16,6 +16,7 @@
 
 from datetime import datetime
 import unittest
+from unittest import mock
 
 from google.cloud import datacatalog
 
@@ -24,6 +25,11 @@ from google.datacatalog_connectors.sisense.prepare import \
 
 
 class DataCatalogEntryFactoryTest(unittest.TestCase):
+    __FACTORY_PACKAGE = 'google.datacatalog_connectors.sisense.prepare'
+    __FACTORY_MODULE = f'{__FACTORY_PACKAGE}.datacatalog_tag_factory'
+    __FACTORY_CLASS = f'{__FACTORY_MODULE}.DataCatalogTagFactory'
+    __PRIVATE_METHOD_PREFIX = f'{__FACTORY_CLASS}._DataCatalogTagFactory'
+
     __DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 
     def setUp(self):
@@ -86,6 +92,52 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.com',
                          tag.fields['server_url'].string_value)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tag_for_jaql')
+    def test_make_tags_for_dashboard_filters_should_process_all_filters(
+            self, mock_make_tag_for_jaql):
+
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'filters': [
+                {
+                    'jaql': {
+                        'datatype': 'text',
+                    },
+                },
+                {
+                    'jaql': {
+                        'datatype': 'datetime',
+                    },
+                },
+            ],
+        }
+
+        tags = self.__factory.make_tags_for_dashboard_filters(
+            tag_template, metadata)
+
+        self.assertEqual(2, len(tags))
+        self.assertEqual(2, mock_make_tag_for_jaql.call_count)
+
+        calls = [
+            mock.call(tag_template, {
+                'datatype': 'text',
+            }, 'filters'),
+            mock.call(tag_template, {
+                'datatype': 'datetime',
+            }, 'filters')
+        ]
+        mock_make_tag_for_jaql.assert_has_calls(calls)
+
+    def test_make_tags_for_dashboard_filters_should_skip_if_no_filters(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        tags = self.__factory.make_tags_for_dashboard_filters(tag_template, {})
+
+        self.assertEqual(0, len(tags))
+
     def test_make_tag_for_folder_should_set_all_available_fields(self):
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_folder_metadata'
@@ -128,55 +180,6 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('https://test.com',
                          tag.fields['server_url'].string_value)
-
-    def test_make_tag_for_jaql_should_set_all_available_fields(self):
-        tag_template = datacatalog.TagTemplate()
-        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
-
-        metadata = {
-            'dim': '[table_a.column_a]',
-            'formula': 'GrowthPastYear([AVG COST])',
-            'agg': 'avg',
-            'title': 'TEST',
-        }
-
-        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
-            tag_template, metadata, 'test')
-
-        self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
-
-        self.assertEqual('table_a', tag.fields['table'].string_value)
-        self.assertEqual('column_a', tag.fields['column'].string_value)
-        self.assertEqual('[table_a.column_a]',
-                         tag.fields['dimension'].string_value)
-        self.assertEqual('GrowthPastYear([AVG COST])',
-                         tag.fields['formula'].string_value)
-        self.assertEqual('avg', tag.fields['aggregation'].string_value)
-        self.assertEqual('https://test.com',
-                         tag.fields['server_url'].string_value)
-
-    def test_make_tag_for_jaql_should_read_table_and_column_fields(self):
-        tag_template = datacatalog.TagTemplate()
-        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
-
-        metadata = {
-            'table': 'table_a',
-            'column': 'column_a',
-            'dim': '[table_b.column_b]',
-            'title': 'TEST',
-        }
-
-        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
-            tag_template, metadata, 'test')
-
-        self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
-
-        # The ``table`` field takes priority over ``dim``.
-        self.assertEqual('table_a', tag.fields['table'].string_value)
-        # The ``column`` field takes priority over ``dim``.
-        self.assertEqual('column_a', tag.fields['column'].string_value)
-        self.assertEqual('[table_b.column_b]',
-                         tag.fields['dimension'].string_value)
 
     def test_make_tag_for_widget_should_set_all_available_fields(self):
         tag_template = datacatalog.TagTemplate()
@@ -233,3 +236,190 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('Test Data Source',
                          tag.fields['datasource'].string_value)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tag_for_jaql')
+    def test_make_tags_for_widget_fields_should_process_all_fields(
+            self, mock_make_tag_for_jaql):
+
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name':
+                        'testField',
+                    'items': [
+                        {
+                            'jaql': {
+                                'datatype': 'text',
+                            },
+                        },
+                        {
+                            'jaql': {
+                                'datatype': 'datetime',
+                            },
+                        },
+                    ],
+                }],
+            },
+        }
+
+        tags = self.__factory.make_tags_for_widget_fields(
+            tag_template, metadata)
+
+        self.assertEqual(2, len(tags))
+        self.assertEqual(2, mock_make_tag_for_jaql.call_count)
+
+        calls = [
+            mock.call(tag_template, {
+                'datatype': 'text',
+            }, 'fields'),
+            mock.call(tag_template, {
+                'datatype': 'datetime',
+            }, 'fields')
+        ]
+        mock_make_tag_for_jaql.assert_has_calls(calls)
+
+    def test_make_tags_for_widget_fields_should_skip_if_no_panels(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        tags = self.__factory.make_tags_for_widget_fields(tag_template, {})
+
+        self.assertEqual(0, len(tags))
+
+    def test_make_tags_for_widget_fields_should_skip_if_no_fields(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name': 'filters',
+                }],
+            },
+        }
+
+        tags = self.__factory.make_tags_for_widget_fields(
+            tag_template, metadata)
+
+        self.assertEqual(0, len(tags))
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tag_for_jaql')
+    def test_make_tags_for_widget_filters_should_process_all_filters(
+            self, mock_make_tag_for_jaql):
+
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name':
+                        'filters',
+                    'items': [
+                        {
+                            'jaql': {
+                                'datatype': 'text',
+                            },
+                        },
+                        {
+                            'jaql': {
+                                'datatype': 'datetime',
+                            },
+                        },
+                    ],
+                }],
+            },
+        }
+
+        tags = self.__factory.make_tags_for_widget_filters(
+            tag_template, metadata)
+
+        self.assertEqual(2, len(tags))
+        self.assertEqual(2, mock_make_tag_for_jaql.call_count)
+
+        calls = [
+            mock.call(tag_template, {
+                'datatype': 'text',
+            }, 'filters'),
+            mock.call(tag_template, {
+                'datatype': 'datetime',
+            }, 'filters')
+        ]
+        mock_make_tag_for_jaql.assert_has_calls(calls)
+
+    def test_make_tags_for_widget_filters_should_skip_if_no_panels(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        tags = self.__factory.make_tags_for_widget_filters(tag_template, {})
+
+        self.assertEqual(0, len(tags))
+
+    def test_make_tags_for_widget_filters_should_skip_if_no_filters(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'metadata': {
+                'panels': [{
+                    'name': 'testField',
+                }],
+            },
+        }
+
+        tags = self.__factory.make_tags_for_widget_filters(
+            tag_template, metadata)
+
+        self.assertEqual(0, len(tags))
+
+    def test_make_tag_for_jaql_should_set_all_available_fields(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'dim': '[table_a.column_a]',
+            'formula': 'GrowthPastYear([AVG COST])',
+            'agg': 'avg',
+            'title': 'TEST',
+        }
+
+        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
+            tag_template, metadata, 'test')
+
+        self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
+
+        self.assertEqual('table_a', tag.fields['table'].string_value)
+        self.assertEqual('column_a', tag.fields['column'].string_value)
+        self.assertEqual('[table_a.column_a]',
+                         tag.fields['dimension'].string_value)
+        self.assertEqual('GrowthPastYear([AVG COST])',
+                         tag.fields['formula'].string_value)
+        self.assertEqual('avg', tag.fields['aggregation'].string_value)
+        self.assertEqual('https://test.com',
+                         tag.fields['server_url'].string_value)
+
+    def test_make_tag_for_jaql_should_read_table_and_column_fields(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'table': 'table_a',
+            'column': 'column_a',
+            'dim': '[table_b.column_b]',
+            'title': 'TEST',
+        }
+
+        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
+            tag_template, metadata, 'test')
+
+        self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
+
+        # The ``table`` field takes priority over ``dim``.
+        self.assertEqual('table_a', tag.fields['table'].string_value)
+        # The ``column`` field takes priority over ``dim``.
+        self.assertEqual('column_a', tag.fields['column'].string_value)
+        self.assertEqual('[table_b.column_b]',
+                         tag.fields['dimension'].string_value)
