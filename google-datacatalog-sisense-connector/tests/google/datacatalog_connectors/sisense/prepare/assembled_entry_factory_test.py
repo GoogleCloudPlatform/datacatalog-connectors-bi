@@ -209,18 +209,29 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             self):
 
         dashboard = self.__make_fake_dashboard()
-        tag_template = datacatalog.TagTemplate()
-        tag_template.name = 'tagTemplates/sisense_dashboard_metadata'
-        tag_templates_dict = {'sisense_dashboard_metadata': tag_template}
+
+        dashboard_tag_template = datacatalog.TagTemplate()
+        dashboard_tag_template.name = 'tagTemplates/sisense_dashboard_metadata'
+        jaql_tag_template = datacatalog.TagTemplate()
+        jaql_tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+        tag_templates_dict = {
+            'sisense_dashboard_metadata': dashboard_tag_template,
+            'sisense_jaql_metadata': jaql_tag_template
+        }
 
         fake_entry = ('test-dashboard', {})
         entry_factory = self.__mock_entry_factory
         entry_factory.make_entry_for_dashboard.return_value = fake_entry
 
-        fake_tag = datacatalog.Tag()
-        fake_tag.template = 'tagTemplates/sisense_dashboard_metadata'
         tag_factory = self.__mock_tag_factory
-        tag_factory.make_tag_for_dashboard.return_value = fake_tag
+        fake_dashboard_tag = datacatalog.Tag()
+        fake_dashboard_tag.template = 'tagTemplates/sisense_dashboard_metadata'
+        tag_factory.make_tag_for_dashboard.return_value = fake_dashboard_tag
+        fake_filter_tag = datacatalog.Tag()
+        fake_filter_tag.template = 'tagTemplates/sisense_jaql_metadata'
+        tag_factory.make_tags_for_dashboard_filters.return_value = [
+            fake_filter_tag
+        ]
 
         assembled_entry = self.__factory\
             ._AssembledEntryFactory__make_assembled_entry_for_dashboard(
@@ -232,27 +243,45 @@ class AssembledEntryFactoryTest(unittest.TestCase):
             dashboard)
 
         tags = assembled_entry.tags
-        self.assertEqual(1, len(tags))
+        self.assertEqual(2, len(tags))
         self.assertEqual('tagTemplates/sisense_dashboard_metadata',
                          tags[0].template)
+        self.assertEqual('tagTemplates/sisense_jaql_metadata',
+                         tags[1].template)
         tag_factory.make_tag_for_dashboard.assert_called_once_with(
-            tag_template, dashboard)
+            dashboard_tag_template, dashboard)
+        tag_factory.make_tags_for_dashboard_filters.assert_called_once_with(
+            jaql_tag_template, dashboard)
 
     def test_make_assembled_entry_for_widget_should_make_entry_and_tags(self):
 
         widget = self.__make_fake_widget()
-        tag_template = datacatalog.TagTemplate()
-        tag_template.name = 'tagTemplates/sisense_widget_metadata'
-        tag_templates_dict = {'sisense_widget_metadata': tag_template}
+
+        widget_tag_template = datacatalog.TagTemplate()
+        widget_tag_template.name = 'tagTemplates/sisense_widget_metadata'
+        jaql_tag_template = datacatalog.TagTemplate()
+        jaql_tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+        tag_templates_dict = {
+            'sisense_widget_metadata': widget_tag_template,
+            'sisense_jaql_metadata': jaql_tag_template
+        }
 
         fake_entry = ('test-widget', {})
         entry_factory = self.__mock_entry_factory
         entry_factory.make_entry_for_widget.return_value = fake_entry
 
-        fake_tag = datacatalog.Tag()
-        fake_tag.template = 'tagTemplates/sisense_widget_metadata'
         tag_factory = self.__mock_tag_factory
-        tag_factory.make_tag_for_widget.return_value = fake_tag
+        fake_widget_tag = datacatalog.Tag()
+        fake_widget_tag.template = 'tagTemplates/sisense_widget_metadata'
+        tag_factory.make_tag_for_widget.return_value = fake_widget_tag
+        fake_field_tag = datacatalog.Tag()
+        fake_field_tag.template = 'tagTemplates/sisense_jaql_metadata'
+        tag_factory.make_tags_for_widget_fields.return_value = [fake_field_tag]
+        fake_filter_tag = datacatalog.Tag()
+        fake_filter_tag.template = 'tagTemplates/sisense_jaql_metadata'
+        tag_factory.make_tags_for_widget_filters.return_value = [
+            fake_filter_tag
+        ]
 
         assembled_entry = self.__factory\
             ._AssembledEntryFactory__make_assembled_entry_for_widget(
@@ -263,11 +292,19 @@ class AssembledEntryFactoryTest(unittest.TestCase):
         entry_factory.make_entry_for_widget.assert_called_once_with(widget)
 
         tags = assembled_entry.tags
-        self.assertEqual(1, len(tags))
+        self.assertEqual(3, len(tags))
         self.assertEqual('tagTemplates/sisense_widget_metadata',
                          tags[0].template)
+        self.assertEqual('tagTemplates/sisense_jaql_metadata',
+                         tags[1].template)
+        self.assertEqual('tagTemplates/sisense_jaql_metadata',
+                         tags[2].template)
         tag_factory.make_tag_for_widget.assert_called_once_with(
-            tag_template, widget)
+            widget_tag_template, widget)
+        tag_factory.make_tags_for_widget_fields.assert_called_once_with(
+            jaql_tag_template, widget)
+        tag_factory.make_tags_for_widget_filters.assert_called_once_with(
+            jaql_tag_template, widget)
 
     @classmethod
     def __make_fake_folder(cls) -> Dict[str, Any]:

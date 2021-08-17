@@ -16,11 +16,14 @@
 
 from datetime import datetime
 import re
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from google.cloud import datacatalog
 from google.cloud.datacatalog import Tag, TagTemplate
 from google.datacatalog_connectors.commons import prepare
+
+from google.datacatalog_connectors.sisense.prepare import \
+    constants, sisense_connector_strings_helper
 
 
 class DataCatalogTagFactory(prepare.BaseTagFactory):
@@ -76,6 +79,24 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'server_url', self.__server_address)
 
         return tag
+
+    def make_tags_for_dashboard_filters(
+            self, jaql_tag_template: TagTemplate,
+            dashboard_metadata: Dict[str, Any]) -> List[Tag]:
+
+        tags = []
+
+        if not dashboard_metadata.get(constants.DASHBOARD_FILTERS_FIELD_NAME):
+            return tags
+
+        for dashboard_filter in dashboard_metadata[
+                constants.DASHBOARD_FILTERS_FIELD_NAME]:
+            tags.append(
+                self.__make_tag_for_jaql(
+                    jaql_tag_template, dashboard_filter.get('jaql'),
+                    constants.DASHBOARD_ENTRY_FILTERS_COLUMN_NAME))
+
+        return tags
 
     def make_tag_for_folder(self, tag_template: TagTemplate,
                             folder_metadata: Dict[str, Any]) -> Tag:
@@ -154,8 +175,63 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         return tag
 
+    def make_tags_for_widget_fields(
+            self, jaql_tag_template: TagTemplate,
+            widget_metadata: Dict[str, Any]) -> List[Tag]:
+
+        tags = []
+
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
+            return tags
+
+        panels = widget_metadata['metadata']['panels']
+        fields = [
+            panel for panel in panels
+            if not panel.get('name') == constants.WIDGET_FILTERS_PANEL_NAME
+        ]
+        if not fields:
+            return tags
+
+        for field in fields:
+            for item in field.get('items'):
+                tags.append(
+                    self.__make_tag_for_jaql(
+                        jaql_tag_template, item.get('jaql'),
+                        constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME))
+
+        return tags
+
+    def make_tags_for_widget_filters(
+            self, jaql_tag_template: TagTemplate,
+            widget_metadata: Dict[str, Any]) -> List[Tag]:
+
+        tags = []
+
+        if not (widget_metadata.get('metadata') and
+                widget_metadata['metadata'].get('panels')):
+            return tags
+
+        panels = widget_metadata['metadata']['panels']
+        filters = next(
+            (panel.get('items')
+             for panel in panels
+             if panel.get('name') == constants.WIDGET_FILTERS_PANEL_NAME),
+            None)
+        if not filters:
+            return tags
+
+        for widget_filter in filters:
+            tags.append(
+                self.__make_tag_for_jaql(
+                    jaql_tag_template, widget_filter.get('jaql'),
+                    constants.WIDGET_ENTRY_FILTERS_COLUMN_NAME))
+
+        return tags
+
     def __make_tag_for_jaql(self, tag_template: TagTemplate,
-                            jaql_metadata: Dict[str, Any]) -> Tag:
+                            jaql_metadata: Dict[str, Any],
+                            column_prefix: str) -> Tag:
 
         tag = datacatalog.Tag()
 
@@ -176,10 +252,10 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             # decided to scrape table and column metadata from the dimension
             # when the appropriate fields are not available to avoid losing
             # relevant lineage information. A regex is used to do so.
-            dim_matches = re.search(r'^\[(?P<table>.*)\.(?P<column>.*)]$',
-                                    dimension)
-            dim_table = dim_matches.group('table')
-            dim_column = dim_matches.group('column')
+            dim_match = re.search(r'^\[(?P<table>.*)\.(?P<column>.*)]$',
+                                  dimension)
+            dim_table = dim_match.group('table')
+            dim_column = dim_match.group('column')
 
         self._set_string_field(tag, 'table',
                                jaql_metadata.get('table') or dim_table)
@@ -190,5 +266,10 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'aggregation', jaql_metadata.get('agg'))
 
         self._set_string_field(tag, 'server_url', self.__server_address)
+
+        title = jaql_metadata.get('title')
+        subcolumn_name = sisense_connector_strings_helper\
+            .SisenseConnectorStringsHelper.format_column_name(title)
+        tag.column = f'{column_prefix}.{subcolumn_name}'
 
         return tag

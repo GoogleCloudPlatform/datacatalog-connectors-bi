@@ -120,11 +120,17 @@ class AssembledEntryFactory:
                 dashboard_metadata)
 
         tags = []
-        tag_template = tag_templates.get(constants.TAG_TEMPLATE_ID_DASHBOARD)
-        if tag_template:
+        dashboard_tag_template = tag_templates.get(
+            constants.TAG_TEMPLATE_ID_DASHBOARD)
+        if dashboard_tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_dashboard(
-                    tag_template, dashboard_metadata))
+                    dashboard_tag_template, dashboard_metadata))
+        jaql_tag_template = tag_templates.get(constants.TAG_TEMPLATE_ID_JAQL)
+        if jaql_tag_template:
+            tags.extend(
+                self.__datacatalog_tag_factory.make_tags_for_dashboard_filters(
+                    jaql_tag_template, dashboard_metadata))
 
         return prepare.AssembledEntryData(entry_id=entry_id,
                                           entry=entry,
@@ -139,11 +145,20 @@ class AssembledEntryFactory:
                 widget_metadata)
 
         tags = []
-        tag_template = tag_templates.get(constants.TAG_TEMPLATE_ID_WIDGET)
-        if tag_template:
+        widget_tag_template = tag_templates.get(
+            constants.TAG_TEMPLATE_ID_WIDGET)
+        if widget_tag_template:
             tags.append(
                 self.__datacatalog_tag_factory.make_tag_for_widget(
-                    tag_template, widget_metadata))
+                    widget_tag_template, widget_metadata))
+        jaql_tag_template = tag_templates.get(constants.TAG_TEMPLATE_ID_JAQL)
+        if jaql_tag_template:
+            tags.extend(
+                self.__datacatalog_tag_factory.make_tags_for_widget_fields(
+                    jaql_tag_template, widget_metadata))
+            tags.extend(
+                self.__datacatalog_tag_factory.make_tags_for_widget_filters(
+                    jaql_tag_template, widget_metadata))
 
         return prepare.AssembledEntryData(entry_id=entry_id,
                                           entry=entry,

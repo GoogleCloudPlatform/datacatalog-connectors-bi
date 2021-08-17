@@ -46,3 +46,18 @@ USER_SPECIFIED_TYPE_DASHBOARD = 'Dashboard'
 USER_SPECIFIED_TYPE_FOLDER = 'Folder'
 # The user specified type of Widget-related Entries.
 USER_SPECIFIED_TYPE_WIDGET = 'Widget'
+
+# Name of the field used by Sisense Dashboards to store their filters.
+DASHBOARD_FILTERS_FIELD_NAME = 'filters'
+# Name of the column used to store filters metadata in Dashboard-related
+# Data Catalog entries.
+DASHBOARD_ENTRY_FILTERS_COLUMN_NAME = 'filters'
+
+# Name of the panel used by Sisense Widgets to store their filters.
+WIDGET_FILTERS_PANEL_NAME = 'filters'
+# Name of the column used to store fields metadata in Widget-related
+# Data Catalog entries.
+WIDGET_ENTRY_FIELDS_COLUMN_NAME = 'fields'
+# Name of the column used to store filters metadata in Widget-related
+# Data Catalog entries.
+WIDGET_ENTRY_FILTERS_COLUMN_NAME = 'filters'
