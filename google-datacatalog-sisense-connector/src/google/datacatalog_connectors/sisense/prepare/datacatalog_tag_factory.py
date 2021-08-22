@@ -86,11 +86,12 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tags = []
 
-        if not dashboard_metadata.get(constants.DASHBOARD_FILTERS_FIELD_NAME):
+        filters = dashboard_metadata.get(
+            constants.DASHBOARD_FILTERS_FIELD_NAME)
+        if not filters:
             return tags
 
-        for dashboard_filter in dashboard_metadata[
-                constants.DASHBOARD_FILTERS_FIELD_NAME]:
+        for dashboard_filter in filters:
             tags.extend(
                 self.__make_tags_for_jaql(jaql_tag_template,
                                           dashboard_filter.get('jaql'),
@@ -263,7 +264,19 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'column',
                                jaql_metadata.get('column') or dim_column)
 
-        self._set_string_field(tag, 'formula', jaql_metadata.get('formula'))
+        formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
+        context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
+        if formula and context:
+            human_readable_formula = formula
+            context_ids = re.findall(r'\[(.*?)]', formula)
+            for context_id in context_ids:
+                context_title = context.get(f'[{context_id}]').get('title')
+                human_readable_formula = human_readable_formula.replace(
+                    context_id, context_title)
+            self._set_string_field(tag, 'formula', human_readable_formula)
+        else:
+            self._set_string_field(tag, 'formula', formula)
+
         self._set_string_field(tag, 'aggregation', jaql_metadata.get('agg'))
 
         self._set_string_field(tag, 'server_url', self.__server_address)
