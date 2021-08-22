@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from datetime import datetime
+import re
 from typing import Any, Dict, Optional, Tuple
 
 from google.cloud import datacatalog
@@ -94,7 +95,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             return
 
         filters_column = datacatalog.ColumnSchema()
-        filters_column.column = constants.DASHBOARD_ENTRY_FILTERS_COLUMN_NAME
+        filters_column.column = constants.ENTRY_COLUMN_FILTERS
         filters_column.type = 'array'
         filters_column.description = 'The Dashboard filters'
 
@@ -224,7 +225,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             return
 
         fields_column = datacatalog.ColumnSchema()
-        fields_column.column = constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME
+        fields_column.column = constants.ENTRY_COLUMN_FIELDS
         fields_column.type = 'array'
         fields_column.description = 'The Widget fields'
 
@@ -258,7 +259,7 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             return
 
         filters_column = datacatalog.ColumnSchema()
-        filters_column.column = constants.WIDGET_ENTRY_FILTERS_COLUMN_NAME
+        filters_column.column = constants.ENTRY_COLUMN_FILTERS
         filters_column.type = 'array'
         filters_column.description = 'The Widget filters'
 
@@ -284,5 +285,35 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             .format_column_name(jaql_metadata.get('title'))
         column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
             'type') or 'unknown'
+
+        context_subcolumn = cls.__make_column_schema_for_jaql_context(
+            jaql_metadata)
+
+        if context_subcolumn:
+            column.subcolumns.append(context_subcolumn)
+
+        return column
+
+    @classmethod
+    def __make_column_schema_for_jaql_context(
+            cls, jaql_metadata: Dict[str, Any]) -> Optional[ColumnSchema]:
+
+        formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
+        context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
+
+        if not (formula and context):
+            return
+
+        column = datacatalog.ColumnSchema()
+        column.column = constants.ENTRY_COLUMN_CONTEXT
+        column.type = 'array'
+        column.description = \
+            f'The {jaql_metadata.get("title")} context'
+
+        context_ids = re.findall(r'\[(.*?)]', formula)
+        for context_id in context_ids:
+            column.subcolumns.append(
+                cls.__make_column_schema_for_jaql(
+                    context.get(f'[{context_id}]')))
 
         return column

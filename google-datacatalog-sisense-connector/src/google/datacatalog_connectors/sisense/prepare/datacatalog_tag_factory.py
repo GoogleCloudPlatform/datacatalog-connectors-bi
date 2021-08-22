@@ -92,9 +92,9 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         for dashboard_filter in dashboard_metadata[
                 constants.DASHBOARD_FILTERS_FIELD_NAME]:
             tags.append(
-                self.__make_tag_for_jaql(
-                    jaql_tag_template, dashboard_filter.get('jaql'),
-                    constants.DASHBOARD_ENTRY_FILTERS_COLUMN_NAME))
+                self.__make_tag_for_jaql(jaql_tag_template,
+                                         dashboard_filter.get('jaql'),
+                                         constants.ENTRY_COLUMN_FILTERS))
 
         return tags
 
@@ -196,9 +196,9 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         for field in fields:
             for item in field.get('items'):
                 tags.append(
-                    self.__make_tag_for_jaql(
-                        jaql_tag_template, item.get('jaql'),
-                        constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME))
+                    self.__make_tag_for_jaql(jaql_tag_template,
+                                             item.get('jaql'),
+                                             constants.ENTRY_COLUMN_FIELDS))
 
         return tags
 
@@ -223,9 +223,9 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         for widget_filter in filters:
             tags.append(
-                self.__make_tag_for_jaql(
-                    jaql_tag_template, widget_filter.get('jaql'),
-                    constants.WIDGET_ENTRY_FILTERS_COLUMN_NAME))
+                self.__make_tag_for_jaql(jaql_tag_template,
+                                         widget_filter.get('jaql'),
+                                         constants.ENTRY_COLUMN_FILTERS))
 
         return tags
 

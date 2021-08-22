@@ -22,6 +22,14 @@ ENTRY_ID_PART_DASHBOARD = 'db_'
 ENTRY_ID_PART_FOLDER = 'fd_'
 ENTRY_ID_PART_WIDGET = 'wg_'
 
+# Name of the column used to store formula context metadata in Data Catalog
+# entries.
+ENTRY_COLUMN_CONTEXT = 'context'
+# Name of the column used to store fields metadata in Data Catalog entries.
+ENTRY_COLUMN_FIELDS = 'fields'
+# Name of the column used to store filters metadata in Data Catalog entries.
+ENTRY_COLUMN_FILTERS = 'filters'
+
 # The Sisense type for Dashboard assets.
 SISENSE_ASSET_TYPE_DASHBOARD = 'dashboard'
 # The Sisense type for Folder assets.
@@ -49,15 +57,10 @@ USER_SPECIFIED_TYPE_WIDGET = 'Widget'
 
 # Name of the field used by Sisense Dashboards to store their filters.
 DASHBOARD_FILTERS_FIELD_NAME = 'filters'
-# Name of the column used to store filters metadata in Dashboard-related
-# Data Catalog entries.
-DASHBOARD_ENTRY_FILTERS_COLUMN_NAME = 'filters'
-
+# Name of the field used by Sisense JAQL Queries to store their formula
+# contexts.
+JAQL_CONTEXT_FIELD_NAME = 'context'
+# Name of the field used by Sisense JAQL Queries to store their formulas.
+JAQL_FORMULA_FIELD_NAME = 'formula'
 # Name of the panel used by Sisense Widgets to store their filters.
 WIDGET_FILTERS_PANEL_NAME = 'filters'
-# Name of the column used to store fields metadata in Widget-related
-# Data Catalog entries.
-WIDGET_ENTRY_FIELDS_COLUMN_NAME = 'fields'
-# Name of the column used to store filters metadata in Widget-related
-# Data Catalog entries.
-WIDGET_ENTRY_FILTERS_COLUMN_NAME = 'filters'

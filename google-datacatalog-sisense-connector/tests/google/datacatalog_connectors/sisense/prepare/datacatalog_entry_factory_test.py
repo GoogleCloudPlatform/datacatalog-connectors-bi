@@ -144,8 +144,8 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         jaql_metadata = {'datatype': 'datetime', 'title': 'TEST'}
         metadata = {'filters': [{'jaql': jaql_metadata}]}
 
-        column_schema = datacatalog.ColumnSchema()
-        mock_make_column_schema_for_jaql.return_value = column_schema
+        column = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column
 
         schema = \
             self.__factory._DataCatalogEntryFactory__make_schema_for_dashboard(
@@ -153,10 +153,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('filters', schema.columns[0].column)
         mock_make_column_schema_for_jaql.assert_called_once_with(jaql_metadata)
-        self.assertEqual(column_schema, schema.columns[0].subcolumns[0])
+        self.assertEqual(column, schema.columns[0].subcolumns[0])
 
     def test_make_schema_for_dashboard_should_skip_if_no_filters(self):
-
         metadata = {'filters': []}
 
         schema = \
@@ -294,7 +293,6 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_schema_for_widget',
                 lambda *args: datacatalog.Schema())
     def test_make_entry_for_widget_should_set_unnamed_on_missing_title(self):
-
         metadata = {
             '_id': 'a123-b456',
             'oid': 'a123-b457',
@@ -455,30 +453,86 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertIsNone(schema)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
+                f'__make_column_schema_for_jaql_context')
     @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
                 f'.SisenseConnectorStringsHelper.format_column_name',
                 lambda *args: args[0])
-    def test_make_column_schema_for_jaql_should_set_all_available_fields(self):
+    def test_make_column_schema_for_jaql_should_set_all_available_fields(
+            self, mock_make_column_schema_for_jaql_context):
+
         metadata = {'datatype': 'datetime', 'title': 'TEST'}
 
-        column = \
-            self.__factory\
-                ._DataCatalogEntryFactory__make_column_schema_for_jaql(
-                    metadata)
+        column = datacatalog.ColumnSchema()
+        column.column = 'context'
+        mock_make_column_schema_for_jaql_context.return_value = column
+
+        column = self.__factory\
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql(metadata)
 
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
+        mock_make_column_schema_for_jaql_context.assert_called_once_with(
+            metadata)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
+                f'__make_column_schema_for_jaql_context', lambda *args: None)
     @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
                 f'.SisenseConnectorStringsHelper.format_column_name',
                 lambda *args: args[0])
     def test_make_column_schema_for_jaql_should_use_type_field_fallback(self):
         metadata = {'type': 'datetime', 'title': 'TEST'}
 
-        column = \
-            self.__factory\
-                ._DataCatalogEntryFactory__make_column_schema_for_jaql(
-                    metadata)
+        column = self.__factory\
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql(metadata)
 
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_column_schema_for_jaql_context_should_process_all_fields(
+            self, mock_make_column_schema_for_jaql):
+
+        metadata = {
+            'formula': 'AVG([OrderDateYears], [CountOrderID])',
+            'context': {
+                '[OrderDateYears]': {
+                    'dim': '[Orders.OrderDate (Calendar)]',
+                    'level': 'years',
+                },
+                '[CountOrderID]': {
+                    'dim': '[Orders.OrderID]',
+                    'agg': 'count',
+                },
+            },
+            'title': 'JAQL Formula test',
+        }
+
+        column = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column
+
+        column = self.__factory \
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_context(
+                metadata)
+
+        self.assertEqual('context', column.column)
+        self.assertEqual('array', column.type)
+        self.assertEqual('The JAQL Formula test context', column.description)
+        self.assertEqual(2, len(column.subcolumns))
+
+    def test_make_column_schema_for_jaql_context_should_skip_if_no_formula(
+            self):
+
+        metadata = {
+            'context': {
+                '[OrderDateYears]': {
+                    'dim': '[Orders.OrderDate (Calendar)]',
+                },
+            },
+        }
+
+        column = self.__factory \
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_context(
+                metadata)
+
+        self.assertIsNone(column)
