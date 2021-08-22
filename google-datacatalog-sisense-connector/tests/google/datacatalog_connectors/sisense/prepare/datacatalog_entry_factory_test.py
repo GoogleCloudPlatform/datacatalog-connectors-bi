@@ -454,12 +454,15 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertIsNone(schema)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
+                f'__make_column_schema_for_jaql_filter_by')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
                 f'__make_column_schema_for_jaql_formula')
     @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
                 f'.SisenseConnectorStringsHelper.format_column_name',
                 lambda *args: args[0])
     def test_make_column_schema_for_jaql_should_set_all_available_fields(
-            self, mock_make_column_schema_for_jaql_formula):
+            self, mock_make_column_schema_for_jaql_formula,
+            mock_make_column_schema_for_jaql_filter_by):
 
         metadata = {'datatype': 'datetime', 'title': 'TEST'}
 
@@ -467,14 +470,23 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         column.column = 'formula'
         mock_make_column_schema_for_jaql_formula.return_value = column
 
+        column = datacatalog.ColumnSchema()
+        column.column = 'filterBy'
+        mock_make_column_schema_for_jaql_filter_by.return_value = column
+
         column = self.__factory\
             ._DataCatalogEntryFactory__make_column_schema_for_jaql(metadata)
 
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
+
         mock_make_column_schema_for_jaql_formula.assert_called_once_with(
             metadata)
+        mock_make_column_schema_for_jaql_filter_by.assert_called_once_with(
+            metadata)
 
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
+                f'__make_column_schema_for_jaql_filter_by', lambda *args: None)
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
                 f'__make_column_schema_for_jaql_formula', lambda *args: None)
     @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
@@ -505,7 +517,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                     'agg': 'count',
                 },
             },
-            'title': 'JAQL Formula test',
+            'title': 'AVG test',
         }
 
         column = datacatalog.ColumnSchema()
@@ -517,7 +529,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual('formula', column.column)
         self.assertEqual('array', column.type)
-        self.assertEqual('The JAQL Formula test formula', column.description)
+        self.assertEqual('The AVG test formula', column.description)
         self.assertEqual(2, len(column.subcolumns))
 
     def test_make_column_schema_for_jaql_formula_should_skip_if_no_formula(
@@ -546,6 +558,65 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         column = self.__factory \
             ._DataCatalogEntryFactory__make_column_schema_for_jaql_formula(
+                metadata)
+
+        self.assertIsNone(column)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
+    def test_make_column_schema_for_jaql_filter_by_should_process_all_fields(
+            self, mock_make_column_schema_for_jaql):
+
+        metadata = {
+            'dim': '[TableA.ColumnA]',
+            'datatype': 'text',
+            'title': 'Test Table and Column A',
+            'filter': {
+                'by': {
+                    'dim': '[TableB.ColumnB]',
+                    'datatype': 'numeric',
+                    'agg': 'sum',
+                    'title': 'Test Table and Column B',
+                },
+            },
+        }
+
+        column = datacatalog.ColumnSchema()
+        mock_make_column_schema_for_jaql.return_value = column
+
+        column = self.__factory \
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_filter_by(
+                metadata)
+
+        self.assertEqual('filterBy', column.column)
+        self.assertEqual('array', column.type)
+        self.assertEqual('The Test Table and Column A nested filter',
+                         column.description)
+        self.assertEqual(1, len(column.subcolumns))
+
+    def test_make_column_schema_for_jaql_filter_by_should_skip_if_no_filter(
+            self):
+
+        metadata = {
+            'filter': {},
+        }
+
+        column = self.__factory \
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_filter_by(
+                metadata)
+
+        self.assertIsNone(column)
+
+    def test_make_column_schema_for_jaql_filter_by_should_skip_if_no_filter_by(
+            self):
+
+        metadata = {
+            'filter': {
+                'by': {},
+            },
+        }
+
+        column = self.__factory \
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_filter_by(
                 metadata)
 
         self.assertIsNone(column)

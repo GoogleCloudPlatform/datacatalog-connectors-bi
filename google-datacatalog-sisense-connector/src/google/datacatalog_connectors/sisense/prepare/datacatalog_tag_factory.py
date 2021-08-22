@@ -312,7 +312,6 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
         context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
-
         if not (formula and context):
             return tags
 
