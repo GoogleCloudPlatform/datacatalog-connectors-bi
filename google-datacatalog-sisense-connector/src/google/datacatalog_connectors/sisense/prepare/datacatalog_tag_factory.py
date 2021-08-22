@@ -268,11 +268,11 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
         if formula and context:
             human_readable_formula = formula
-            context_ids = re.findall(r'\[(.*?)]', formula)
-            for context_id in context_ids:
-                context_title = context.get(f'[{context_id}]').get('title')
+            parts = re.findall(r'\[(.*?)]', formula)
+            for part in parts:
+                context_title = context.get(f'[{part}]').get('title')
                 human_readable_formula = human_readable_formula.replace(
-                    context_id, context_title)
+                    part, context_title)
             self._set_string_field(tag, 'formula', human_readable_formula)
         else:
             self._set_string_field(tag, 'formula', formula)
@@ -288,12 +288,12 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         tags.append(tag)
 
         tags.extend(
-            self.__make_tags_for_jaql_context(tag_template, jaql_metadata,
+            self.__make_tags_for_jaql_formula(tag_template, jaql_metadata,
                                               tag.column))
 
         return tags
 
-    def __make_tags_for_jaql_context(self, tag_template: TagTemplate,
+    def __make_tags_for_jaql_formula(self, tag_template: TagTemplate,
                                      jaql_metadata: Dict[str, Any],
                                      column_prefix: str) -> List[Tag]:
 
@@ -305,11 +305,11 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         if not (formula and context):
             return tags
 
-        context_ids = re.findall(r'\[(.*?)]', formula)
-        for context_id in context_ids:
+        parts = re.findall(r'\[(.*?)]', formula)
+        for part in parts:
             tags.extend(
-                self.__make_tags_for_jaql(tag_template,
-                                          context.get(f'[{context_id}]'),
-                                          f'{column_prefix}.context'))
+                self.__make_tags_for_jaql(
+                    tag_template, context.get(f'[{part}]'),
+                    f'{column_prefix}.{constants.ENTRY_COLUMN_FORMULA}'))
 
         return tags

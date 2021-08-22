@@ -22,13 +22,12 @@ ENTRY_ID_PART_DASHBOARD = 'db_'
 ENTRY_ID_PART_FOLDER = 'fd_'
 ENTRY_ID_PART_WIDGET = 'wg_'
 
-# Name of the column used to store formula context metadata in Data Catalog
-# entries.
-ENTRY_COLUMN_CONTEXT = 'context'
 # Name of the column used to store fields metadata in Data Catalog entries.
 ENTRY_COLUMN_FIELDS = 'fields'
 # Name of the column used to store filters metadata in Data Catalog entries.
 ENTRY_COLUMN_FILTERS = 'filters'
+# Name of the column used to store formula metadata in Data Catalog entries.
+ENTRY_COLUMN_FORMULA = 'formula'
 
 # The Sisense type for Dashboard assets.
 SISENSE_ASSET_TYPE_DASHBOARD = 'dashboard'

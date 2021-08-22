@@ -286,16 +286,15 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         column.type = jaql_metadata.get('datatype') or jaql_metadata.get(
             'type') or 'unknown'
 
-        context_subcolumn = cls.__make_column_schema_for_jaql_context(
+        formula_subcolumn = cls.__make_column_schema_for_jaql_formula(
             jaql_metadata)
-
-        if context_subcolumn:
-            column.subcolumns.append(context_subcolumn)
+        if formula_subcolumn:
+            column.subcolumns.append(formula_subcolumn)
 
         return column
 
     @classmethod
-    def __make_column_schema_for_jaql_context(
+    def __make_column_schema_for_jaql_formula(
             cls, jaql_metadata: Dict[str, Any]) -> Optional[ColumnSchema]:
 
         formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
@@ -305,15 +304,14 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
             return
 
         column = datacatalog.ColumnSchema()
-        column.column = constants.ENTRY_COLUMN_CONTEXT
+        column.column = constants.ENTRY_COLUMN_FORMULA
         column.type = 'array'
         column.description = \
-            f'The {jaql_metadata.get("title")} context'
+            f'The {jaql_metadata.get("title")} formula'
 
-        context_ids = re.findall(r'\[(.*?)]', formula)
-        for context_id in context_ids:
+        parts = re.findall(r'\[(.*?)]', formula)
+        for part in parts:
             column.subcolumns.append(
-                cls.__make_column_schema_for_jaql(
-                    context.get(f'[{context_id}]')))
+                cls.__make_column_schema_for_jaql(context.get(f'[{part}]')))
 
         return column

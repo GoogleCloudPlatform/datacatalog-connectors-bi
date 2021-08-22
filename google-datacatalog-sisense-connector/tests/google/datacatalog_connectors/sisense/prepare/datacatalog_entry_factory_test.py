@@ -454,29 +454,29 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertIsNone(schema)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
-                f'__make_column_schema_for_jaql_context')
+                f'__make_column_schema_for_jaql_formula')
     @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
                 f'.SisenseConnectorStringsHelper.format_column_name',
                 lambda *args: args[0])
     def test_make_column_schema_for_jaql_should_set_all_available_fields(
-            self, mock_make_column_schema_for_jaql_context):
+            self, mock_make_column_schema_for_jaql_formula):
 
         metadata = {'datatype': 'datetime', 'title': 'TEST'}
 
         column = datacatalog.ColumnSchema()
-        column.column = 'context'
-        mock_make_column_schema_for_jaql_context.return_value = column
+        column.column = 'formula'
+        mock_make_column_schema_for_jaql_formula.return_value = column
 
         column = self.__factory\
             ._DataCatalogEntryFactory__make_column_schema_for_jaql(metadata)
 
         self.assertEqual('TEST', column.column)
         self.assertEqual('datetime', column.type)
-        mock_make_column_schema_for_jaql_context.assert_called_once_with(
+        mock_make_column_schema_for_jaql_formula.assert_called_once_with(
             metadata)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}'
-                f'__make_column_schema_for_jaql_context', lambda *args: None)
+                f'__make_column_schema_for_jaql_formula', lambda *args: None)
     @mock.patch(f'{__FACTORY_PACKAGE}.sisense_connector_strings_helper'
                 f'.SisenseConnectorStringsHelper.format_column_name',
                 lambda *args: args[0])
@@ -490,7 +490,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('datetime', column.type)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
-    def test_make_column_schema_for_jaql_context_should_process_all_fields(
+    def test_make_column_schema_for_jaql_formula_should_process_all_fields(
             self, mock_make_column_schema_for_jaql):
 
         metadata = {
@@ -512,15 +512,15 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         mock_make_column_schema_for_jaql.return_value = column
 
         column = self.__factory \
-            ._DataCatalogEntryFactory__make_column_schema_for_jaql_context(
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_formula(
                 metadata)
 
-        self.assertEqual('context', column.column)
+        self.assertEqual('formula', column.column)
         self.assertEqual('array', column.type)
-        self.assertEqual('The JAQL Formula test context', column.description)
+        self.assertEqual('The JAQL Formula test formula', column.description)
         self.assertEqual(2, len(column.subcolumns))
 
-    def test_make_column_schema_for_jaql_context_should_skip_if_no_formula(
+    def test_make_column_schema_for_jaql_formula_should_skip_if_no_formula(
             self):
 
         metadata = {
@@ -532,7 +532,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         }
 
         column = self.__factory \
-            ._DataCatalogEntryFactory__make_column_schema_for_jaql_context(
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_formula(
                 metadata)
 
         self.assertIsNone(column)
