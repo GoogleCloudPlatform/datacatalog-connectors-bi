@@ -1,13 +1,15 @@
 # google-datacatalog-sisense-connector
 
 Package for ingesting [Sisense](https://www.sisense.com/) metadata into Google
-Cloud Data Catalog, currently supporting below asset types:
+Cloud Data Catalog, currently supporting the below assets:
 - Folder
 - Dashboard
-  - Filters (including upstream ElastiCube Table and Column names)
+  * Filters
+  * Nested formulas
 - Widget
-  - Fields (including upstream ElastiCube Table and Column names)
-  - Filters (including upstream ElastiCube Table and Column names)
+  * Fields
+  * Filters
+  * Nested formulas
 
 **Disclaimer: This is not an officially supported Google product.**
 
@@ -195,13 +197,13 @@ scenarios are described below:
 | Widget Metadata (`sisense_widget_metadata`)       | <ul><li>Id</li><li>Type</li><li>Subtype</li><li>Owner username</li><li>Owner name</li><li>Dashboard Id</li><li>Dashboard Title</li><li>Data Catalog Entry for the Dashboard</li><li>Data Source</li><li>Sisense Server Url</li></ul>                                          | Store additional metadata for Widget-related Entries.                                                                              |
 | JAQL Metadata (`sisense_jaql_metadata`)           | <ul><li>Table</li><li>Column</li><li>Dimension</li><li>Formula</li><li>Aggregation</li><li>Sisense Server Url</li></ul>                                                                                                                                                       | Store lineage metadata for JAQL-dependent entities such as Dashboard filters, Widget fields and filters, formulas and their parts. |
 
-Please notice the connector creates Data Catalog Tags for all Dashboard and
-Widget components (e.g.: fields, filters, and nested formulas) that depend on
-JAQL queries. Such tags are created from the **JAQL Metadata** template and are
-quite simple (~4 fields each). The connector creates a lot of them to store
-metadata for a given Sisense server. These tags enable a column-level lineage
-mechanism which allows users to search Data Catalog to find where/which
-ElastiCube Table fields are used in Widgets or Dashboards.
+Please notice the connector creates Data Catalog Tags for most Dashboard and
+Widget components (e.g., fields, filters, and nested formulas) that depend on
+JAQL queries. Such tags, created from the **JAQL Metadata** template, are quite
+simple: ~4 fields each. The connector creates a lot of them to store metadata
+for a given Sisense server. These tags enable a column-level lineage mechanism
+that allows users to search Data Catalog to find where/which ElastiCube Table
+fields are used in Widgets or Dashboards.
 
 ## 6. Troubleshooting
 
