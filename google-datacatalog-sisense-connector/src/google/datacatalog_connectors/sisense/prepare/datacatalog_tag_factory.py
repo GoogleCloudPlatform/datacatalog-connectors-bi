@@ -86,15 +86,16 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tags = []
 
-        if not dashboard_metadata.get(constants.DASHBOARD_FILTERS_FIELD_NAME):
+        filters = dashboard_metadata.get(
+            constants.DASHBOARD_FILTERS_FIELD_NAME)
+        if not filters:
             return tags
 
-        for dashboard_filter in dashboard_metadata[
-                constants.DASHBOARD_FILTERS_FIELD_NAME]:
-            tags.append(
-                self.__make_tag_for_jaql(
-                    jaql_tag_template, dashboard_filter.get('jaql'),
-                    constants.DASHBOARD_ENTRY_FILTERS_COLUMN_NAME))
+        for dashboard_filter in filters:
+            tags.extend(
+                self.__make_tags_for_jaql(jaql_tag_template,
+                                          dashboard_filter.get('jaql'),
+                                          constants.ENTRY_COLUMN_FILTERS))
 
         return tags
 
@@ -195,10 +196,10 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         for field in fields:
             for item in field.get('items'):
-                tags.append(
-                    self.__make_tag_for_jaql(
-                        jaql_tag_template, item.get('jaql'),
-                        constants.WIDGET_ENTRY_FIELDS_COLUMN_NAME))
+                tags.extend(
+                    self.__make_tags_for_jaql(jaql_tag_template,
+                                              item.get('jaql'),
+                                              constants.ENTRY_COLUMN_FIELDS))
 
         return tags
 
@@ -222,19 +223,23 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             return tags
 
         for widget_filter in filters:
-            tags.append(
-                self.__make_tag_for_jaql(
-                    jaql_tag_template, widget_filter.get('jaql'),
-                    constants.WIDGET_ENTRY_FILTERS_COLUMN_NAME))
+            tags.extend(
+                self.__make_tags_for_jaql(jaql_tag_template,
+                                          widget_filter.get('jaql'),
+                                          constants.ENTRY_COLUMN_FILTERS))
 
         return tags
 
-    def __make_tag_for_jaql(self, tag_template: TagTemplate,
-                            jaql_metadata: Dict[str, Any],
-                            column_prefix: str) -> Tag:
+    def __make_tags_for_jaql(self, tag_template: TagTemplate,
+                             jaql_metadata: Dict[str, Any],
+                             column_prefix: str) -> List[Tag]:
+
+        tags = []
+
+        if not jaql_metadata:
+            return tags
 
         tag = datacatalog.Tag()
-
         tag.template = tag_template.name
 
         dim_table = None
@@ -262,7 +267,27 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         self._set_string_field(tag, 'column',
                                jaql_metadata.get('column') or dim_column)
 
-        self._set_string_field(tag, 'formula', jaql_metadata.get('formula'))
+        formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
+        context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
+        human_readable_formula = formula
+        # The formula and its fields (aka parts) are stored in distinct fields,
+        # ``formula`` and ``context``. The below code seeks to replace the part
+        # identifiers, usually system-generated strings, with the part titles,
+        # which are human-readable strings. On success, the resulting formula
+        # is equal to what Sisense shows to users in the UI.
+        if formula and context:
+            parts = re.findall(r'\[(.*?)]', formula)
+            for part in parts:
+                part_metadata = context.get(f'[{part}]')
+                if not part_metadata:
+                    continue
+                part_title = part_metadata.get('title')
+                if part_title:
+                    human_readable_formula = human_readable_formula.replace(
+                        part, part_title)
+
+        self._set_string_field(tag, 'formula', human_readable_formula)
+
         self._set_string_field(tag, 'aggregation', jaql_metadata.get('agg'))
 
         self._set_string_field(tag, 'server_url', self.__server_address)
@@ -271,5 +296,31 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
         subcolumn_name = sisense_connector_strings_helper\
             .SisenseConnectorStringsHelper.format_column_name(title)
         tag.column = f'{column_prefix}.{subcolumn_name}'
+        tags.append(tag)
 
-        return tag
+        tags.extend(
+            self.__make_tags_for_jaql_formula(tag_template, jaql_metadata,
+                                              tag.column))
+
+        return tags
+
+    def __make_tags_for_jaql_formula(self, tag_template: TagTemplate,
+                                     jaql_metadata: Dict[str, Any],
+                                     column_prefix: str) -> List[Tag]:
+
+        tags = []
+
+        formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
+        context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
+
+        if not (formula and context):
+            return tags
+
+        parts = re.findall(r'\[(.*?)]', formula)
+        for part in parts:
+            tags.extend(
+                self.__make_tags_for_jaql(
+                    tag_template, context.get(f'[{part}]'),
+                    f'{column_prefix}.{constants.ENTRY_COLUMN_FORMULA}'))
+
+        return tags

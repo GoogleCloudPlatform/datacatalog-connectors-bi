@@ -92,9 +92,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('https://test.com',
                          tag.fields['server_url'].string_value)
 
-    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tag_for_jaql')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql')
     def test_make_tags_for_dashboard_filters_should_process_all_filters(
-            self, mock_make_tag_for_jaql):
+            self, mock_make_tags_for_jaql):
 
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_jaql_metadata'
@@ -114,11 +114,13 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             ],
         }
 
+        mock_make_tags_for_jaql.return_value = [datacatalog.Tag()]
+
         tags = self.__factory.make_tags_for_dashboard_filters(
             tag_template, metadata)
 
         self.assertEqual(2, len(tags))
-        self.assertEqual(2, mock_make_tag_for_jaql.call_count)
+        self.assertEqual(2, mock_make_tags_for_jaql.call_count)
 
         calls = [
             mock.call(tag_template, {
@@ -128,7 +130,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                 'datatype': 'datetime',
             }, 'filters')
         ]
-        mock_make_tag_for_jaql.assert_has_calls(calls)
+        mock_make_tags_for_jaql.assert_has_calls(calls)
 
     def test_make_tags_for_dashboard_filters_should_skip_if_no_filters(self):
         tag_template = datacatalog.TagTemplate()
@@ -237,9 +239,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('Test Data Source',
                          tag.fields['datasource'].string_value)
 
-    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tag_for_jaql')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql')
     def test_make_tags_for_widget_fields_should_process_all_fields(
-            self, mock_make_tag_for_jaql):
+            self, mock_make_tags_for_jaql):
 
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_jaql_metadata'
@@ -265,11 +267,13 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             },
         }
 
+        mock_make_tags_for_jaql.return_value = [datacatalog.Tag()]
+
         tags = self.__factory.make_tags_for_widget_fields(
             tag_template, metadata)
 
         self.assertEqual(2, len(tags))
-        self.assertEqual(2, mock_make_tag_for_jaql.call_count)
+        self.assertEqual(2, mock_make_tags_for_jaql.call_count)
 
         calls = [
             mock.call(tag_template, {
@@ -279,7 +283,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                 'datatype': 'datetime',
             }, 'fields')
         ]
-        mock_make_tag_for_jaql.assert_has_calls(calls)
+        mock_make_tags_for_jaql.assert_has_calls(calls)
 
     def test_make_tags_for_widget_fields_should_skip_if_no_panels(self):
         tag_template = datacatalog.TagTemplate()
@@ -306,9 +310,9 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual(0, len(tags))
 
-    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tag_for_jaql')
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql')
     def test_make_tags_for_widget_filters_should_process_all_filters(
-            self, mock_make_tag_for_jaql):
+            self, mock_make_tags_for_jaql):
 
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_jaql_metadata'
@@ -334,11 +338,13 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             },
         }
 
+        mock_make_tags_for_jaql.return_value = [datacatalog.Tag()]
+
         tags = self.__factory.make_tags_for_widget_filters(
             tag_template, metadata)
 
         self.assertEqual(2, len(tags))
-        self.assertEqual(2, mock_make_tag_for_jaql.call_count)
+        self.assertEqual(2, mock_make_tags_for_jaql.call_count)
 
         calls = [
             mock.call(tag_template, {
@@ -348,7 +354,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                 'datatype': 'datetime',
             }, 'filters')
         ]
-        mock_make_tag_for_jaql.assert_has_calls(calls)
+        mock_make_tags_for_jaql.assert_has_calls(calls)
 
     def test_make_tags_for_widget_filters_should_skip_if_no_panels(self):
         tag_template = datacatalog.TagTemplate()
@@ -375,33 +381,66 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
 
         self.assertEqual(0, len(tags))
 
-    def test_make_tag_for_jaql_should_set_all_available_fields(self):
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql_formula')
+    def test_make_tags_for_jaql_should_set_all_available_fields(
+            self, mock_make_tags_for_jaql_formula):
+
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_jaql_metadata'
 
         metadata = {
             'dim': '[table_a.column_a]',
-            'formula': 'GrowthPastYear([AVG COST])',
+            'formula': 'AVG([ODY], [COID])',
+            'context': {
+                '[ODY]': {
+                    'dim': '[Orders.OrderDate (Calendar)]',
+                    'title': 'OrderDateYears',
+                },
+                '[COID]': {
+                    'dim': '[Orders.OrderID]',
+                    'title': 'CountOrderID',
+                },
+            },
             'agg': 'avg',
             'title': 'TEST',
         }
 
-        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
+        mock_make_tags_for_jaql_formula.return_value = []
+
+        tags = self.__factory._DataCatalogTagFactory__make_tags_for_jaql(
             tag_template, metadata, 'test')
 
+        self.assertEqual(1, len(tags))
+
+        tag = tags[0]
         self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
 
         self.assertEqual('table_a', tag.fields['table'].string_value)
         self.assertEqual('column_a', tag.fields['column'].string_value)
         self.assertEqual('[table_a.column_a]',
                          tag.fields['dimension'].string_value)
-        self.assertEqual('GrowthPastYear([AVG COST])',
+        self.assertEqual('AVG([OrderDateYears], [CountOrderID])',
                          tag.fields['formula'].string_value)
         self.assertEqual('avg', tag.fields['aggregation'].string_value)
         self.assertEqual('https://test.com',
                          tag.fields['server_url'].string_value)
 
-    def test_make_tag_for_jaql_should_read_table_and_column_fields(self):
+        mock_make_tags_for_jaql_formula.assert_called_once()
+
+    def test_make_tags_for_jaql_should_skip_if_no_metadata(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {}
+
+        tags = self.__factory._DataCatalogTagFactory__make_tags_for_jaql(
+            tag_template, metadata, 'test')
+
+        self.assertEqual(0, len(tags))
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql_formula',
+                lambda *args: [])
+    def test_make_tags_for_jaql_should_read_table_and_column_fields(self):
         tag_template = datacatalog.TagTemplate()
         tag_template.name = 'tagTemplates/sisense_jaql_metadata'
 
@@ -412,9 +451,12 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
             'title': 'TEST',
         }
 
-        tag = self.__factory._DataCatalogTagFactory__make_tag_for_jaql(
+        tags = self.__factory._DataCatalogTagFactory__make_tags_for_jaql(
             tag_template, metadata, 'test')
 
+        self.assertEqual(1, len(tags))
+
+        tag = tags[0]
         self.assertEqual('tagTemplates/sisense_jaql_metadata', tag.template)
 
         # The ``table`` field takes priority over ``dim``.
@@ -423,3 +465,116 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('column_a', tag.fields['column'].string_value)
         self.assertEqual('[table_b.column_b]',
                          tag.fields['dimension'].string_value)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql_formula',
+                lambda *args: [])
+    def test_make_tags_for_jaql_should_set_formula_as_is_if_no_context(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'formula': 'AVG([ODY], [COID])',
+            'title': 'TEST',
+        }
+
+        tags = self.__factory._DataCatalogTagFactory__make_tags_for_jaql(
+            tag_template, metadata, 'test')
+
+        tag = tags[0]
+        self.assertEqual('AVG([ODY], [COID])',
+                         tag.fields['formula'].string_value)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql_formula',
+                lambda *args: [])
+    def test_make_tags_for_jaql_should_set_formula_with_available_titles(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'formula': 'AVG([ODY], [COID])',
+            'context': {
+                '[ODY]': {
+                    'dim': '[Orders.OrderDate (Calendar)]',
+                    'title': 'OrderDateYears',
+                },
+            },
+            'title': 'TEST',
+        }
+
+        tags = self.__factory._DataCatalogTagFactory__make_tags_for_jaql(
+            tag_template, metadata, 'test')
+
+        tag = tags[0]
+        self.assertEqual('AVG([OrderDateYears], [COID])',
+                         tag.fields['formula'].string_value)
+
+    @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_tags_for_jaql')
+    def test_make_tags_for_jaql_formula_should_process_all_fields(
+            self, mock_make_tags_for_jaql):
+
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'formula': 'AVG([ODY], [COID])',
+            'context': {
+                '[ODY]': {
+                    'dim': '[Orders.OrderDate (Calendar)]',
+                },
+                '[COID]': {
+                    'dim': '[Orders.OrderID]',
+                },
+            },
+        }
+
+        tag = datacatalog.Tag()
+        mock_make_tags_for_jaql.return_value = [tag]
+
+        tags = self.__factory \
+            ._DataCatalogTagFactory__make_tags_for_jaql_formula(
+                tag_template, metadata, 'JAQL Formula test')
+
+        self.assertEqual(2, len(tags))
+        self.assertEqual(2, mock_make_tags_for_jaql.call_count)
+
+        calls = [
+            mock.call(tag_template, {
+                'dim': '[Orders.OrderDate (Calendar)]',
+            }, 'JAQL Formula test.formula'),
+            mock.call(tag_template, {
+                'dim': '[Orders.OrderID]',
+            }, 'JAQL Formula test.formula')
+        ]
+        mock_make_tags_for_jaql.assert_has_calls(calls)
+
+    def test_make_tags_for_jaql_formula_should_skip_if_no_formula(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'context': {
+                '[ODY]': {
+                    'dim': '[Orders.OrderDate (Calendar)]',
+                },
+            },
+        }
+
+        tags = self.__factory \
+            ._DataCatalogTagFactory__make_tags_for_jaql_formula(
+                tag_template, metadata, 'JAQL Formula test')
+
+        self.assertEqual(0, len(tags))
+
+    def test_make_tags_for_jaql_formula_should_skip_if_no_context(self):
+        tag_template = datacatalog.TagTemplate()
+        tag_template.name = 'tagTemplates/sisense_jaql_metadata'
+
+        metadata = {
+            'formula': 'AVG([ODY], [COID])',
+        }
+
+        tags = self.__factory \
+            ._DataCatalogTagFactory__make_tags_for_jaql_formula(
+                tag_template, metadata, 'JAQL Formula test')
+
+        self.assertEqual(0, len(tags))
