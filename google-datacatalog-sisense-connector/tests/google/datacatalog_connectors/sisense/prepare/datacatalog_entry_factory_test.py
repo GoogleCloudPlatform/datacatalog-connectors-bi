@@ -536,3 +536,16 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
                 metadata)
 
         self.assertIsNone(column)
+
+    def test_make_column_schema_for_jaql_formula_should_skip_if_no_context(
+            self):
+
+        metadata = {
+            'formula': 'AVG([OrderDateYears], [CountOrderID])',
+        }
+
+        column = self.__factory \
+            ._DataCatalogEntryFactory__make_column_schema_for_jaql_formula(
+                metadata)
+
+        self.assertIsNone(column)
