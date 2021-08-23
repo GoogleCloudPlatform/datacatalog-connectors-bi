@@ -236,6 +236,9 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         tags = []
 
+        if not jaql_metadata:
+            return tags
+
         tag = datacatalog.Tag()
         tag.template = tag_template.name
 
@@ -266,16 +269,24 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
         context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
+        human_readable_formula = formula
+        # The formula and its fields (aka parts) are stored in distinct fields,
+        # ``formula`` and ``context``. The below code seeks to replace the part
+        # identifiers, usually system-generated strings, with the part titles,
+        # which are human-readable strings. On success, the resulting formula
+        # is equal to what Sisense shows to users in the UI.
         if formula and context:
-            human_readable_formula = formula
             parts = re.findall(r'\[(.*?)]', formula)
             for part in parts:
-                context_title = context.get(f'[{part}]').get('title')
-                human_readable_formula = human_readable_formula.replace(
-                    part, context_title)
-            self._set_string_field(tag, 'formula', human_readable_formula)
-        else:
-            self._set_string_field(tag, 'formula', formula)
+                part_metadata = context.get(f'[{part}]')
+                if not part_metadata:
+                    continue
+                part_title = part_metadata.get('title')
+                if part_title:
+                    human_readable_formula = human_readable_formula.replace(
+                        part, part_title)
+
+        self._set_string_field(tag, 'formula', human_readable_formula)
 
         self._set_string_field(tag, 'aggregation', jaql_metadata.get('agg'))
 
