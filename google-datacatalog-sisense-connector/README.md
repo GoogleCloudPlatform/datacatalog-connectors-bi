@@ -1,15 +1,19 @@
 # google-datacatalog-sisense-connector
 
-Package for ingesting [Sisense](https://www.sisense.com/) metadata into Google
+Package for ingesting [Sisense](https://www.sisense.com) metadata into Google
 Cloud Data Catalog, currently supporting the below assets:
 - Folder
 - Dashboard
-  * Filters
-  * Nested formulas
 - Widget
-  * Fields
-  * Filters
-  * Nested formulas
+
+This sample connector counts on Data Catalog tags to enable a lineage mechanism
+that allows users to search Data Catalog to find where/which ElastiCube Table
+fields are used in Widgets or Dashboards. To do so, it relies on JAQL query 
+metadata from:
+- Dashboard filters
+- Widgets fields and filters
+- Nested formulas
+- Nested `filter.by` fields
 
 **Disclaimer: This is not an officially supported Google product.**
 
@@ -201,9 +205,7 @@ Please notice the connector creates Data Catalog Tags for most Dashboard and
 Widget components (e.g., fields, filters, and nested formulas) that depend on
 JAQL queries. Such tags, created from the **JAQL Metadata** template, are quite
 simple: ~4 fields each. The connector creates a lot of them to store metadata
-for a given Sisense server. These tags enable a column-level lineage mechanism
-that allows users to search Data Catalog to find where/which ElastiCube Table
-fields are used in Widgets or Dashboards.
+for a given Sisense server and enable column-level lineage tracking.
 
 ## 6. Troubleshooting
 

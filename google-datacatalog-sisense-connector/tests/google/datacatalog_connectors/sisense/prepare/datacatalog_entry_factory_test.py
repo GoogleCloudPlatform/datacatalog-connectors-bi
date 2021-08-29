@@ -502,7 +502,7 @@ class DataCatalogEntryFactoryTest(unittest.TestCase):
         self.assertEqual('datetime', column.type)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__make_column_schema_for_jaql')
-    def test_make_column_schema_for_jaql_formula_should_process_all_fields(
+    def test_make_column_schema_for_jaql_formula_should_process_all_parts(
             self, mock_make_column_schema_for_jaql):
 
         metadata = {
