@@ -6,14 +6,14 @@ Cloud Data Catalog, currently supporting the below assets:
 - Dashboard
 - Widget
 
-This sample connector counts on Data Catalog tags to enable a lineage mechanism
-that allows users to search Data Catalog to find where/which ElastiCube Table
-fields are used in Widgets or Dashboards. To do so, it relies on JAQL query 
-metadata from:
+This sample connector creates Data Catalog tags to enable a data lineage
+mechanism that allows users to search the catalog to find where/which
+ElastiCube Table fields are used in Widgets or Dashboards. To do so, it
+currently processes JAQL query metadata from:
 - Dashboard filters
 - Widgets fields and filters
-- Nested formulas
-- Nested `filter.by` fields
+- Nested [formulas](https://sisense.dev/reference/jaql/#formulas)
+- Nested `filter.by` properties, used by [top/bottom filters](https://sisense.dev/reference/jaql/#top-bottom-filters)
 
 **Disclaimer: This is not an officially supported Google product.**
 
@@ -194,18 +194,18 @@ documentation](docs/developer-resources).
 The Data Catalog Tag Templates created by this connector and their usage
 scenarios are described below:
 
-| TAG TEMPLATE                                      | FIELDS                                                                                                                                                                                                                                                                        | USAGE                                                                                                                              |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Folder Metadata (`sisense_folder_metadata`)       | <ul><li>Id</li><li>Owner username</li><li>Owner name</li><li>Id of Parent</li><li>Parent Folder</li><li>Data Catalog Entry for the parent Folder</li><li>Has children</li><li>Child count</li><li>Has dashboards</li><li>Dashboard count</li><li>Sisense Server Url</li></ul> | Store additional metadata for Folder-related Entries.                                                                              |
-| Dashboard Metadata (`sisense_dashboard_metadata`) | <ul><li>Id</li><li>Owner username</li><li>Owner name</li><li>Folder Id</li><li>Folder Name</li><li>Data Catalog Entry for the Folder</li><li>Data Source</li><li>Time it was last published</li><li>Time it was last opened</li><li>Sisense Server Url</li></ul>              | Store additional metadata for Dashboard-related Entries.                                                                           |
-| Widget Metadata (`sisense_widget_metadata`)       | <ul><li>Id</li><li>Type</li><li>Subtype</li><li>Owner username</li><li>Owner name</li><li>Dashboard Id</li><li>Dashboard Title</li><li>Data Catalog Entry for the Dashboard</li><li>Data Source</li><li>Sisense Server Url</li></ul>                                          | Store additional metadata for Widget-related Entries.                                                                              |
-| JAQL Metadata (`sisense_jaql_metadata`)           | <ul><li>Table</li><li>Column</li><li>Dimension</li><li>Formula</li><li>Aggregation</li><li>Sisense Server Url</li></ul>                                                                                                                                                       | Store lineage metadata for JAQL-dependent entities such as Dashboard filters, Widget fields and filters, formulas and their parts. |
+| TAG TEMPLATE                                      | FIELDS                                                                                                                                                                                                                                                                        | USAGE                                                                                                        |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Folder Metadata (`sisense_folder_metadata`)       | <ul><li>Id</li><li>Owner username</li><li>Owner name</li><li>Id of Parent</li><li>Parent Folder</li><li>Data Catalog Entry for the parent Folder</li><li>Has children</li><li>Child count</li><li>Has dashboards</li><li>Dashboard count</li><li>Sisense Server Url</li></ul> | Store additional metadata for Folder-related Entries.                                                        |
+| Dashboard Metadata (`sisense_dashboard_metadata`) | <ul><li>Id</li><li>Owner username</li><li>Owner name</li><li>Folder Id</li><li>Folder Name</li><li>Data Catalog Entry for the Folder</li><li>Data Source</li><li>Time it was last published</li><li>Time it was last opened</li><li>Sisense Server Url</li></ul>              | Store additional metadata for Dashboard-related Entries.                                                     |
+| Widget Metadata (`sisense_widget_metadata`)       | <ul><li>Id</li><li>Type</li><li>Subtype</li><li>Owner username</li><li>Owner name</li><li>Dashboard Id</li><li>Dashboard Title</li><li>Data Catalog Entry for the Dashboard</li><li>Data Source</li><li>Sisense Server Url</li></ul>                                          | Store additional metadata for Widget-related Entries.                                                        |
+| JAQL Metadata (`sisense_jaql_metadata`)           | <ul><li>Table</li><li>Column</li><li>Dimension</li><li>Formula</li><li>Aggregation</li><li>Sisense Server Url</li></ul>                                                                                                                                                       | Store JAQL metadata for ElasticCube-dependent entities such as Dashboard filters, Widget fields and filters. |
 
-Please notice the connector creates Data Catalog Tags for most Dashboard and
-Widget components (e.g., fields, filters, and nested formulas) that depend on
-JAQL queries. Such tags, created from the **JAQL Metadata** template, are quite
-simple: ~4 fields each. The connector creates a lot of them to store metadata
-for a given Sisense server and enable column-level lineage tracking.
+Please notice the connector creates Data Catalog Tags for most of the Dashboard
+and Widget properties that depend on JAQL queries, e.g., fields, filters,
+nested formulas, and top/bottom filters. Such tags, created from the **JAQL
+Metadata** template, are quite simple: ~4 fields each. The connector uses lots
+of them to enable column-level lineage tracking for a given Sisense server.
 
 ## 6. Troubleshooting
 
