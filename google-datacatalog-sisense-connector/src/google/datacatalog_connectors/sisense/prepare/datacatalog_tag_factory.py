@@ -16,7 +16,7 @@
 
 from datetime import datetime
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from google.cloud import datacatalog
 from google.cloud.datacatalog import Tag, TagTemplate
@@ -302,6 +302,11 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
             self.__make_tags_for_jaql_formula(tag_template, jaql_metadata,
                                               tag.column))
 
+        filter_by_tag = self.__make_tag_for_jaql_filter_by(
+            tag_template, jaql_metadata, tag.column)
+        if filter_by_tag:
+            tags.append(filter_by_tag)
+
         return tags
 
     def __make_tags_for_jaql_formula(self, tag_template: TagTemplate,
@@ -312,7 +317,6 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
 
         formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
         context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
-
         if not (formula and context):
             return tags
 
@@ -324,3 +328,17 @@ class DataCatalogTagFactory(prepare.BaseTagFactory):
                     f'{column_prefix}.{constants.ENTRY_COLUMN_FORMULA}'))
 
         return tags
+
+    def __make_tag_for_jaql_filter_by(self, tag_template: TagTemplate,
+                                      jaql_metadata: Dict[str, Any],
+                                      column_prefix: str) -> Optional[Tag]:
+
+        jaql_filter = jaql_metadata.get(constants.JAQL_FILTER_FIELD_NAME)
+        if not jaql_filter:
+            return
+
+        tags = self.__make_tags_for_jaql(
+            tag_template, jaql_filter.get(constants.JAQL_FILTER_BY_FIELD_NAME),
+            f'{column_prefix}.{constants.ENTRY_COLUMN_FILTER_BY}')
+
+        return tags[0] if tags else None

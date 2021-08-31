@@ -291,6 +291,11 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         if formula_subcolumn:
             column.subcolumns.append(formula_subcolumn)
 
+        filter_by_subcolumn = cls.__make_column_schema_for_jaql_filter_by(
+            jaql_metadata)
+        if filter_by_subcolumn:
+            column.subcolumns.append(filter_by_subcolumn)
+
         return column
 
     @classmethod
@@ -299,7 +304,6 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
 
         formula = jaql_metadata.get(constants.JAQL_FORMULA_FIELD_NAME)
         context = jaql_metadata.get(constants.JAQL_CONTEXT_FIELD_NAME)
-
         if not (formula and context):
             return
 
@@ -313,5 +317,26 @@ class DataCatalogEntryFactory(prepare.BaseEntryFactory):
         for part in parts:
             column.subcolumns.append(
                 cls.__make_column_schema_for_jaql(context.get(f'[{part}]')))
+
+        return column
+
+    @classmethod
+    def __make_column_schema_for_jaql_filter_by(
+            cls, jaql_metadata: Dict[str, Any]) -> Optional[ColumnSchema]:
+
+        jaql_filter = jaql_metadata.get(constants.JAQL_FILTER_FIELD_NAME)
+        if not jaql_filter:
+            return
+
+        filter_by = jaql_filter.get(constants.JAQL_FILTER_BY_FIELD_NAME)
+        if not filter_by:
+            return
+
+        column = datacatalog.ColumnSchema()
+        column.column = constants.ENTRY_COLUMN_FILTER_BY
+        column.type = 'array'
+        column.description = f'The {jaql_metadata.get("title")} nested filter'
+
+        column.subcolumns.append(cls.__make_column_schema_for_jaql(filter_by))
 
         return column

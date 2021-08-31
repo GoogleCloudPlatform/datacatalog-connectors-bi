@@ -24,6 +24,9 @@ ENTRY_ID_PART_WIDGET = 'wg_'
 
 # Name of the column used to store fields metadata in Data Catalog entries.
 ENTRY_COLUMN_FIELDS = 'fields'
+# Name of the column used to store metadata for nested JAQL Query filters in
+# Data Catalog entries.
+ENTRY_COLUMN_FILTER_BY = 'filterBy'
 # Name of the column used to store filters metadata in Data Catalog entries.
 ENTRY_COLUMN_FILTERS = 'filters'
 # Name of the column used to store formula metadata in Data Catalog entries.
@@ -59,6 +62,11 @@ DASHBOARD_FILTERS_FIELD_NAME = 'filters'
 # Name of the field used by Sisense JAQL Queries to store their formula
 # contexts.
 JAQL_CONTEXT_FIELD_NAME = 'context'
+# Name of the field used by Sisense JAQL Queries to store their filters.
+JAQL_FILTER_FIELD_NAME = 'filter'
+# Name of the field used by Sisense JAQL Query filters to store their own JAQL
+# Queries.
+JAQL_FILTER_BY_FIELD_NAME = 'by'
 # Name of the field used by Sisense JAQL Queries to store their formulas.
 JAQL_FORMULA_FIELD_NAME = 'formula'
 # Name of the panel used by Sisense Widgets to store their filters.
