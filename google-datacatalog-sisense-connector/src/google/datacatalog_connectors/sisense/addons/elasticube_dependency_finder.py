@@ -155,7 +155,8 @@ class ElastiCubeDependencyFinder:
         return f'({" OR ".join(type_query_terms)})'
 
     @classmethod
-    def __make_datasource_search_term(cls, datasource: str) -> Optional[str]:
+    def __make_datasource_search_term(cls,
+                                      datasource: str = None) -> Optional[str]:
         """Make a Data Catalog search string with the `tag:datasource:val`
         qualifier.
 
@@ -170,7 +171,7 @@ class ElastiCubeDependencyFinder:
         return f'tag:datasource:"{datasource}"' if datasource else None
 
     @classmethod
-    def __make_table_search_term(cls, table: str) -> Optional[str]:
+    def __make_table_search_term(cls, table: str = None) -> Optional[str]:
         """Make a Data Catalog search string with the `tag:table:val`
         qualifier.
 
@@ -184,7 +185,7 @@ class ElastiCubeDependencyFinder:
         return f'tag:table:"{table}"' if table else None
 
     @classmethod
-    def __make_column_search_term(cls, column: str) -> Optional[str]:
+    def __make_column_search_term(cls, column: str = None) -> Optional[str]:
         """Make a Data Catalog search string with the `tag:column:val`
         qualifier.
 
@@ -225,8 +226,11 @@ class ElastiCubeDependencyFinder:
         return tags_dict
 
     @classmethod
-    def __filter_relevant_tags(cls, entry: Entry, tags: List[Tag], table: str,
-                               column: str) -> List[Tag]:
+    def __filter_relevant_tags(cls,
+                               entry: Entry,
+                               tags: List[Tag],
+                               table: str = None,
+                               column: str = None) -> List[Tag]:
         """Filter Tags for ElastiCube dependencies finding. "Relevant", in this
         context, means Tags that have ElastiCube-related information such as
         data source, table, or column names.
@@ -240,7 +244,7 @@ class ElastiCubeDependencyFinder:
         if asset_metadata_tag:
             filtered_tags.append(asset_metadata_tag)
         table_column_matching_tags = cls.__filter_table_column_matching_tags(
-            table, column, tags)
+            tags, table=table, column=column)
         filtered_tags.extend(
             cls.__sort_tags_by_schema(entry.schema.columns, '',
                                       table_column_matching_tags))
@@ -269,14 +273,16 @@ class ElastiCubeDependencyFinder:
                 return tag
 
     @classmethod
-    def __filter_table_column_matching_tags(cls, table: str, column: str,
-                                            tags: List[Tag]) -> List[Tag]:
+    def __filter_table_column_matching_tags(cls,
+                                            tags: List[Tag],
+                                            table: str = None,
+                                            column: str = None) -> List[Tag]:
         """Filter JAQL-related Tags which `table` and/or `column` fields match
-        the provided values.
+        the provided args.
 
         If both `table` and `column` args are provided, a given Tag's
-        corresponding fields must match both values in order to added to the
-        resulting list.
+        corresponding fields must match both values in order to have the Tag
+        added to the resulting list.
 
         Returns:
             list: The filtered Tags.

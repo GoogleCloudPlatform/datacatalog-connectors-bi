@@ -171,7 +171,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
             self):
 
         query = self.__finder\
-            ._ElastiCubeDependencyFinder__make_datasource_search_term(None)
+            ._ElastiCubeDependencyFinder__make_datasource_search_term()
 
         self.assertIsNone(query)
 
@@ -184,7 +184,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
     def test_make_table_search_term_should_return_none_if_no_table(self):
         query = self.__finder\
-            ._ElastiCubeDependencyFinder__make_table_search_term(None)
+            ._ElastiCubeDependencyFinder__make_table_search_term()
 
         self.assertIsNone(query)
 
@@ -196,7 +196,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
     def test_make_column_search_term_should_return_none_if_no_column(self):
         query = self.__finder\
-            ._ElastiCubeDependencyFinder__make_column_search_term(None)
+            ._ElastiCubeDependencyFinder__make_column_search_term()
 
         self.assertIsNone(query)
 
@@ -253,7 +253,8 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder._ElastiCubeDependencyFinder__filter_relevant_tags(
             fake_entry, [fake_asset_metadata_tag, fake_table_matching_tag],
-            'test-table', 'test-column')
+            table='test-table',
+            column='test-column')
 
         self.assertEqual(2, len(tags))
         self.assertEqual(fake_asset_metadata_tag, tags[0])
@@ -262,8 +263,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         mock_filter_asset_metadata_tag.assert_called_once_with(
             [fake_asset_metadata_tag, fake_table_matching_tag])
         mock_filter_table_column_matching_tags.assert_called_once_with(
-            'test-table', 'test-column',
-            [fake_asset_metadata_tag, fake_table_matching_tag])
+            [fake_asset_metadata_tag, fake_table_matching_tag],
+            table='test-table',
+            column='test-column')
         mock_sort_tags_by_schema.assert_called_once_with(
             [], '', [fake_table_matching_tag])
 
@@ -307,14 +309,14 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder\
             ._ElastiCubeDependencyFinder__filter_table_column_matching_tags(
-                'test-table', '',
-                [fake_table_matching_tag, fake_non_matching_tag])
+                [fake_table_matching_tag, fake_non_matching_tag],
+                table='test-table')
 
         self.assertEqual(1, len(tags))
         self.assertEqual(fake_table_matching_tag, tags[0])
 
         mock_filter_column_matching_tags.assert_called_once_with(
-            '', [fake_table_matching_tag, fake_non_matching_tag])
+            None, [fake_table_matching_tag, fake_non_matching_tag])
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__filter_column_matching_tags')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__filter_table_matching_tags',
@@ -332,8 +334,8 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder\
             ._ElastiCubeDependencyFinder__filter_table_column_matching_tags(
-                '', 'test-column',
-                [fake_non_matching_tag, fake_column_matching_tag])
+                [fake_non_matching_tag, fake_column_matching_tag],
+                column='test-column')
 
         self.assertEqual(1, len(tags))
         self.assertEqual(fake_column_matching_tag, tags[0])
@@ -361,12 +363,12 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder\
             ._ElastiCubeDependencyFinder__filter_table_column_matching_tags(
-                'test-table', 'test-column',
                 [
                     fake_table_only_matching_tag,
                     fake_column_only_matching_tag,
                     fake_table_column_matching_tag
-                ])
+                ],
+                table='test-table', column='test-column')
 
         self.assertEqual(1, len(tags))
         self.assertEqual(fake_table_column_matching_tag, tags[0])
