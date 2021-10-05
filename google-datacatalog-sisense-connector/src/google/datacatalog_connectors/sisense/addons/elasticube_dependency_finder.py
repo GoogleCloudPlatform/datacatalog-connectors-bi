@@ -37,10 +37,12 @@ class ElastiCubeDependencyFinder:
     def __init__(self, project_id: str):
         self.__datacatalog_facade = commons.DataCatalogFacade(project_id)
 
-    def find(self,
-             datasource: str = None,
-             table: str = None,
-             column: str = None) -> Dict[str, Tuple[Entry, List[Tag]]]:
+    def find(
+            self,
+            datasource: Optional[str] = None,
+            table: Optional[str] = None,
+            column: Optional[str] = None
+    ) -> Dict[str, Tuple[Entry, List[Tag]]]:
         """
         Orchestrate actions that comprise:
             - generating a query string to search Google Data Catalog;
@@ -57,9 +59,7 @@ class ElastiCubeDependencyFinder:
         """
         logging.info('')
         logging.info('===> Searching Data Catalog...')
-        query = self.__make_query(datasource=datasource,
-                                  table=table,
-                                  column=column)
+        query = self.__make_query(datasource, table, column)
         search_results = self.__datacatalog_facade.search_catalog(query)
         logging.info('==== DONE ========================================')
 
@@ -97,9 +97,9 @@ class ElastiCubeDependencyFinder:
 
     @classmethod
     def __make_query(cls,
-                     datasource: str = None,
-                     table: str = None,
-                     column: str = None) -> str:
+                     datasource: Optional[str] = None,
+                     table: Optional[str] = None,
+                     column: Optional[str] = None) -> str:
         """Make a Data Catalog search string by joining static and dynamic
         terms.
 
@@ -155,8 +155,9 @@ class ElastiCubeDependencyFinder:
         return f'({" OR ".join(type_query_terms)})'
 
     @classmethod
-    def __make_datasource_search_term(cls,
-                                      datasource: str = None) -> Optional[str]:
+    def __make_datasource_search_term(
+            cls, datasource: Optional[str] = None
+    ) -> Optional[str]:  # yapf: disable
         """Make a Data Catalog search string with the `tag:datasource:val`
         qualifier.
 
@@ -171,7 +172,8 @@ class ElastiCubeDependencyFinder:
         return f'tag:datasource:"{datasource}"' if datasource else None
 
     @classmethod
-    def __make_table_search_term(cls, table: str = None) -> Optional[str]:
+    def __make_table_search_term(cls,
+                                 table: Optional[str] = None) -> Optional[str]:
         """Make a Data Catalog search string with the `tag:table:val`
         qualifier.
 
@@ -185,7 +187,9 @@ class ElastiCubeDependencyFinder:
         return f'tag:table:"{table}"' if table else None
 
     @classmethod
-    def __make_column_search_term(cls, column: str = None) -> Optional[str]:
+    def __make_column_search_term(
+            cls, column: Optional[str] = None
+    ) -> Optional[str]:  # yapf: disable
         """Make a Data Catalog search string with the `tag:column:val`
         qualifier.
 
@@ -229,8 +233,8 @@ class ElastiCubeDependencyFinder:
     def __filter_relevant_tags(cls,
                                entry: Entry,
                                tags: List[Tag],
-                               table: str = None,
-                               column: str = None) -> List[Tag]:
+                               table: Optional[str] = None,
+                               column: Optional[str] = None) -> List[Tag]:
         """Filter Tags for ElastiCube dependencies finding. "Relevant", in this
         context, means Tags that have ElastiCube-related information such as
         data source, table, or column names.
@@ -244,7 +248,7 @@ class ElastiCubeDependencyFinder:
         if asset_metadata_tag:
             filtered_tags.append(asset_metadata_tag)
         table_column_matching_tags = cls.__filter_table_column_matching_tags(
-            tags, table=table, column=column)
+            tags, table, column)
         filtered_tags.extend(
             cls.__sort_tags_by_schema(entry.schema.columns, '',
                                       table_column_matching_tags))
@@ -273,10 +277,11 @@ class ElastiCubeDependencyFinder:
                 return tag
 
     @classmethod
-    def __filter_table_column_matching_tags(cls,
-                                            tags: List[Tag],
-                                            table: str = None,
-                                            column: str = None) -> List[Tag]:
+    def __filter_table_column_matching_tags(
+            cls,
+            tags: List[Tag],
+            table: Optional[str] = None,
+            column: Optional[str] = None) -> List[Tag]:
         """Filter JAQL-related Tags which `table` and/or `column` fields match
         the provided args.
 
@@ -289,9 +294,9 @@ class ElastiCubeDependencyFinder:
         """
         jaql_tags = cls.filter_jaql_tags(tags)
         table_matching_tags = cls.__filter_table_matching_tags(
-            table, jaql_tags)
+            jaql_tags, table)
         column_matching_tags = cls.__filter_column_matching_tags(
-            column, table_matching_tags if table and column else tags)
+            table_matching_tags if table and column else tags, column)
 
         return column_matching_tags if column else table_matching_tags
 
@@ -316,8 +321,9 @@ class ElastiCubeDependencyFinder:
         return filtered_tags
 
     @classmethod
-    def __filter_table_matching_tags(cls, table: str,
-                                     tags: List[Tag]) -> List[Tag]:
+    def __filter_table_matching_tags(cls,
+                                     tags: List[Tag],
+                                     table: Optional[str] = None) -> List[Tag]:
         """Filter Tags that have a `table` field that match the provided table
         name.
 
@@ -336,8 +342,11 @@ class ElastiCubeDependencyFinder:
         ]
 
     @classmethod
-    def __filter_column_matching_tags(cls, column: str,
-                                      tags: List[Tag]) -> List[Tag]:
+    def __filter_column_matching_tags(
+            cls,
+            tags: List[Tag],
+            column: Optional[str] = None
+    ) -> List[Tag]:  # yapf: disable
         """Filter Tags that have a `column` field that match the provided
         column name.
 

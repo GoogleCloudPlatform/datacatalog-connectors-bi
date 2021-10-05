@@ -71,9 +71,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.__datacatalog_facade.search_catalog.assert_called_once_with(
             fake_query)
 
-        mock_make_query.assert_called_once_with(datasource=None,
-                                                table='test-table',
-                                                column=None)
+        mock_make_query.assert_called_once_with(None, 'test-table', None)
         mock_get_entries.assert_called_once_with(['fake_entries/table-entry'])
         mock_list_tags.assert_called_once_with(['fake_entries/table-entry'])
         mock_filter_relevant_tags.assert_called_once_with(
@@ -134,9 +132,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         mock_make_column_search_term.return_value = 'tag:column:"test-column"'
 
         query = self.__finder._ElastiCubeDependencyFinder__make_query(
-            datasource='test-datasource',
-            table='test-table',
-            column='test-column')
+            'test-datasource', 'test-table', 'test-column')
 
         self.assertTrue('tag:datasource:"test-datasource"' in query)
         self.assertTrue('tag:table:"test-table"' in query)
@@ -253,8 +249,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder._ElastiCubeDependencyFinder__filter_relevant_tags(
             fake_entry, [fake_asset_metadata_tag, fake_table_matching_tag],
-            table='test-table',
-            column='test-column')
+            'test-table', 'test-column')
 
         self.assertEqual(2, len(tags))
         self.assertEqual(fake_asset_metadata_tag, tags[0])
@@ -263,9 +258,8 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         mock_filter_asset_metadata_tag.assert_called_once_with(
             [fake_asset_metadata_tag, fake_table_matching_tag])
         mock_filter_table_column_matching_tags.assert_called_once_with(
-            [fake_asset_metadata_tag, fake_table_matching_tag],
-            table='test-table',
-            column='test-column')
+            [fake_asset_metadata_tag, fake_table_matching_tag], 'test-table',
+            'test-column')
         mock_sort_tags_by_schema.assert_called_once_with(
             [], '', [fake_table_matching_tag])
 
@@ -316,11 +310,11 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual(fake_table_matching_tag, tags[0])
 
         mock_filter_column_matching_tags.assert_called_once_with(
-            None, [fake_table_matching_tag, fake_non_matching_tag])
+            [fake_table_matching_tag, fake_non_matching_tag], None)
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__filter_column_matching_tags')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__filter_table_matching_tags',
-                lambda *args: None)
+                lambda *args, **kwargs: None)
     @mock.patch(f'{__FINDER_CLASS}.filter_jaql_tags', lambda *args: args)
     def test_filter_table_column_matching_tags_should_return_matching_column(
             self, mock_filter_column_matching_tags):
@@ -341,7 +335,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual(fake_column_matching_tag, tags[0])
 
         mock_filter_column_matching_tags.assert_called_once_with(
-            'test-column', [fake_non_matching_tag, fake_column_matching_tag])
+            [fake_non_matching_tag, fake_column_matching_tag], 'test-column')
 
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__filter_column_matching_tags')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__filter_table_matching_tags')
@@ -368,14 +362,14 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
                     fake_column_only_matching_tag,
                     fake_table_column_matching_tag
                 ],
-                table='test-table', column='test-column')
+                'test-table', 'test-column')
 
         self.assertEqual(1, len(tags))
         self.assertEqual(fake_table_column_matching_tag, tags[0])
 
         mock_filter_column_matching_tags.assert_called_once_with(
-            'test-column',
-            [fake_table_only_matching_tag, fake_table_column_matching_tag])
+            [fake_table_only_matching_tag, fake_table_column_matching_tag],
+            'test-column')
 
     def test_filter_jaql_tags_should_return_only_jaql_tags(self):
 
@@ -401,7 +395,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder \
             ._ElastiCubeDependencyFinder__filter_table_matching_tags(
-                None, [fake_table_related_tag])
+                [fake_table_related_tag])
 
         self.assertEqual(0, len(tags))
 
@@ -413,7 +407,8 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder \
             ._ElastiCubeDependencyFinder__filter_table_matching_tags(
-                'test-table', [fake_non_matching_tag, fake_table_matching_tag])
+                [fake_non_matching_tag, fake_table_matching_tag],
+                table='test-table')
 
         self.assertEqual(1, len(tags))
         self.assertEqual(fake_table_matching_tag, tags[0])
@@ -424,7 +419,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder \
             ._ElastiCubeDependencyFinder__filter_column_matching_tags(
-                None, [fake_column_related_tag])
+                [fake_column_related_tag])
 
         self.assertEqual(0, len(tags))
 
@@ -438,8 +433,8 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
         tags = self.__finder \
             ._ElastiCubeDependencyFinder__filter_column_matching_tags(
-                'test-column',
-                [fake_non_matching_tag, fake_column_matching_tag])
+                [fake_non_matching_tag, fake_column_matching_tag],
+                column='test-column')
 
         self.assertEqual(1, len(tags))
         self.assertEqual(fake_column_matching_tag, tags[0])
