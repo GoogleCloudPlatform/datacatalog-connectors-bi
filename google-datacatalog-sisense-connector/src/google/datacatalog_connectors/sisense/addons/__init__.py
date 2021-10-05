@@ -15,5 +15,6 @@
 # limitations under the License.
 
 from .elasticube_dependency_finder import ElastiCubeDependencyFinder
+from .elasticube_dependency_printer import ElastiCubeDependencyPrinter
 
-__all__ = ('ElastiCubeDependencyFinder',)
+__all__ = ('ElastiCubeDependencyFinder', 'ElastiCubeDependencyPrinter')

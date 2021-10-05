@@ -23,49 +23,51 @@ from google.datacatalog_connectors.sisense import sisense2datacatalog_cli
 
 class Sisense2DataCatalogCliTest(unittest.TestCase):
 
-    def test_parse_args_missing_sisense_server_should_raise_system_exit(self):
+    def test_parse_args_sync_catalog_should_require_sisense_server(self):
         self.assertRaises(
             SystemExit,
             sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
+                'sync-catalog', '--sisense-username', 'test-username',
+                '--sisense-password', 'test-password',
+                '--datacatalog-project-id', 'dc-project-id'
+            ])
+
+    def test_parse_args_sync_catalog_should_require_sisense_username(self):
+        self.assertRaises(
+            SystemExit,
+            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
+                'sync-catalog', '--sisense-server', 'test-server',
+                '--sisense-password', 'test-password',
+                '--datacatalog-project-id', 'dc-project-id'
+            ])
+
+    def test_parse_args_sync_catalog_should_require_sisense_password(self):
+        self.assertRaises(
+            SystemExit,
+            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
+                'sync-catalog', '--sisense-server', 'test-server',
+                '--sisense-username', 'test-username',
+                '--datacatalog-project-id', 'dc-project-id'
+            ])
+
+    def test_parse_args_sync_catalog_should_require_project_id(self):
+        self.assertRaises(
+            SystemExit,
+            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
+                'sync-catalog', '--sisense-server', 'test-server',
                 '--sisense-username', 'test-username', '--sisense-password',
-                'test-password', '--datacatalog-project-id', 'dc-project-id'
-            ])
-
-    def test_parse_args_missing_sisense_username_should_raise_system_exit(
-            self):
-
-        self.assertRaises(
-            SystemExit,
-            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
-                '--sisense-server', 'test-server', '--sisense-password',
-                'test-password', '--datacatalog-project-id', 'dc-project-id'
-            ])
-
-    def test_parse_args_missing_sisense_password_should_raise_system_exit(
-            self):
-
-        self.assertRaises(
-            SystemExit,
-            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
-                '--sisense-server', 'test-server', '--sisense-username',
-                'test-username', '--datacatalog-project-id', 'dc-project-id'
-            ])
-
-    def test_parse_args_missing_project_id_should_raise_system_exit(self):
-        self.assertRaises(
-            SystemExit,
-            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
-                '--sisense-server', 'test-server', '--sisense-username',
-                'test-username', '--sisense-password', 'test-password'
+                'test-password'
             ])
 
     @mock.patch(
         'google.datacatalog_connectors.sisense.sync.MetadataSynchronizer')
-    def test_run_should_call_synchronizer(self, mock_metadata_synchonizer):
+    def test_sync_catalog_should_use_synchronizer(self,
+                                                  mock_metadata_synchonizer):
+
         sisense2datacatalog_cli.Sisense2DataCatalogCli.run([
-            '--sisense-server', 'test-server', '--sisense-username',
-            'test-username', '--sisense-password', 'test-password',
-            '--datacatalog-project-id', 'dc-project-id'
+            'sync-catalog', '--sisense-server', 'test-server',
+            '--sisense-username', 'test-username', '--sisense-password',
+            'test-password', '--datacatalog-project-id', 'dc-project-id'
         ])
 
         mock_metadata_synchonizer.assert_called_once_with(
@@ -77,6 +79,49 @@ class Sisense2DataCatalogCliTest(unittest.TestCase):
 
         synchonizer = mock_metadata_synchonizer.return_value
         synchonizer.run.assert_called_once()
+
+    def test_parse_args_find_elasticube_deps_should_require_project_id(self):
+        self.assertRaises(
+            SystemExit,
+            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
+                'find-elasticube-deps', '--datasource', 'test-datasource',
+                '--table', 'test-table', '--column', 'test-column'
+            ])
+
+    @mock.patch('google.datacatalog_connectors.sisense.addons'
+                '.ElastiCubeDependencyPrinter')
+    @mock.patch('google.datacatalog_connectors.sisense.addons'
+                '.ElastiCubeDependencyFinder')
+    def test_find_elasticube_deps_should_find_and_print_dependencies(
+            self, mock_deps_finder, mock_deps_printer):
+
+        sisense2datacatalog_cli.Sisense2DataCatalogCli.run([
+            'find-elasticube-deps', '--datasource', 'test-datasource',
+            '--table', 'test-table', '--column', 'test-column',
+            '--datacatalog-project-id', 'dc-project-id'
+        ])
+
+        mock_deps_finder.assert_called_once_with('dc-project-id')
+
+        printer = mock_deps_finder.return_value
+        printer.find.assert_called_once_with('test-datasource', 'test-table',
+                                             'test-column')
+
+        printer = mock_deps_printer.return_value
+        printer.print_dependency_finder_results.assert_called_once()
+
+    @mock.patch('google.datacatalog_connectors.sisense.addons'
+                '.ElastiCubeDependencyFinder')
+    def test_find_elasticube_deps_should_exit_on_exception(
+            self, mock_deps_finder):
+
+        mock_deps_finder.return_value.find.side_effect = Exception()
+
+        self.assertRaises(SystemExit,
+                          sisense2datacatalog_cli.Sisense2DataCatalogCli.run, [
+                              'find-elasticube-deps',
+                              '--datacatalog-project-id', 'dc-project-id'
+                          ])
 
     @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
                 '.Sisense2DataCatalogCli')

@@ -130,7 +130,7 @@ export SISENSE2DC_DATACATALOG_LOCATION_ID=google_cloud_location_id
 - Virtualenv
 
 ```shell script
-google-datacatalog-sisense-connector \
+google-datacatalog-sisense-connector sync-catalog \
   --sisense-server $SISENSE2DC_SISENSE_SERVER \
   --sisense-username $SISENSE2DC_SISENSE_USERNAME \
   --sisense-password $SISENSE2DC_SISENSE_PASSWORD \
@@ -143,7 +143,7 @@ google-datacatalog-sisense-connector \
 ```shell script
 docker build --rm --tag sisense2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
-  sisense2datacatalog \
+  sisense2datacatalog sync-catalog \
   --sisense-server $SISENSE2DC_SISENSE_SERVER \
   --sisense-username $SISENSE2DC_SISENSE_USERNAME \
   --sisense-password $SISENSE2DC_SISENSE_PASSWORD \
