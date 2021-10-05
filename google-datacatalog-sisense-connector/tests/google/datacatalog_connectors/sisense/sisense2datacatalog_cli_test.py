@@ -59,8 +59,8 @@ class Sisense2DataCatalogCliTest(unittest.TestCase):
                 'test-password'
             ])
 
-    @mock.patch(
-        'google.datacatalog_connectors.sisense.sync.MetadataSynchronizer')
+    @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
+                '.sync.MetadataSynchronizer')
     def test_sync_catalog_should_use_synchronizer(self,
                                                   mock_metadata_synchonizer):
 
@@ -88,10 +88,10 @@ class Sisense2DataCatalogCliTest(unittest.TestCase):
                 '--table', 'test-table', '--column', 'test-column'
             ])
 
-    @mock.patch('google.datacatalog_connectors.sisense.addons'
-                '.ElastiCubeDependencyPrinter')
-    @mock.patch('google.datacatalog_connectors.sisense.addons'
-                '.ElastiCubeDependencyFinder')
+    @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
+                '.addons.ElastiCubeDependencyPrinter')
+    @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
+                '.addons.ElastiCubeDependencyFinder')
     def test_find_elasticube_deps_should_find_and_print_dependencies(
             self, mock_deps_finder, mock_deps_printer):
 
@@ -103,15 +103,14 @@ class Sisense2DataCatalogCliTest(unittest.TestCase):
 
         mock_deps_finder.assert_called_once_with('dc-project-id')
 
-        printer = mock_deps_finder.return_value
-        printer.find.assert_called_once_with('test-datasource', 'test-table',
-                                             'test-column')
+        finder = mock_deps_finder.return_value
+        finder.find.assert_called_once_with('test-datasource', 'test-table',
+                                            'test-column')
 
-        printer = mock_deps_printer.return_value
-        printer.print_dependency_finder_results.assert_called_once()
+        mock_deps_printer.print_dependency_finder_results.assert_called_once()
 
-    @mock.patch('google.datacatalog_connectors.sisense.addons'
-                '.ElastiCubeDependencyFinder')
+    @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
+                '.addons.ElastiCubeDependencyFinder')
     def test_find_elasticube_deps_should_exit_on_exception(
             self, mock_deps_finder):
 

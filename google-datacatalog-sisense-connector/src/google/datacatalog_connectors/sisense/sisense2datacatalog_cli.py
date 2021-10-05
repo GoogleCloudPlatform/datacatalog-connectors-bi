@@ -121,8 +121,8 @@ class _FindElastiCubeDepsCliHelper:
                 args.datacatalog_project_id).find(args.datasource, args.table,
                                                   args.column)
 
-            addons.ElastiCubeDependencyPrinter()\
-                .print_dependency_finder_results(dependencies)
+            addons.ElastiCubeDependencyPrinter.print_dependency_finder_results(
+                dependencies)
         except Exception as e:
             raise SystemExit(e)
 

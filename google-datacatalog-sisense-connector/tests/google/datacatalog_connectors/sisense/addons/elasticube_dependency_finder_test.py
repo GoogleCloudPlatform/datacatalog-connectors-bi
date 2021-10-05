@@ -16,12 +16,12 @@
 
 import unittest
 from unittest import mock
-from typing import Tuple
 
 from google.cloud import datacatalog
-from google.cloud.datacatalog import Entry, SearchCatalogResult, Tag
 
 from google.datacatalog_connectors.sisense import addons
+
+from . import elasticube_dependency_mocks as mocks
 
 
 class ElastiCubeDependencyFinderTest(unittest.TestCase):
@@ -48,15 +48,15 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         mock_make_query.return_value = fake_query
 
         self.__datacatalog_facade.search_catalog.return_value = [
-            self.__make_fake_search_result('table-entry')
+            mocks.make_fake_search_result('table-entry')
         ]
 
-        fake_entry = self.__make_fake_entry('table-entry')
+        fake_entry = mocks.make_fake_entry('table-entry')
         mock_get_entries.return_value = {
             'fake_entries/table-entry': fake_entry
         }
 
-        fake_tag = self.__make_fake_tag()
+        fake_tag = mocks.make_fake_tag()
         mock_list_tags.return_value = {'fake_entries/table-entry': [fake_tag]}
 
         mock_filter_relevant_tags.return_value = [fake_tag]
@@ -204,7 +204,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual('tag:column:"test-column"', query)
 
     def test_get_entries_should_return_dict(self):
-        fake_entry = self.__make_fake_entry('some-entry')
+        fake_entry = mocks.make_fake_entry('some-entry')
         self.__datacatalog_facade.get_entry.return_value = fake_entry
 
         entries = self.__finder._ElastiCubeDependencyFinder__get_entries(
@@ -217,7 +217,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
             'fake_entries/some-entry')
 
     def test_list_tags_should_return_dict(self):
-        fake_tag = self.__make_fake_tag()
+        fake_tag = mocks.make_fake_tag()
         self.__datacatalog_facade.list_tags.return_value = [fake_tag]
 
         tags = self.__finder._ElastiCubeDependencyFinder__list_tags(
@@ -237,9 +237,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
             self, mock_filter_asset_metadata_tag,
             mock_filter_table_column_matching_tags, mock_sort_tags_by_schema):
 
-        fake_entry = self.__make_fake_entry('some-entry')
-        fake_asset_metadata_tag = self.__make_fake_tag()
-        fake_table_matching_tag = self.__make_fake_tag()
+        fake_entry = mocks.make_fake_entry('some-entry')
+        fake_asset_metadata_tag = mocks.make_fake_tag()
+        fake_table_matching_tag = mocks.make_fake_tag()
 
         mock_filter_asset_metadata_tag.return_value = fake_asset_metadata_tag
         mock_filter_table_column_matching_tags.return_value = [
@@ -266,9 +266,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
     def test_filter_asset_metadata_tag_should_return_dashboard_metadata_tag(
             self):
 
-        fake_jaql_related_tag = self.__make_fake_tag(
+        fake_jaql_related_tag = mocks.make_fake_tag(
             template='test/tagTemplates/sisense_jaql_metadata')
-        fake_dashboard_metadata_tag = self.__make_fake_tag(
+        fake_dashboard_metadata_tag = mocks.make_fake_tag(
             template='test/tagTemplates/sisense_dashboard_metadata')
 
         tag = self.__finder.filter_asset_metadata_tag(
@@ -277,9 +277,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual(fake_dashboard_metadata_tag, tag)
 
     def test_filter_asset_metadata_tag_should_return_widget_metadata_tag(self):
-        fake_jaql_related_tag = self.__make_fake_tag(
+        fake_jaql_related_tag = mocks.make_fake_tag(
             template='test/tagTemplates/sisense_jaql_metadata')
-        fake_widget_metadata_tag = self.__make_fake_tag(
+        fake_widget_metadata_tag = mocks.make_fake_tag(
             template='test/tagTemplates/sisense_widget_metadata')
 
         tag = self.__finder.filter_asset_metadata_tag(
@@ -294,8 +294,8 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
             self, mock_filter_table_matching_tags,
             mock_filter_column_matching_tags):
 
-        fake_table_matching_tag = self.__make_fake_tag()
-        fake_non_matching_tag = self.__make_fake_tag()
+        fake_table_matching_tag = mocks.make_fake_tag()
+        fake_non_matching_tag = mocks.make_fake_tag()
 
         mock_filter_table_matching_tags.return_value = [
             fake_table_matching_tag
@@ -319,8 +319,8 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
     def test_filter_table_column_matching_tags_should_return_matching_column(
             self, mock_filter_column_matching_tags):
 
-        fake_non_matching_tag = self.__make_fake_tag()
-        fake_column_matching_tag = self.__make_fake_tag()
+        fake_non_matching_tag = mocks.make_fake_tag()
+        fake_column_matching_tag = mocks.make_fake_tag()
 
         mock_filter_column_matching_tags.return_value = [
             fake_column_matching_tag
@@ -344,9 +344,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
             self, mock_filter_table_matching_tags,
             mock_filter_column_matching_tags):
 
-        fake_table_only_matching_tag = self.__make_fake_tag()
-        fake_column_only_matching_tag = self.__make_fake_tag()
-        fake_table_column_matching_tag = self.__make_fake_tag()
+        fake_table_only_matching_tag = mocks.make_fake_tag()
+        fake_column_only_matching_tag = mocks.make_fake_tag()
+        fake_table_column_matching_tag = mocks.make_fake_tag()
 
         mock_filter_table_matching_tags.return_value = [
             fake_table_only_matching_tag, fake_table_column_matching_tag
@@ -373,11 +373,11 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
 
     def test_filter_jaql_tags_should_return_only_jaql_tags(self):
 
-        fake_jaql_related_tag_1 = self.__make_fake_tag(
+        fake_jaql_related_tag_1 = mocks.make_fake_tag(
             template='test/tagTemplates/sisense_jaql_metadata')
-        fake_widget_metadata_tag = self.__make_fake_tag(
+        fake_widget_metadata_tag = mocks.make_fake_tag(
             template='test/tagTemplates/sisense_widget_metadata')
-        fake_jaql_related_tag_2 = self.__make_fake_tag(
+        fake_jaql_related_tag_2 = mocks.make_fake_tag(
             template='test/tagTemplates/sisense_jaql_metadata')
 
         tags = self.__finder.filter_jaql_tags([
@@ -390,7 +390,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual(fake_jaql_related_tag_2, tags[1])
 
     def test_filter_table_matching_tags_should_none_if_no_table_name(self):
-        fake_table_related_tag = self.__make_fake_tag(
+        fake_table_related_tag = mocks.make_fake_tag(
             string_fields=(('table', 'test-table'),))
 
         tags = self.__finder \
@@ -400,9 +400,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual(0, len(tags))
 
     def test_filter_table_matching_tags_should_return_only_matching_tags(self):
-        fake_non_matching_tag = self.__make_fake_tag(
+        fake_non_matching_tag = mocks.make_fake_tag(
             string_fields=(('column', 'test-column'),))
-        fake_table_matching_tag = self.__make_fake_tag(
+        fake_table_matching_tag = mocks.make_fake_tag(
             string_fields=(('table', 'test-table'),))
 
         tags = self.__finder \
@@ -414,7 +414,7 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual(fake_table_matching_tag, tags[0])
 
     def test_filter_column_matching_tags_should_none_if_no_column_name(self):
-        fake_column_related_tag = self.__make_fake_tag(
+        fake_column_related_tag = mocks.make_fake_tag(
             string_fields=(('column', 'test-column'),))
 
         tags = self.__finder \
@@ -426,9 +426,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
     def test_filter_column_matching_tags_should_return_only_matching_tags(
             self):
 
-        fake_non_matching_tag = self.__make_fake_tag(
+        fake_non_matching_tag = mocks.make_fake_tag(
             string_fields=(('table', 'test-table'),))
-        fake_column_matching_tag = self.__make_fake_tag(
+        fake_column_matching_tag = mocks.make_fake_tag(
             string_fields=(('column', 'test-column'),))
 
         tags = self.__finder \
@@ -463,9 +463,9 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         schema = datacatalog.Schema()
         schema.columns.append(fields_column)
 
-        fake_column_level_tag_1 = self.__make_fake_tag(column='fields.field1')
-        fake_column_level_tag_2 = self.__make_fake_tag(column='fields.field2')
-        fake_column_level_tag_3 = self.__make_fake_tag(
+        fake_column_level_tag_1 = mocks.make_fake_tag(column='fields.field1')
+        fake_column_level_tag_2 = mocks.make_fake_tag(column='fields.field2')
+        fake_column_level_tag_3 = mocks.make_fake_tag(
             column='fields.field2.subfields.subfield1')
 
         tags = self.__finder \
@@ -481,36 +481,3 @@ class ElastiCubeDependencyFinderTest(unittest.TestCase):
         self.assertEqual(fake_column_level_tag_1, tags[0])
         self.assertEqual(fake_column_level_tag_2, tags[1])
         self.assertEqual(fake_column_level_tag_3, tags[2])
-
-    @classmethod
-    def __make_fake_search_result(cls, entry_id: str) -> SearchCatalogResult:
-        result = datacatalog.SearchCatalogResult()
-        result.relative_resource_name = f'fake_entries/{entry_id}'
-        return result
-
-    @classmethod
-    def __make_fake_entry(cls, entry_id: str) -> Entry:
-        entry = datacatalog.Entry()
-        entry.name = f'fake_entries/{entry_id}'
-        entry.schema = datacatalog.Schema()
-        return entry
-
-    @classmethod
-    def __make_fake_tag(cls,
-                        template: str = 'template',
-                        column: str = None,
-                        string_fields: Tuple[Tuple[str, str]] = None) -> Tag:
-
-        tag = datacatalog.Tag()
-        tag.template = template
-
-        if column:
-            tag.column = column
-
-        if string_fields:
-            for string_field in string_fields:
-                tag_field = datacatalog.TagField()
-                tag_field.string_value = string_field[1]
-                tag.fields[string_field[0]] = tag_field
-
-        return tag

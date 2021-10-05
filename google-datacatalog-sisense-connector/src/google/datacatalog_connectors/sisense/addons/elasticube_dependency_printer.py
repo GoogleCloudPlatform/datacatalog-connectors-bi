@@ -18,14 +18,14 @@ from typing import Dict, List, Optional, Tuple
 
 from google.cloud.datacatalog import Entry, Tag
 
-from google.datacatalog_connectors.sisense.addons import \
-    elasticube_dependency_finder as finder
+from google.datacatalog_connectors.sisense import addons
 
 
 class ElastiCubeDependencyPrinter:
 
+    @classmethod
     def print_dependency_finder_results(
-            self, results: Dict[str, Tuple[Entry, List[Tag]]]) -> None:
+            cls, results: Dict[str, Tuple[Entry, List[Tag]]]) -> None:
 
         if not results:
             return
@@ -37,10 +37,10 @@ class ElastiCubeDependencyPrinter:
             entry = metadata[0]
             tags = metadata[1]
 
-            dashboard_title = self.__get_asset_metadata_value(
+            dashboard_title = cls.__get_asset_metadata_value(
                 tags, 'dashboard_title')
-            datasource = self.__get_asset_metadata_value(tags, 'datasource')
-            jaql_tags = finder.ElastiCubeDependencyFinder.filter_jaql_tags(
+            datasource = cls.__get_asset_metadata_value(tags, 'datasource')
+            jaql_tags = addons.ElastiCubeDependencyFinder.filter_jaql_tags(
                 tags)
 
             human_readable_index += 1
@@ -50,7 +50,7 @@ class ElastiCubeDependencyPrinter:
             print(f'Title       : {entry.display_name}')
             if dashboard_title:
                 print(f'Dashboard   : {dashboard_title}')
-            print(f'Data source : {datasource}')
+            print(f'Data source : {datasource if datasource else ""}')
             print(f'URL         : {entry.linked_resource}\n')
             if jaql_tags:
                 print('Matching fields and filters:')
@@ -66,7 +66,7 @@ class ElastiCubeDependencyPrinter:
     def __get_asset_metadata_value(cls, tags: List[Tag],
                                    field_name: str) -> Optional[str]:
 
-        asset_metadata_tag = finder.ElastiCubeDependencyFinder\
+        asset_metadata_tag = addons.ElastiCubeDependencyFinder\
             .filter_asset_metadata_tag(tags)
 
         if field_name in asset_metadata_tag.fields:
