@@ -41,8 +41,12 @@ currently processes JAQL query metadata from:
     + [2.1.2. Download a JSON key and save it as](#212-download-a-json-key-and-save-it-as)
   * [2.2. Set environment variables](#22-set-environment-variables)
 - [3. Running the connector](#3-running-the-connector)
-  * [3.1. Python entry point](#31-python-entry-point)
-  * [3.2. Docker entry point](#32-docker-entry-point)
+  * [3.1. sync-catalog](#31-sync-catalog)
+    + [3.1.1. Python entry point](#311-python-entry-point)
+    + [3.1.2. Docker entry point](#312-docker-entry-point)
+  * [3.2. find-elasticube-deps](#32-find-elasticube-deps)
+    + [3.2.1. Python entry point](#321-python-entry-point)
+    + [3.2.2. Docker entry point](#322-docker-entry-point)
 - [4. Developer environment](#4-developer-environment)
   * [4.1. Install and run the YAPF formatter](#41-install-and-run-the-yapf-formatter)
   * [4.2. Install and run the Flake8 linter](#42-install-and-run-the-flake8-linter)
@@ -123,14 +127,18 @@ export SISENSE2DC_DATACATALOG_LOCATION_ID=google_cloud_location_id
 
 ## 3. Running the connector
 
+### 3.1. sync-catalog
+
+Synchronizes Google Data Catalog with a given Sisense server.
+
 - The `--datacatalog-location-id` argument is optional and defaults to `us`.
 
-### 3.1. Python entry point
+#### 3.1.1. Python entry point
 
 - Virtualenv
 
 ```shell script
-google-datacatalog-sisense-connector \
+google-datacatalog-sisense-connector sync-catalog \
   --sisense-server $SISENSE2DC_SISENSE_SERVER \
   --sisense-username $SISENSE2DC_SISENSE_USERNAME \
   --sisense-password $SISENSE2DC_SISENSE_PASSWORD \
@@ -138,17 +146,46 @@ google-datacatalog-sisense-connector \
   [--datacatalog-location-id $SISENSE2DC_DATACATALOG_LOCATION_ID]
 ```
 
-### 3.2. Docker entry point
+#### 3.1.2. Docker entry point
 
 ```shell script
 docker build --rm --tag sisense2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
-  sisense2datacatalog \
+  sisense2datacatalog sync-catalog \
   --sisense-server $SISENSE2DC_SISENSE_SERVER \
   --sisense-username $SISENSE2DC_SISENSE_USERNAME \
   --sisense-password $SISENSE2DC_SISENSE_PASSWORD \
   --datacatalog-project-id $SISENSE2DC_DATACATALOG_PROJECT_ID \
   [--datacatalog-location-id $SISENSE2DC_DATACATALOG_LOCATION_ID]
+```
+
+### 3.2. find-elasticube-deps
+
+Finds ElastiCube dependencies through catalog search and prints them in the
+console.
+
+#### 3.2.1. Python entry point
+
+- Virtualenv
+
+```shell script
+google-datacatalog-sisense-connector find-elasticube-deps \
+  --datasource <datasource> \
+  --table <table> \
+  --column <column> \
+  --datacatalog-project-id $SISENSE2DC_DATACATALOG_PROJECT_ID
+```
+
+#### 3.2.2. Docker entry point
+
+```shell script
+docker build --rm --tag sisense2datacatalog .
+docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
+  sisense2datacatalog find-elasticube-deps \
+  --datasource <datasource> \
+  --table <table> \
+  --column <column> \
+  --datacatalog-project-id $SISENSE2DC_DATACATALOG_PROJECT_ID
 ```
 
 ## 4. Developer environment

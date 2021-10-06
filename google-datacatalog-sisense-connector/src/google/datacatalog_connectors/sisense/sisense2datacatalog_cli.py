@@ -18,11 +18,10 @@ import argparse
 import logging
 import sys
 
-from google.datacatalog_connectors.sisense import sync
+from google.datacatalog_connectors.sisense import addons, sync
 
 
 class Sisense2DataCatalogCli:
-    __DEFAULT_DATACATALOG_LOCATION_ID = 'us'
 
     @classmethod
     def run(cls, argv):
@@ -41,36 +40,91 @@ class Sisense2DataCatalogCli:
             description=__doc__,
             formatter_class=argparse.RawDescriptionHelpFormatter)
 
-        parser.add_argument('--sisense-server',
-                            help='Sisense Server address',
-                            required=True)
-        parser.add_argument('--sisense-username',
-                            help='Sisense username',
-                            required=True)
-        parser.add_argument('--sisense-password',
-                            help='Sisense password',
-                            required=True)
-        parser.add_argument('--datacatalog-project-id',
-                            help='Google Cloud Project ID',
-                            required=True)
-        parser.add_argument('--datacatalog-location-id',
-                            help='Location ID to be used Google Data Catalog'
-                            'to store the metadata',
-                            default=cls.__DEFAULT_DATACATALOG_LOCATION_ID)
-
-        parser.set_defaults(func=cls.__run_synchronizer)
+        subparsers = parser.add_subparsers()
+        _SyncCatalogCliHelper().add_parser(subparsers)
+        _FindElastiCubeDepsCliHelper().add_parser(subparsers)
 
         return parser.parse_args(argv)
 
+
+class _SyncCatalogCliHelper:
+    __DEFAULT_DATACATALOG_LOCATION_ID = 'us'
+
     @classmethod
-    def __run_synchronizer(cls, args):
-        sync.MetadataSynchronizer(
+    def add_parser(cls, subparsers):
+        parser = subparsers.add_parser(
+            'sync-catalog',
+            help='Synchronize Data Catalog with a Sisense server')
+
+        parser.add_argument('--sisense-server',
+                            help='Sisense Server address',
+                            required=True)
+
+        parser.add_argument('--sisense-username',
+                            help='Sisense username',
+                            required=True)
+
+        parser.add_argument('--sisense-password',
+                            help='Sisense password',
+                            required=True)
+
+        parser.add_argument('--datacatalog-project-id',
+                            help='ID of the Google Cloud Project where the'
+                            ' Data Catalog entries, tag templates, and tags'
+                            ' created by the connector are stored',
+                            required=True)
+
+        parser.add_argument('--datacatalog-location-id',
+                            help='ID of the Location to be used by Google Data'
+                            ' Catalog to store the metadata',
+                            default=cls.__DEFAULT_DATACATALOG_LOCATION_ID)
+
+        parser.set_defaults(func=cls.__sync_catalog)
+
+    @classmethod
+    def __sync_catalog(cls, args):
+        synchronizer = sync.MetadataSynchronizer(
             sisense_server_address=args.sisense_server,
             sisense_username=args.sisense_username,
             sisense_password=args.sisense_password,
             datacatalog_project_id=args.datacatalog_project_id,
-            datacatalog_location_id=cls.__DEFAULT_DATACATALOG_LOCATION_ID).run(
-            )
+            datacatalog_location_id=cls.__DEFAULT_DATACATALOG_LOCATION_ID)
+        synchronizer.run()
+
+
+class _FindElastiCubeDepsCliHelper:
+
+    @classmethod
+    def add_parser(cls, subparsers):
+        parser = subparsers.add_parser(
+            'find-elasticube-deps',
+            help='Find ElastiCube dependencies through catalog search')
+
+        parser.add_argument('--datasource',
+                            help='An ElastiCube Data Source name')
+
+        parser.add_argument('--table', help='An ElastiCube Table name')
+
+        parser.add_argument('--column', help='An ElastiCube Column name')
+
+        parser.add_argument('--datacatalog-project-id',
+                            help='ID of the Google Cloud Project in which the'
+                            ' catalog search will be scoped',
+                            required=True)
+
+        parser.set_defaults(func=cls.__find_elasticube_deps)
+
+    @classmethod
+    def __find_elasticube_deps(cls, args):
+        try:
+            dependencies = addons.ElastiCubeDependencyFinder(
+                args.datacatalog_project_id).find(args.datasource, args.table,
+                                                  args.column)
+
+            addons.ElastiCubeDependencyPrinter.print_dependency_finder_results(
+                dependencies)
+        except Exception as e:
+            raise SystemExit(e)
 
 
 def main():
