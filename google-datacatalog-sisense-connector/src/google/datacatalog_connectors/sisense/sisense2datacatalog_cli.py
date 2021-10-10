@@ -43,6 +43,7 @@ class Sisense2DataCatalogCli:
         subparsers = parser.add_subparsers()
         _SyncCatalogCliHelper().add_parser(subparsers)
         _FindElastiCubeDepsCliHelper().add_parser(subparsers)
+        _ListElastiCubeDepsCliHelper().add_parser(subparsers)
 
         return parser.parse_args(argv)
 
@@ -120,6 +121,32 @@ class _FindElastiCubeDepsCliHelper:
             dependencies = addons.TagBasedFinder(
                 args.datacatalog_project_id).find(args.datasource, args.table,
                                                   args.column)
+
+            addons.ElastiCubeDependencyPrinter.print_dependency_finder_results(
+                dependencies)
+        except Exception as e:
+            raise SystemExit(e)
+
+
+class _ListElastiCubeDepsCliHelper:
+
+    @classmethod
+    def add_parser(cls, subparsers):
+        parser = subparsers.add_parser(
+            'list-elasticube-deps',
+            help='List all ElastiCube dependencies for a given Sisense asset')
+
+        parser.add_argument('--asset-url',
+                            help='An ElastiCube Dashboard or Widget url',
+                            required=True)
+
+        parser.set_defaults(func=cls.__list_elasticube_deps)
+
+    @classmethod
+    def __list_elasticube_deps(cls, args):
+        try:
+            dependencies = addons.ElastiCubeDependencyFinder().list_all(
+                args.asset_url)
 
             addons.ElastiCubeDependencyPrinter.print_dependency_finder_results(
                 dependencies)
