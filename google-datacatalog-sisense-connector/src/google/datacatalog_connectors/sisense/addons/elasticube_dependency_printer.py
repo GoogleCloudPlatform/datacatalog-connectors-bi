@@ -70,5 +70,5 @@ class ElastiCubeDependencyPrinter:
         asset_metadata_tag = base_finder.ElastiCubeDependencyFinder\
             .filter_asset_metadata_tag(tags)
 
-        if field_name in asset_metadata_tag.fields:
+        if asset_metadata_tag and field_name in asset_metadata_tag.fields:
             return asset_metadata_tag.fields[field_name].string_value
