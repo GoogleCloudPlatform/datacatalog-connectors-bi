@@ -26,9 +26,14 @@ def make_fake_search_result(entry_id: str) -> SearchCatalogResult:
     return result
 
 
-def make_fake_entry(entry_id: str) -> Entry:
+def make_fake_entry(entry_id: str,
+                    linked_resource: Optional[str] = None,
+                    user_specified_type: Optional[str] = None) -> Entry:
+
     entry = datacatalog.Entry()
     entry.name = f'fake_entries/{entry_id}'
+    entry.linked_resource = linked_resource
+    entry.user_specified_type = user_specified_type
     entry.schema = datacatalog.Schema()
     return entry
 
