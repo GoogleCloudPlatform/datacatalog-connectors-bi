@@ -380,7 +380,7 @@ class ElastiCubeDependencyFinder:
             .search_catalog_relative_resource_name(query)
         logging.info('==== DONE ========================================')
         logging.info('     %s results found',
-                     len(entry_names)) if entry_names else 'No'
+                     len(entry_names) if entry_names else 'No')
 
         return entry_names
 
