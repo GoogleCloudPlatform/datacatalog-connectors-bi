@@ -35,14 +35,21 @@ class ElastiCubeDependencyPrinter:
         print('\nResults:')
 
         human_readable_index = 0
-        table_headers = [
+        output_table_headers = [
             'Field or filter                         ', 'Table', 'Column'
         ]
+        dashboard_title_tag_field = 'dashboard_title'
+        datasource_tag_field = 'datasource'
+        table_tag_field = 'table'
+        column_tag_field = 'column'
+
         for entry_name, metadata in results.items():
             entry = metadata[0]
             tags = metadata[1]
-            dashboard = cls.__get_asset_metadata_value(tags, 'dashboard_title')
-            datasource = cls.__get_asset_metadata_value(tags, 'datasource')
+            dashboard = cls.__get_asset_metadata_value(
+                tags, dashboard_title_tag_field)
+            datasource = cls.__get_asset_metadata_value(
+                tags, datasource_tag_field)
             jaql_tags = base_finder.ElastiCubeDependencyFinder\
                 .filter_jaql_tags(tags)
 
@@ -59,17 +66,18 @@ class ElastiCubeDependencyPrinter:
             if not jaql_tags:
                 continue
 
-            table_data = []
+            output_table_data = []
             for tag in jaql_tags:
-                if 'table' in tag.fields and 'column' in tag.fields:
-                    table_data.append([
-                        tag.column, tag.fields['table'].string_value,
-                        tag.fields['column'].string_value
+                if table_tag_field in tag.fields \
+                        and column_tag_field in tag.fields:
+                    output_table_data.append([
+                        tag.column, tag.fields[table_tag_field].string_value,
+                        tag.fields[column_tag_field].string_value
                     ])
-            if table_data:
+            if output_table_data:
                 print(
-                    tabulate.tabulate(table_data,
-                                      headers=table_headers,
+                    tabulate.tabulate(output_table_data,
+                                      headers=output_table_headers,
                                       tablefmt='presto'))
         print()
 
