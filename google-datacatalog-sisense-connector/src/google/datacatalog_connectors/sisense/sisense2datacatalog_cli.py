@@ -140,13 +140,18 @@ class _ListElastiCubeDepsCliHelper:
                             help='An ElastiCube Dashboard or Widget url',
                             required=True)
 
+        parser.add_argument('--datacatalog-project-id',
+                            help='ID of the Google Cloud Project in which the'
+                            ' catalog search will be scoped',
+                            required=True)
+
         parser.set_defaults(func=cls.__list_elasticube_deps)
 
     @classmethod
     def __list_elasticube_deps(cls, args):
         try:
-            dependencies = addons.ElastiCubeDependencyFinder().list_all(
-                args.asset_url)
+            dependencies = addons.LinkedResourceBasedFinder(
+                args.datacatalog_project_id).find(args.asset_url)
 
             addons.ElastiCubeDependencyPrinter.print_dependency_finder_results(
                 dependencies)
