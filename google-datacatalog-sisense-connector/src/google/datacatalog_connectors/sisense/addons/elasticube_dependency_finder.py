@@ -155,9 +155,9 @@ class ElastiCubeDependencyFinder:
         return f'tag:table:"{table}"' if table else None
 
     @classmethod
-    def __make_column_search_term(cls,
-                                  column: Optional[str] = None
-                                 ) -> Optional[str]:
+    def __make_column_search_term(
+            cls, column: Optional[str] = None
+    ) -> Optional[str]:  # yapf: disable
         """Make a Data Catalog search string with the ``tag:column:<val>``
         qualifier.
 
