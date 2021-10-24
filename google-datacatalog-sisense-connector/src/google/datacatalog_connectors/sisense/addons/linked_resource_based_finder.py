@@ -24,8 +24,7 @@ from google.datacatalog_connectors.sisense.addons import \
 from google.datacatalog_connectors.sisense.prepare import constants
 
 
-class LinkedResourceBasedDependencyFinder(
-        base_finder.ElastiCubeDependencyFinder):
+class LinkedResourceBasedFinder(base_finder.ElastiCubeDependencyFinder):
     """Count on Google Data Catalog search capabilities to find
     ElastiCube-related dependencies using Entry's ``linked_resource`` field.
 

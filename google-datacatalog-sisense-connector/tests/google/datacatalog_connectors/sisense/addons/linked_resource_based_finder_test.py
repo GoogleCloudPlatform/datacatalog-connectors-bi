@@ -24,16 +24,14 @@ from . import elasticube_dependency_mocks as mocks
 
 class LinkedResourceBasedDependencyFinderTest(unittest.TestCase):
     __ADDONS_PACKAGE = 'google.datacatalog_connectors.sisense.addons'
-    __FINDER_MODULE = (f'{__ADDONS_PACKAGE}'
-                       f'.linked_resource_based_dependency_finder')
-    __FINDER_CLASS = f'{__FINDER_MODULE}.LinkedResourceBasedDependencyFinder'
-    __PRIVATE_METHOD_PREFIX = (f'{__FINDER_CLASS}'
-                               f'._LinkedResourceBasedDependencyFinder')
+    __FINDER_MODULE = f'{__ADDONS_PACKAGE}.linked_resource_based_finder'
+    __FINDER_CLASS = f'{__FINDER_MODULE}.LinkedResourceBasedFinder'
+    __PRIVATE_METHOD_PREFIX = f'{__FINDER_CLASS}._LinkedResourceBasedFinder'
 
     @mock.patch(f'{__ADDONS_PACKAGE}.elasticube_dependency_finder'
                 f'.commons.DataCatalogFacade', lambda *args: None)
     def setUp(self):
-        self.__finder = addons.LinkedResourceBasedDependencyFinder(
+        self.__finder = addons.LinkedResourceBasedFinder(
             project_id='test-project')
 
     @mock.patch(f'{__FINDER_CLASS}._make_query')
@@ -199,7 +197,7 @@ class LinkedResourceBasedDependencyFinderTest(unittest.TestCase):
 
         # when
         tags = self.__finder\
-            ._LinkedResourceBasedDependencyFinder__filter_relevant_tags(
+            ._LinkedResourceBasedFinder__filter_relevant_tags(
                 fake_entry, [fake_asset_metadata_tag, fake_table_matching_tag])
 
         # then

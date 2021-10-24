@@ -24,15 +24,14 @@ from . import elasticube_dependency_mocks as mocks
 
 class TagBasedDependencyFinderTest(unittest.TestCase):
     __ADDONS_PACKAGE = 'google.datacatalog_connectors.sisense.addons'
-    __FINDER_MODULE = f'{__ADDONS_PACKAGE}.tag_based_dependency_finder'
-    __FINDER_CLASS = f'{__FINDER_MODULE}.TagBasedDependencyFinder'
-    __PRIVATE_METHOD_PREFIX = f'{__FINDER_CLASS}._TagBasedDependencyFinder'
+    __FINDER_MODULE = f'{__ADDONS_PACKAGE}.tag_based_finder'
+    __FINDER_CLASS = f'{__FINDER_MODULE}.TagBasedFinder'
+    __PRIVATE_METHOD_PREFIX = f'{__FINDER_CLASS}._TagBasedFinder'
 
     @mock.patch(f'{__ADDONS_PACKAGE}.elasticube_dependency_finder'
                 f'.commons.DataCatalogFacade', lambda *args: None)
     def setUp(self):
-        self.__finder = addons.TagBasedDependencyFinder(
-            project_id='test-project')
+        self.__finder = addons.TagBasedFinder(project_id='test-project')
 
     @mock.patch(f'{__FINDER_CLASS}._make_query')
     def test_find_should_raise_exception_if_empty_args(self, mock_make_query):
@@ -120,10 +119,9 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
         mock_sort_tags_by_schema.return_value = [fake_table_matching_tag]
 
         # when
-        tags = self.__finder\
-            ._TagBasedDependencyFinder__filter_relevant_tags(
-                fake_entry, [fake_asset_metadata_tag, fake_table_matching_tag],
-                'test-table', 'test-column')
+        tags = self.__finder._TagBasedFinder__filter_relevant_tags(
+            fake_entry, [fake_asset_metadata_tag, fake_table_matching_tag],
+            'test-table', 'test-column')
 
         # then
         self.assertEqual(2, len(tags))
@@ -153,7 +151,7 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
 
         # when
         tags = self.__finder\
-            ._TagBasedDependencyFinder__filter_table_column_matching_tags(
+            ._TagBasedFinder__filter_table_column_matching_tags(
                 [fake_table_matching_tag, fake_non_matching_tag],
                 table='test-table')
 
@@ -179,7 +177,7 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
 
         # when
         tags = self.__finder\
-            ._TagBasedDependencyFinder__filter_table_column_matching_tags(
+            ._TagBasedFinder__filter_table_column_matching_tags(
                 [fake_non_matching_tag, fake_column_matching_tag],
                 column='test-column')
 
@@ -209,7 +207,7 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
 
         # when
         tags = self.__finder\
-            ._TagBasedDependencyFinder__filter_table_column_matching_tags(
+            ._TagBasedFinder__filter_table_column_matching_tags(
                 [
                     fake_table_only_matching_tag,
                     fake_column_only_matching_tag,
@@ -230,9 +228,8 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
             string_fields=[('table', 'test-table')])
 
         # when
-        tags = self.__finder \
-            ._TagBasedDependencyFinder__filter_table_matching_tags(
-                [fake_table_related_tag])
+        tags = self.__finder._TagBasedFinder__filter_table_matching_tags(
+            [fake_table_related_tag])
 
         # then
         self.assertEqual(0, len(tags))
@@ -245,10 +242,9 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
             string_fields=[('table', 'test-table')])
 
         # when
-        tags = self.__finder \
-            ._TagBasedDependencyFinder__filter_table_matching_tags(
-                [fake_non_matching_tag, fake_table_matching_tag],
-                table='test-table')
+        tags = self.__finder._TagBasedFinder__filter_table_matching_tags(
+            [fake_non_matching_tag, fake_table_matching_tag],
+            table='test-table')
 
         # then
         self.assertEqual(1, len(tags))
@@ -260,9 +256,8 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
             string_fields=[('column', 'test-column')])
 
         # when
-        tags = self.__finder \
-            ._TagBasedDependencyFinder__filter_column_matching_tags(
-                [fake_column_related_tag])
+        tags = self.__finder._TagBasedFinder__filter_column_matching_tags(
+            [fake_column_related_tag])
 
         # then
         self.assertEqual(0, len(tags))
@@ -277,10 +272,9 @@ class TagBasedDependencyFinderTest(unittest.TestCase):
             string_fields=[('column', 'test-column')])
 
         # when
-        tags = self.__finder \
-            ._TagBasedDependencyFinder__filter_column_matching_tags(
-                [fake_non_matching_tag, fake_column_matching_tag],
-                column='test-column')
+        tags = self.__finder._TagBasedFinder__filter_column_matching_tags(
+            [fake_non_matching_tag, fake_column_matching_tag],
+            column='test-column')
 
         # then
         self.assertEqual(1, len(tags))

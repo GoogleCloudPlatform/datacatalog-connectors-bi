@@ -91,7 +91,7 @@ class Sisense2DataCatalogCliTest(unittest.TestCase):
     @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
                 '.addons.ElastiCubeDependencyPrinter')
     @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
-                '.addons.TagBasedDependencyFinder')
+                '.addons.TagBasedFinder')
     def test_find_elasticube_deps_should_find_and_print_dependencies(
             self, mock_deps_finder, mock_deps_printer):
 
@@ -110,7 +110,7 @@ class Sisense2DataCatalogCliTest(unittest.TestCase):
         mock_deps_printer.print_dependency_finder_results.assert_called_once()
 
     @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
-                '.addons.TagBasedDependencyFinder')
+                '.addons.TagBasedFinder')
     def test_find_elasticube_deps_should_exit_on_exception(
             self, mock_deps_finder):
 

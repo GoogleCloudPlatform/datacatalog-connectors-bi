@@ -15,12 +15,11 @@
 # limitations under the License.
 
 from .elasticube_dependency_printer import ElastiCubeDependencyPrinter
-from .linked_resource_based_dependency_finder import \
-    LinkedResourceBasedDependencyFinder
-from .tag_based_dependency_finder import TagBasedDependencyFinder
+from .linked_resource_based_finder import LinkedResourceBasedFinder
+from .tag_based_finder import TagBasedFinder
 
 __all__ = (
     'ElastiCubeDependencyPrinter',
-    'LinkedResourceBasedDependencyFinder',
-    'TagBasedDependencyFinder',
+    'LinkedResourceBasedFinder',
+    'TagBasedFinder',
 )

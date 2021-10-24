@@ -24,7 +24,7 @@ from google.datacatalog_connectors.sisense.addons import \
 from google.datacatalog_connectors.sisense.prepare import constants
 
 
-class TagBasedDependencyFinder(base_finder.ElastiCubeDependencyFinder):
+class TagBasedFinder(base_finder.ElastiCubeDependencyFinder):
     """Count on Google Data Catalog search capabilities to find
     ElastiCube-related dependencies using specific Tag fields.
 
