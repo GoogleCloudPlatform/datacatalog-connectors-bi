@@ -30,7 +30,7 @@ class ElastiCubeDependencyPrinterTest(unittest.TestCase):
     __PRINTER_CLASS = f'{__PRINTER_MODULE}.ElastiCubeDependencyPrinter'
     __PRIVATE_METHOD_PREFIX = f'{__PRINTER_CLASS}._ElastiCubeDependencyPrinter'
 
-    @mock.patch(f'{__PRINTER_MODULE}.addons'
+    @mock.patch(f'{__PRINTER_MODULE}.base_finder'
                 f'.ElastiCubeDependencyFinder.filter_jaql_tags')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_asset_metadata_value')
     def test_print_dependency_finder_results_should_skip_if_no_results(
@@ -41,7 +41,7 @@ class ElastiCubeDependencyPrinterTest(unittest.TestCase):
         mock_get_asset_metadata_value.assert_not_called()
         mock_filter_jaql_tags.assert_not_called()
 
-    @mock.patch(f'{__PRINTER_MODULE}.addons.ElastiCubeDependencyFinder'
+    @mock.patch(f'{__PRINTER_MODULE}.base_finder.ElastiCubeDependencyFinder'
                 f'.filter_jaql_tags', lambda *args: [])
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_asset_metadata_value')
     def test_print_dependency_finder_results_should_get_asset_metadata_values(
@@ -56,7 +56,7 @@ class ElastiCubeDependencyPrinterTest(unittest.TestCase):
             [mock.call([], 'dashboard_title'),
              mock.call([], 'datasource')])
 
-    @mock.patch(f'{__PRINTER_MODULE}.addons'
+    @mock.patch(f'{__PRINTER_MODULE}.base_finder'
                 f'.ElastiCubeDependencyFinder.filter_jaql_tags')
     @mock.patch(f'{__PRIVATE_METHOD_PREFIX}__get_asset_metadata_value',
                 lambda *args: None)
@@ -79,7 +79,7 @@ class ElastiCubeDependencyPrinterTest(unittest.TestCase):
 
         mock_filter_jaql_tags.assert_called_once_with([fake_tag])
 
-    @mock.patch(f'{__PRINTER_MODULE}.addons'
+    @mock.patch(f'{__PRINTER_MODULE}.base_finder'
                 f'.ElastiCubeDependencyFinder.filter_asset_metadata_tag')
     def test_get_asset_metadata_value_should_return_value_if_available(
             self, mock_filter_asset_metadata_tag):
@@ -97,7 +97,7 @@ class ElastiCubeDependencyPrinterTest(unittest.TestCase):
 
         mock_filter_asset_metadata_tag.assert_called_once_with([fake_tag])
 
-    @mock.patch(f'{__PRINTER_MODULE}.addons'
+    @mock.patch(f'{__PRINTER_MODULE}.base_finder'
                 f'.ElastiCubeDependencyFinder.filter_asset_metadata_tag')
     def test_get_asset_metadata_value_should_return_none_if_not_available(
             self, mock_filter_asset_metadata_tag):

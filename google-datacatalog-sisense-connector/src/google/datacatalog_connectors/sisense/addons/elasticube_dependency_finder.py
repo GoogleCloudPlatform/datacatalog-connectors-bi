@@ -16,7 +16,7 @@
 
 import logging
 import re
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 from google.cloud.datacatalog import ColumnSchema, Entry, Tag
 from google.datacatalog_connectors import commons
@@ -25,11 +25,8 @@ from google.datacatalog_connectors.sisense.prepare import constants
 
 
 class ElastiCubeDependencyFinder:
-    """Count on Google Data Catalog search capabilities to find
+    """Base class for features that rely on Google Data Catalog to find
     ElastiCube-related dependencies.
-
-    The public methods are intended to provide clients a simplified interface
-    for Data Catalog search and results handling.
     """
     # Regex used to parse Tag Template names and get specific parts.
     __TAG_TEMPLATE_NAME_PATTERN = r'^(.+?)/tagTemplates/(?P<id>.+?)$'
@@ -37,208 +34,14 @@ class ElastiCubeDependencyFinder:
     def __init__(self, project_id: Optional[str] = None):
         self.__datacatalog_facade = commons.DataCatalogFacade(project_id)
 
-    def find(
-            self,
-            datasource: Optional[str] = None,
-            table: Optional[str] = None,
-            column: Optional[str] = None
-    ) -> Dict[str, Tuple[Entry, List[Tag]]]:
-        """
-        Orchestrate actions that comprise:
-            - generating a query string to search Google Data Catalog;
-            - performing a catalog search operation;
-            - getting Entries and Tags based on search results;
-            - filtering Tags that contain Entry enrichment metadata or match
-                the table/column search criteria;
-            - assembling the Entries and Tags in a user-friendly dict.
-
-        Returns:
-            dict: Keys are Entry names and values are tuples in which the
-            first element is an Entry object and the second is an array of
-            ElastiCube-related Tags.
-
-        Raises:
-            Exception: If no datasource, table, or column are provided.
-        """
-        if not (datasource or table or column):
-            raise Exception(
-                'Either a datasource, table, or column must be provided.')
-
-        types = [
-            constants.USER_SPECIFIED_TYPE_DASHBOARD,
-            constants.USER_SPECIFIED_TYPE_WIDGET
-        ]
-        query = self.__make_query(types,
-                                  datasource=datasource,
-                                  table=table,
-                                  column=column)
-        entry_names = self.__search_catalog(query)
-
-        if not entry_names:
-            return {}
-
-        logging.info('')
-        logging.info('===> Getting entries...')
-        entries_dict = self.__get_entries(entry_names)
-        logging.info('==== DONE ========================================')
-
-        logging.info('')
-        logging.info('===> Listing tags...')
-        tags_dict = self.__list_tags(entry_names)
-        logging.info('==== DONE ========================================')
-
-        logging.info('')
-        logging.info('===> Assembling results...')
-        assembled_results = {}
-        for entry_name in entry_names:
-            entry = entries_dict.get(entry_name)
-            tags = tags_dict.get(entry_name)
-            assembled_results[entry_name] = (entry,
-                                             self.__filter_find_relevant_tags(
-                                                 entry, tags, table, column))
-        logging.info('==== DONE ========================================')
-
-        logging.info('')
-        logging.info('%d assembled result(s) to be returned',
-                     len(assembled_results))
-        logging.info('')
-
-        return assembled_results
-
-    def list_all(self,
-                 sisense_asset_url: str) -> Dict[str, Tuple[Entry, List[Tag]]]:
-        """
-        Orchestrate actions that comprise:
-            - performing a catalog lookup entry operation;
-            - getting Tags based on the lookup results;
-            - filtering Tags that contain Entry enrichment or JAQL metadata;
-            - assembling the Entries and Tags in a user-friendly dict.
-
-        Returns:
-            dict: Keys are Entry names and values are tuples in which the
-            first element is an Entry object and the second is an array of
-            ElastiCube-related Tags.
-
-        Raises:
-            Exception: If no Sisense asset URL provided.
-        """
-        if not sisense_asset_url:
-            raise Exception('A Sisense asset URL must be provided.')
-
-        if sisense_asset_url.endswith('/'):
-            sisense_asset_url = sisense_asset_url[:len(sisense_asset_url) - 1]
-
-        asset_id = sisense_asset_url[sisense_asset_url.rfind('/') + 1:]
-
-        # ========================================
-        # Catalog search fallback start
-        logging.info('')
-        logging.info('The entries.lookup API does not work for user-specified'
-                     ' Entries'
-                     ' (https://issuetracker.google.com/issues/202510978'
-                     ' for details). Catalog search is used as a fallback.')
-
-        types = [
-            constants.USER_SPECIFIED_TYPE_DASHBOARD,
-            constants.USER_SPECIFIED_TYPE_WIDGET
-        ]
-        query = self.__make_query(types, asset_id=asset_id)
-        tmp_entry_names = self.__search_catalog(query)
-
-        if not tmp_entry_names:
-            logging.info('')
-            logging.info('Not found!')
-            return {}
-
-        logging.info('')
-        logging.info('===> Getting entries...')
-        tmp_entries_dict = self.__get_entries(tmp_entry_names)
-        logging.info('==== DONE ========================================')
-
-        entry = next((entry for entry in tmp_entries_dict.values()
-                      if entry.linked_resource == sisense_asset_url), None)
-        # Catalog search fallback end
-        # ========================================
-
-        # The above catalog search fallback should be replaced with the
-        # commented lines below if
-        # https://issuetracker.google.com/issues/202510978 gets fixed.
-        #
-        # logging.info('')
-        # logging.info('===> Looking for the linked catalog entry...')
-        # entry = self.__datacatalog_facade.lookup_entry(sisense_asset_url)
-        # logging.info('==== DONE ========================================')
-
-        if not entry:
-            logging.info('')
-            logging.info('Not found!')
-            return {}
-
-        entry_names = [entry.name]
-        entries_dict = {entry.name: entry}
-
-        dashboard_type = constants.USER_SPECIFIED_TYPE_DASHBOARD
-        if entry.user_specified_type == dashboard_type:
-            # ========================================
-            # Catalog search fallback start
-
-            # If the asset is a Dashboard, search results include the Widgets
-            # that belong to it, thus there's no need to perform a second
-            # search. It happens because the `asset_id`-based search uses a
-            # `tag:id:<val>` term which causes Data Catalog to return all
-            # entries tagged with fields that have the `id` substring in their
-            # names and values matching the provided Dashboard ID. Widgets'
-            # extended metadata tags have a `dashboard_id` field, so they match
-            # the above condition.
-            widget_type = constants.USER_SPECIFIED_TYPE_WIDGET
-            widget_entries_dict = {
-                entry.name: entry
-                for entry in tmp_entries_dict.values()
-                if entry.user_specified_type == widget_type
-            }
-            widget_entry_names = widget_entries_dict.keys()
-            # Catalog search fallback end
-            # ========================================
-
-            # The above catalog search fallback should be replaced with the
-            # commented lines below if
-            # https://issuetracker.google.com/issues/202510978 gets fixed.
-            #
-            # widgets_query = self.__make_query(
-            #     [constants.USER_SPECIFIED_TYPE_WIDGET],
-            #     dashboard_id=asset_id)
-            # widget_entry_names = self.__search_catalog(widgets_query)
-            # widget_entries_dict = self.__get_entries(widget_entry_names)
-
-            entry_names.extend(widget_entry_names)
-            entries_dict = {**entries_dict, **widget_entries_dict}
-
-        logging.info('')
-        logging.info('===> Listing tags...')
-        tags_dict = self.__list_tags(entry_names)
-        logging.info('==== DONE ========================================')
-
-        logging.info('')
-        logging.info('===> Assembling results...')
-        assembled_results = {}
-        for entry_name in entry_names:
-            entry = entries_dict.get(entry_name)
-            tags = tags_dict.get(entry_name)
-            assembled_results[entry_name] = (entry,
-                                             self.__filter_list_relevant_tags(
-                                                 entry, tags))
-        logging.info('==== DONE ========================================')
-
-        return assembled_results
-
     @classmethod
-    def __make_query(cls,
-                     types: List[str],
-                     asset_id: Optional[str] = None,
-                     dashboard_id: Optional[str] = None,
-                     datasource: Optional[str] = None,
-                     table: Optional[str] = None,
-                     column: Optional[str] = None) -> str:
+    def _make_query(cls,
+                    types: List[str],
+                    asset_id: Optional[str] = None,
+                    dashboard_id: Optional[str] = None,
+                    datasource: Optional[str] = None,
+                    table: Optional[str] = None,
+                    column: Optional[str] = None) -> str:
         """Make a Data Catalog search string by joining mandatory and optional
         terms.
 
@@ -352,9 +155,9 @@ class ElastiCubeDependencyFinder:
         return f'tag:table:"{table}"' if table else None
 
     @classmethod
-    def __make_column_search_term(
-            cls, column: Optional[str] = None
-    ) -> Optional[str]:  # yapf: disable
+    def __make_column_search_term(cls,
+                                  column: Optional[str] = None
+                                 ) -> Optional[str]:
         """Make a Data Catalog search string with the ``tag:column:<val>``
         qualifier.
 
@@ -367,7 +170,7 @@ class ElastiCubeDependencyFinder:
         """
         return f'tag:column:"{column}"' if column else None
 
-    def __search_catalog(self, query: str) -> List[str]:
+    def _search_catalog(self, query: str) -> List[str]:
         """Perform a catalog search.
 
         Returns:
@@ -384,7 +187,7 @@ class ElastiCubeDependencyFinder:
 
         return entry_names
 
-    def __get_entries(self, entry_names: List[str]) -> Dict[str, Entry]:
+    def _get_entries(self, entry_names: List[str]) -> Dict[str, Entry]:
         """Get Data Catalog Entries for a given list of entry names.
 
         Returns:
@@ -397,7 +200,7 @@ class ElastiCubeDependencyFinder:
 
         return entries_dict
 
-    def __list_tags(self, entry_names: List[str]) -> Dict[str, List[Tag]]:
+    def _list_tags(self, entry_names: List[str]) -> Dict[str, List[Tag]]:
         """Get Data Catalog Tags for a given list of entry names.
 
         Returns:
@@ -410,58 +213,6 @@ class ElastiCubeDependencyFinder:
                 entry_name)
 
         return tags_dict
-
-    @classmethod
-    def __filter_find_relevant_tags(cls,
-                                    entry: Entry,
-                                    tags: List[Tag],
-                                    table: Optional[str] = None,
-                                    column: Optional[str] = None) -> List[Tag]:
-        """Filter Tags for ElastiCube dependencies finding. "Relevant", in this
-        context, means Tags that have ElastiCube-related information such as
-        data source, table, or column names that match the user-provided search
-        criteria.
-
-        The data source name, if provided as search criteria, is expected to be
-        handled as a search term in the catalog search operation that precedes
-        this step, therefore this method does not take it into account for
-        filtering purposes.
-
-        Returns:
-            list: The filtered Tags.
-        """
-        filtered_tags = []
-
-        asset_metadata_tag = cls.filter_asset_metadata_tag(tags)
-        if asset_metadata_tag:
-            filtered_tags.append(asset_metadata_tag)
-        table_column_matching_tags = cls.__filter_table_column_matching_tags(
-            tags, table, column)
-        filtered_tags.extend(
-            cls.__sort_tags_by_schema(entry.schema.columns, '',
-                                      table_column_matching_tags))
-
-        return filtered_tags
-
-    @classmethod
-    def __filter_list_relevant_tags(cls, entry: Entry,
-                                    tags: List[Tag]) -> List[Tag]:
-        """Filter Tags for ElastiCube dependencies listing, "Relevant", in this
-        context, means Tags that comprise asset and JAQL metadata.
-
-        Returns:
-            list: The filtered Tags.
-        """
-        filtered_tags = []
-
-        asset_metadata_tag = cls.filter_asset_metadata_tag(tags)
-        if asset_metadata_tag:
-            filtered_tags.append(asset_metadata_tag)
-        jaql_tags = cls.filter_jaql_tags(tags)
-        filtered_tags.extend(
-            cls.__sort_tags_by_schema(entry.schema.columns, '', jaql_tags))
-
-        return filtered_tags
 
     @classmethod
     def filter_asset_metadata_tag(cls, tags: List[Tag]) -> Optional[Tag]:
@@ -505,75 +256,7 @@ class ElastiCubeDependencyFinder:
         return filtered_tags
 
     @classmethod
-    def __filter_table_column_matching_tags(
-            cls,
-            tags: List[Tag],
-            table: Optional[str] = None,
-            column: Optional[str] = None) -> List[Tag]:
-        """Filter JAQL-related Tags which `table` and/or `column` fields match
-        the provided args.
-
-        If both `table` and `column` args are provided, a given Tag's
-        corresponding fields must match both values in order to have the Tag
-        added to the resulting list.
-
-        Returns:
-            list: The filtered Tags.
-        """
-        jaql_tags = cls.filter_jaql_tags(tags)
-        table_matching_tags = cls.__filter_table_matching_tags(
-            jaql_tags, table)
-        column_matching_tags = cls.__filter_column_matching_tags(
-            table_matching_tags if table and column else tags, column)
-
-        return column_matching_tags if column else table_matching_tags
-
-    @classmethod
-    def __filter_table_matching_tags(cls,
-                                     tags: List[Tag],
-                                     table: Optional[str] = None) -> List[Tag]:
-        """Filter Tags that have a `table` field that match the provided table
-        name.
-
-        Returns:
-            list: The filtered Tags.
-        """
-        if not table:
-            return []
-
-        table_field = 'table'
-        table_lower = table.lower()
-
-        return [
-            tag for tag in tags or [] if table_field in tag.fields and
-            table_lower in tag.fields[table_field].string_value.lower()
-        ]
-
-    @classmethod
-    def __filter_column_matching_tags(
-            cls,
-            tags: List[Tag],
-            column: Optional[str] = None
-    ) -> List[Tag]:  # yapf: disable
-        """Filter Tags that have a `column` field that match the provided
-        column name.
-
-        Returns:
-            list: The filtered Tags.
-        """
-        if not column:
-            return []
-
-        column_field = 'column'
-        column_lower = column.lower()
-
-        return [
-            tag for tag in tags or [] if column_field in tag.fields and
-            column_lower in tag.fields[column_field].string_value.lower()
-        ]
-
-    @classmethod
-    def __sort_tags_by_schema(
+    def _sort_tags_by_schema(
             cls, schema_columns: List[ColumnSchema], schema_path: str,
             tags: Union[List[Tag], Dict[str, Tag]]) -> List[Tag]:
         """Sort column-level Tags according to the order their related columns
@@ -607,7 +290,7 @@ class ElastiCubeDependencyFinder:
             if column_tag:
                 sorted_tags.append(column_tag)
             sorted_tags.extend(
-                cls.__sort_tags_by_schema(column.subcolumns, f'{column_path}.',
-                                          tags_dict))
+                cls._sort_tags_by_schema(column.subcolumns, f'{column_path}.',
+                                         tags_dict))
 
         return sorted_tags

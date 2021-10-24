@@ -18,7 +18,8 @@ from typing import Dict, List, Optional, Tuple
 
 from google.cloud.datacatalog import Entry, Tag
 
-from google.datacatalog_connectors.sisense import addons
+from google.datacatalog_connectors.sisense.addons import \
+    elasticube_dependency_finder as base_finder
 
 
 class ElastiCubeDependencyPrinter:
@@ -40,8 +41,8 @@ class ElastiCubeDependencyPrinter:
             dashboard_title = cls.__get_asset_metadata_value(
                 tags, 'dashboard_title')
             datasource = cls.__get_asset_metadata_value(tags, 'datasource')
-            jaql_tags = addons.ElastiCubeDependencyFinder.filter_jaql_tags(
-                tags)
+            jaql_tags = base_finder.ElastiCubeDependencyFinder\
+                .filter_jaql_tags(tags)
 
             human_readable_index += 1
             print(f'\n{human_readable_index}')
@@ -66,7 +67,7 @@ class ElastiCubeDependencyPrinter:
     def __get_asset_metadata_value(cls, tags: List[Tag],
                                    field_name: str) -> Optional[str]:
 
-        asset_metadata_tag = addons.ElastiCubeDependencyFinder\
+        asset_metadata_tag = base_finder.ElastiCubeDependencyFinder\
             .filter_asset_metadata_tag(tags)
 
         if field_name in asset_metadata_tag.fields:

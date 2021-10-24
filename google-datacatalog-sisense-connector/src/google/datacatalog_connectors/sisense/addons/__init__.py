@@ -14,7 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .elasticube_dependency_finder import ElastiCubeDependencyFinder
 from .elasticube_dependency_printer import ElastiCubeDependencyPrinter
+from .linked_resource_based_dependency_finder import \
+    LinkedResourceBasedDependencyFinder
+from .tag_based_dependency_finder import TagBasedDependencyFinder
 
-__all__ = ('ElastiCubeDependencyFinder', 'ElastiCubeDependencyPrinter')
+__all__ = (
+    'ElastiCubeDependencyPrinter',
+    'LinkedResourceBasedDependencyFinder',
+    'TagBasedDependencyFinder',
+)
