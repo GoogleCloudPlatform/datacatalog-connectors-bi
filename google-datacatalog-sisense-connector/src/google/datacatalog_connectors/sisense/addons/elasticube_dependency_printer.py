@@ -36,7 +36,7 @@ class ElastiCubeDependencyPrinter:
 
         human_readable_index = 0
         output_table_headers = [
-            'Field or filter                         ', 'Table', 'Column'
+            'Matching field or filter                ', 'Table', 'Column'
         ]
         dashboard_title_tag_field = 'dashboard_title'
         datasource_tag_field = 'datasource'
