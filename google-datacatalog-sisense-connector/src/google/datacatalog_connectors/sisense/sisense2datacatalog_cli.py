@@ -117,7 +117,7 @@ class _FindElastiCubeDepsCliHelper:
     @classmethod
     def __find_elasticube_deps(cls, args):
         try:
-            dependencies = addons.ElastiCubeDependencyFinder(
+            dependencies = addons.TagBasedFinder(
                 args.datacatalog_project_id).find(args.datasource, args.table,
                                                   args.column)
 
