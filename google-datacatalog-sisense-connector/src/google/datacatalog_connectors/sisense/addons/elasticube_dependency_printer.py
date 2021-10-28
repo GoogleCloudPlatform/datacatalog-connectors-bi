@@ -17,6 +17,7 @@
 from typing import Dict, List, Optional, Tuple
 
 from google.cloud.datacatalog import Entry, Tag
+import tabulate
 
 from google.datacatalog_connectors.sisense.addons import \
     elasticube_dependency_finder as base_finder
@@ -34,33 +35,50 @@ class ElastiCubeDependencyPrinter:
         print('\nResults:')
 
         human_readable_index = 0
+        output_table_headers = [
+            'Matching field or filter                ', 'Table', 'Column'
+        ]
+        dashboard_title_tag_field = 'dashboard_title'
+        datasource_tag_field = 'datasource'
+        table_tag_field = 'table'
+        column_tag_field = 'column'
+
         for entry_name, metadata in results.items():
             entry = metadata[0]
             tags = metadata[1]
-
-            dashboard_title = cls.__get_asset_metadata_value(
-                tags, 'dashboard_title')
-            datasource = cls.__get_asset_metadata_value(tags, 'datasource')
+            dashboard = cls.__get_asset_metadata_value(
+                tags, dashboard_title_tag_field)
+            datasource = cls.__get_asset_metadata_value(
+                tags, datasource_tag_field)
             jaql_tags = base_finder.ElastiCubeDependencyFinder\
                 .filter_jaql_tags(tags)
 
             human_readable_index += 1
-            print(f'\n{human_readable_index}')
+            print(f'\n\n{human_readable_index}')
             print(f'Entry       : {entry.name}')
             print(f'Type        : {entry.user_specified_type}')
             print(f'Title       : {entry.display_name}')
-            if dashboard_title:
-                print(f'Dashboard   : {dashboard_title}')
+            if dashboard:
+                print(f'Dashboard   : {dashboard}')
             print(f'Data source : {datasource if datasource else ""}')
             print(f'URL         : {entry.linked_resource}\n')
-            if jaql_tags:
-                print('Matching fields and filters:')
-                for tag in jaql_tags:
-                    print()
-                    print(f'  Component : {tag.column}')
-                    print(f'  Table     : {tag.fields["table"].string_value}')
-                    print(f'  Column    : {tag.fields["column"].string_value}')
-            print('--------------------------------------------------')
+
+            if not jaql_tags:
+                continue
+
+            output_table_data = []
+            for tag in jaql_tags:
+                if table_tag_field in tag.fields \
+                        and column_tag_field in tag.fields:
+                    output_table_data.append([
+                        tag.column, tag.fields[table_tag_field].string_value,
+                        tag.fields[column_tag_field].string_value
+                    ])
+            if output_table_data:
+                print(
+                    tabulate.tabulate(output_table_data,
+                                      headers=output_table_headers,
+                                      tablefmt='presto'))
         print()
 
     @classmethod
@@ -70,5 +88,5 @@ class ElastiCubeDependencyPrinter:
         asset_metadata_tag = base_finder.ElastiCubeDependencyFinder\
             .filter_asset_metadata_tag(tags)
 
-        if field_name in asset_metadata_tag.fields:
+        if asset_metadata_tag and field_name in asset_metadata_tag.fields:
             return asset_metadata_tag.fields[field_name].string_value

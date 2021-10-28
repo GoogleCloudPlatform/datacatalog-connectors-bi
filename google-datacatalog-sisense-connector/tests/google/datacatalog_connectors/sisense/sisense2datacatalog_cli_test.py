@@ -122,6 +122,52 @@ class Sisense2DataCatalogCliTest(unittest.TestCase):
                               '--datacatalog-project-id', 'dc-project-id'
                           ])
 
+    def test_parse_args_list_elasticube_deps_should_require_asset_url(self):
+        self.assertRaises(
+            SystemExit,
+            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args, [
+                'list-elasticube-deps', '--datacatalog-project-id',
+                'dc-project-id'
+            ])
+
+    def test_parse_args_list_elasticube_deps_should_require_project_id(self):
+        self.assertRaises(
+            SystemExit,
+            sisense2datacatalog_cli.Sisense2DataCatalogCli._parse_args,
+            ['list-elasticube-deps', '--asset-url', 'test-asset-url'])
+
+    @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
+                '.addons.ElastiCubeDependencyPrinter')
+    @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
+                '.addons.LinkedResourceBasedFinder')
+    def test_list_elasticube_deps_should_list_and_print_dependencies(
+            self, mock_deps_finder, mock_deps_printer):
+
+        sisense2datacatalog_cli.Sisense2DataCatalogCli.run([
+            'list-elasticube-deps', '--asset-url', 'test-asset-url',
+            '--datacatalog-project-id', 'dc-project-id'
+        ])
+
+        mock_deps_finder.assert_called_once_with('dc-project-id')
+
+        finder = mock_deps_finder.return_value
+        finder.find.assert_called_once_with('test-asset-url')
+
+        mock_deps_printer.print_dependency_finder_results.assert_called_once()
+
+    @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
+                '.addons.LinkedResourceBasedFinder')
+    def test_list_elasticube_deps_should_exit_on_exception(
+            self, mock_deps_finder):
+
+        mock_deps_finder.return_value.find.side_effect = Exception()
+
+        self.assertRaises(
+            SystemExit, sisense2datacatalog_cli.Sisense2DataCatalogCli.run, [
+                'list-elasticube-deps', '--asset-url', 'test-asset-url',
+                '--datacatalog-project-id', 'dc-project-id'
+            ])
+
     @mock.patch('google.datacatalog_connectors.sisense.sisense2datacatalog_cli'
                 '.Sisense2DataCatalogCli')
     def test_main_should_call_cli_run(self, mock_cli):

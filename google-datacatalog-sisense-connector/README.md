@@ -47,6 +47,9 @@ currently processes JAQL query metadata from:
   * [3.2. find-elasticube-deps](#32-find-elasticube-deps)
     + [3.2.1. Python entry point](#321-python-entry-point)
     + [3.2.2. Docker entry point](#322-docker-entry-point)
+  * [3.3. list-elasticube-deps](#33-list-elasticube-deps)
+    + [3.3.1. Python entry point](#331-python-entry-point)
+    + [3.3.2. Docker entry point](#332-docker-entry-point)
 - [4. Developer environment](#4-developer-environment)
   * [4.1. Install and run the YAPF formatter](#41-install-and-run-the-yapf-formatter)
   * [4.2. Install and run the Flake8 linter](#42-install-and-run-the-flake8-linter)
@@ -185,6 +188,31 @@ docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   --datasource <datasource> \
   --table <table> \
   --column <column> \
+  --datacatalog-project-id $SISENSE2DC_DATACATALOG_PROJECT_ID
+```
+
+### 3.3. list-elasticube-deps
+
+Lists ElastiCube dependencies for a given Sisense Dashboard or Widget and
+prints them in the console.
+
+#### 3.3.1. Python entry point
+
+- Virtualenv
+
+```shell script
+google-datacatalog-sisense-connector list-elasticube-deps \
+  --asset-url <asset-url> \
+  --datacatalog-project-id $SISENSE2DC_DATACATALOG_PROJECT_ID
+```
+
+#### 3.3.2. Docker entry point
+
+```shell script
+docker build --rm --tag sisense2datacatalog .
+docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
+  sisense2datacatalog list-elasticube-deps \
+  --asset-url <asset-url> \
   --datacatalog-project-id $SISENSE2DC_DATACATALOG_PROJECT_ID
 ```
 
