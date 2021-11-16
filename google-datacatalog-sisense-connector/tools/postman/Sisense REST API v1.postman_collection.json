@@ -24,6 +24,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.globals.set(\"access_token\", pm.response.json().access_token);",
 									""
 								],
@@ -78,6 +82,29 @@
 			"item": [
 				{
 					"name": "1.01.01 Get Folders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const jsonData = pm.response.json();\r",
+									"const folders = jsonData;\r",
+									"\r",
+									"pm.globals.unset(\"folderId\");\r",
+									"\r",
+									"if (folders.length > 0) {\r",
+									"    pm.globals.set(\"folderId\", folders[0].oid);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -92,7 +119,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/folders",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/folders?structure=flat",
 							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
@@ -101,6 +128,57 @@
 								"api",
 								"{{API_VERSION}}",
 								"folders"
+							],
+							"query": [
+								{
+									"key": "structure",
+									"value": "flat"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.01.02 Get Folder by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/folders/{{folderId}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"folders",
+								"{{folderId}}"
 							]
 						}
 					},
@@ -113,6 +191,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"const jsonData = pm.response.json();",
 									"const dashboards = jsonData;",
 									"",
@@ -141,7 +223,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards?expand=owner,parentFolder",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards",
 							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
@@ -150,12 +232,6 @@
 								"api",
 								"{{API_VERSION}}",
 								"dashboards"
-							],
-							"query": [
-								{
-									"key": "expand",
-									"value": "owner,parentFolder"
-								}
 							]
 						}
 					},
@@ -163,6 +239,20 @@
 				},
 				{
 					"name": "1.02.02 Get Dashboard by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -177,7 +267,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}?expand=owner",
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/dashboards/{{dashboardId}}",
 							"protocol": "{{SCHEME}}",
 							"host": [
 								"{{SERVER}}"
@@ -187,12 +277,6 @@
 								"{{API_VERSION}}",
 								"dashboards",
 								"{{dashboardId}}"
-							],
-							"query": [
-								{
-									"key": "expand",
-									"value": "owner"
-								}
 							]
 						}
 					},
@@ -200,6 +284,29 @@
 				},
 				{
 					"name": "1.03.01 Get Widgets by dashboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"const widgets = jsonData;",
+									"",
+									"pm.globals.unset(\"userId\");",
+									"",
+									"if (widgets.length > 0) {",
+									"    pm.globals.set(\"userId\", widgets[0].userId);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -225,6 +332,284 @@
 								"dashboards",
 								"{{dashboardId}}",
 								"widgets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.04.01 Get User by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/users/{{userId}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.05.01 Get Elasticubes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/elasticubes/getElasticubes",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"elasticubes",
+								"getElasticubes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.06.01 Get Datasets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const jsonData = pm.response.json();",
+									"const datasets = jsonData;",
+									"",
+									"pm.globals.unset(\"datasetId\");",
+									"",
+									"if (datasets.length > 0) {",
+									"    pm.globals.set(\"datasetId\", datasets[0]._id);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/datasets",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"datasets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.06.02 Get Dataset by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/datasets/{{datasetId}}",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"datasets",
+								"{{datasetId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.07.01 Get Table",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/datasets/{{datasetId}}/tables",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"datasets",
+								"{{datasetId}}",
+								"tables"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.08.01 Get Connections",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code should be 200 [OK]\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{SCHEME}}://{{SERVER}}/api/{{API_VERSION}}/connection",
+							"protocol": "{{SCHEME}}",
+							"host": [
+								"{{SERVER}}"
+							],
+							"path": [
+								"api",
+								"{{API_VERSION}}",
+								"connection"
 							]
 						}
 					},
