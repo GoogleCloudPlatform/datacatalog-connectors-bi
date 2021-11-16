@@ -23,7 +23,7 @@ with open('README.md') as readme_file:
 
 setuptools.setup(
     name='google-datacatalog-sisense-connector',
-    version='0.0.1',
+    version='0.1.0',
     author='Google LLC',
     description='Package for ingesting Sisense metadata'
     ' into Google Cloud Data Catalog',
