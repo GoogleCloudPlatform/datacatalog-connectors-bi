@@ -31,10 +31,12 @@ currently processes JAQL query metadata from:
 <!-- toc -->
 
 - [1. Installation](#1-installation)
-  * [1.1. Install from source](#11-install-from-source)
-    + [1.1.1. Get the code](#111-get-the-code)
-    + [1.1.2. Create and activate a *virtualenv*](#112-create-and-activate-a-virtualenv)
-    + [1.1.3. Install the library](#113-install-the-library)
+  * [1.1. Mac/Linux](#11-maclinux)
+  * [1.2. Windows](#12-windows)
+  * [1.3. Install from source](#13-install-from-source)
+    + [1.3.1. Get the code](#131-get-the-code)
+    + [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
+    + [1.3.3. Install the library](#133-install-the-library)
 - [2. Environment setup](#2-environment-setup)
   * [2.1. Auth credentials](#21-auth-credentials)
     + [2.1.1. Create a GCP Service Account and grant it below roles](#211-create-a-gcp-service-account-and-grant-it-below-roles)
@@ -74,16 +76,34 @@ With [virtualenv][1], it's possible to install this library without needing
 system install permissions, and without clashing with the installed system
 dependencies. Make sure you use Python 3.6+.
 
-### 1.1. Install from source
+### 1.1. Mac/Linux
 
-#### 1.1.1. Get the code
+```shell script
+pip3 install virtualenv
+virtualenv --python python3.6 <your-env>
+source <your-env>/bin/activate
+<your-env>/bin/pip install google-datacatalog-sisense-connector
+```
+
+### 1.2. Windows
+
+```shell script
+pip3 install virtualenv
+virtualenv --python python3.6 <your-env>
+<your-env>\Scripts\activate
+<your-env>\Scripts\pip.exe install google-datacatalog-sisense-connector
+```
+
+### 1.3. Install from source
+
+#### 1.3.1. Get the code
 
 ````shell script
 git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/
 cd datacatalog-connectors-bi/google-datacatalog-sisense-connector
 ````
 
-#### 1.1.2. Create and activate a *virtualenv*
+#### 1.3.2. Create and activate a *virtualenv*
 
 ```shell script
 pip3 install virtualenv
@@ -91,7 +111,7 @@ virtualenv --python python3.6 <your-env>
 source <your-env>/bin/activate
 ```
 
-#### 1.1.3. Install the library
+#### 1.3.3. Install the library
 
 ```shell script
 pip install .
