@@ -19,9 +19,9 @@ for details.
 
 The following components are available in this repo:
 
-| Component                            | Description                             | Folder                                                                                                                                                    | Language |
-| ------------------------------------ | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | :------: |
-| google-datacatalog-looker-connector  | Sample code for Looker data source.     | [google-datacatalog-looker-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-looker-connector)   |  Python  |
-| google-datacatalog-qlik-connector    | Sample code for Qlik Sense data source. | [google-datacatalog-qlik-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-qlik-connector)       |  Python  |
-| google-datacatalog-sisense-connector | Sample code for Sisense data source.    | [google-datacatalog-sisense-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-sisense-connector) |  Python  |
-| google-datacatalog-tableau-connector | Sample code for Tableau data source.    | [google-datacatalog-tableau-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-tableau-connector) |  Python  |
+| Component                            | Description                                 | Folder                                                                                                                                                    | Language |
+| ------------------------------------ | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | :------: |
+| google-datacatalog-looker-connector  | Sample code for **Looker** data source.     | [google-datacatalog-looker-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-looker-connector)   |  Python  |
+| google-datacatalog-qlik-connector    | Sample code for **Qlik Sense** data source. | [google-datacatalog-qlik-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-qlik-connector)       |  Python  |
+| google-datacatalog-sisense-connector | Sample code for **Sisense** data source.    | [google-datacatalog-sisense-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-sisense-connector) |  Python  |
+| google-datacatalog-tableau-connector | Sample code for **Tableau** data source.    | [google-datacatalog-tableau-connector](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/tree/master/google-datacatalog-tableau-connector) |  Python  |
