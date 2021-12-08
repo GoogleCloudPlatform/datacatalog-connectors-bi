@@ -216,7 +216,7 @@ The connector may fail during the scrape stage if the Looker APIs do not return
 metadata in the expected format. The code base uses the `init31` looker_sdk client.
 As a reference, the below versions were already validated:
 
-| VERSION             | RESULT  |
+| VERSION             | PASSED? |
 | ------------------- | :-----: |
 | [Looker API 3.1][7] | &check; |
 
