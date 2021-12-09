@@ -239,7 +239,7 @@ In case a connector execution hits Data Catalog quota limit, an error will be
 raised and logged with the following details, depending on the performed
 operation (READ/WRITE/SEARCH):
 
-```
+```text
 status = StatusCode.RESOURCE_EXHAUSTED
 details = "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:___REDACTED___'."
 debug_error_string =
