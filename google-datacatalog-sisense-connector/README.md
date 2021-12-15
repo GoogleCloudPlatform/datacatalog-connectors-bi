@@ -2,6 +2,7 @@
 
 Package for ingesting [Sisense](https://www.sisense.com) metadata into Google
 Cloud Data Catalog, currently supporting the below assets:
+
 - Folder
 - Dashboard
 - Widget
@@ -10,14 +11,15 @@ This sample connector creates Data Catalog tags to enable a data lineage
 mechanism that allows users to search the catalog to find where/which
 ElastiCube Table fields are used in Widgets or Dashboards. To do so, it
 currently processes JAQL query metadata from:
+
 - Dashboard filters
 - Widgets fields and filters
 - Nested [formulas](https://sisense.dev/reference/jaql/#formulas)
 - Nested `filter.by` properties, used by [top/bottom filters](https://sisense.dev/reference/jaql/#top-bottom-filters)
 
-**Disclaimer: This is not an officially supported Google product.**
+[![License][1]][2] [![PyPi][3]][4]
 
-> This connector is a work in progress!
+**Disclaimer: This is not an officially supported Google product.**
 
 <!--
   ⚠️ DO NOT UPDATE THE TABLE OF CONTENTS MANUALLY ️️⚠️
@@ -35,7 +37,7 @@ currently processes JAQL query metadata from:
   * [1.2. Windows](#12-windows)
   * [1.3. Install from source](#13-install-from-source)
     + [1.3.1. Get the code](#131-get-the-code)
-    + [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
+    + [1.3.2. Create and activate a _virtualenv_](#132-create-and-activate-a-virtualenv)
     + [1.3.3. Install the library](#133-install-the-library)
 - [2. Environment setup](#2-environment-setup)
   * [2.1. Auth credentials](#21-auth-credentials)
@@ -68,17 +70,17 @@ currently processes JAQL query metadata from:
 
 ## 1. Installation
 
-Install this library in a [virtualenv][1] using pip. [Virtualenv][1] is a tool
+Install this library in a [virtualenv][5] using pip. [Virtualenv][5] is a tool
 to create isolated Python environments. The basic problem it addresses is one
 of dependencies and versions, and indirectly permissions.
 
-With [virtualenv][1], it's possible to install this library without needing
+With [virtualenv][5], it's possible to install this library without needing
 system install permissions, and without clashing with the installed system
 dependencies. Make sure you use Python 3.6+.
 
 ### 1.1. Mac/Linux
 
-```shell script
+```sh
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 source <your-env>/bin/activate
@@ -87,7 +89,7 @@ source <your-env>/bin/activate
 
 ### 1.2. Windows
 
-```shell script
+```sh
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 <your-env>\Scripts\activate
@@ -98,14 +100,14 @@ virtualenv --python python3.6 <your-env>
 
 #### 1.3.1. Get the code
 
-````shell script
+```sh
 git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/
 cd datacatalog-connectors-bi/google-datacatalog-sisense-connector
-````
+```
 
-#### 1.3.2. Create and activate a *virtualenv*
+#### 1.3.2. Create and activate a _virtualenv_
 
-```shell script
+```sh
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 source <your-env>/bin/activate
@@ -113,7 +115,7 @@ source <your-env>/bin/activate
 
 #### 1.3.3. Install the library
 
-```shell script
+```sh
 pip install .
 ```
 
@@ -126,6 +128,7 @@ pip install .
 - Data Catalog Admin
 
 #### 2.1.2. Download a JSON key and save it as
+
 - `<YOUR-CREDENTIALS_FILES_FOLDER>/sisense2dc-datacatalog-credentials.json`
 
 > Please notice this folder and file will be required in next steps.
@@ -134,7 +137,7 @@ pip install .
 
 Replace below values according to your environment:
 
-```shell script
+```sh
 export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 
 export SISENSE2DC_SISENSE_SERVER=sisense_server
@@ -160,7 +163,7 @@ Synchronizes Google Data Catalog with a given Sisense server.
 
 - Virtualenv
 
-```shell script
+```sh
 google-datacatalog-sisense-connector sync-catalog \
   --sisense-server $SISENSE2DC_SISENSE_SERVER \
   --sisense-username $SISENSE2DC_SISENSE_USERNAME \
@@ -171,7 +174,7 @@ google-datacatalog-sisense-connector sync-catalog \
 
 #### 3.1.2. Docker entry point
 
-```shell script
+```sh
 docker build --rm --tag sisense2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   sisense2datacatalog sync-catalog \
@@ -191,7 +194,7 @@ console.
 
 - Virtualenv
 
-```shell script
+```sh
 google-datacatalog-sisense-connector find-elasticube-deps \
   --datasource <datasource> \
   --table <table> \
@@ -201,7 +204,7 @@ google-datacatalog-sisense-connector find-elasticube-deps \
 
 #### 3.2.2. Docker entry point
 
-```shell script
+```sh
 docker build --rm --tag sisense2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   sisense2datacatalog find-elasticube-deps \
@@ -220,7 +223,7 @@ prints them in the console.
 
 - Virtualenv
 
-```shell script
+```sh
 google-datacatalog-sisense-connector list-elasticube-deps \
   --asset-url <asset-url> \
   --datacatalog-project-id $SISENSE2DC_DATACATALOG_PROJECT_ID
@@ -228,7 +231,7 @@ google-datacatalog-sisense-connector list-elasticube-deps \
 
 #### 3.3.2. Docker entry point
 
-```shell script
+```sh
 docker build --rm --tag sisense2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   sisense2datacatalog list-elasticube-deps \
@@ -240,7 +243,7 @@ docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
 
 ### 4.1. Install and run the YAPF formatter
 
-```shell script
+```sh
 pip install --upgrade yapf
 
 # Auto update files
@@ -258,14 +261,14 @@ mv pre-commit.sh .git/hooks/pre-commit
 
 ### 4.2. Install and run the Flake8 linter
 
-```shell script
+```sh
 pip install --upgrade flake8
 flake8 src tests
 ```
 
 ### 4.3. Run Tests
 
-```shell script
+```sh
 python setup.py test
 ```
 
@@ -302,25 +305,29 @@ already validated:
 
 - Sisense REST API v1.0
 
-| VERSION       | RESULT  |
+| VERSION       | PASSED? |
 | ------------- | :-----: |
-| Windows 8.2.5 | SUCCESS |
+| Windows 8.2.5 | &check; |
 
 ### 6.2. Data Catalog quota
 
 In case a connector execution hits Data Catalog quota limit, an error will be
 raised and logged with the following details, depending on the performed
-operation (READ/WRITE/SEARCH): 
+operation (READ/WRITE/SEARCH):
 
-```
+```text
 status = StatusCode.RESOURCE_EXHAUSTED
-details = "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'."
-debug_error_string = 
-"{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'.","grpc_status":8}"
+details = "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:___REDACTED___'."
+debug_error_string =
+"{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:___REDACTED___'.","grpc_status":8}"
 ```
 
 For more information on Data Catalog quota, please refer to the [product
-documentation][2].
+documentation][6].
 
-[1]: https://virtualenv.pypa.io/en/latest/
-[2]: https://cloud.google.com/data-catalog/docs/resources/quotas
+[1]: https://img.shields.io/github/license/GoogleCloudPlatform/datacatalog-connectors-bi.svg
+[2]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/blob/master/LICENSE
+[3]: https://img.shields.io/pypi/v/google-datacatalog-sisense-connector.svg
+[4]: https://pypi.org/project/google-datacatalog-sisense-connector/
+[5]: https://virtualenv.pypa.io/en/latest/
+[6]: https://cloud.google.com/data-catalog/docs/resources/quotas

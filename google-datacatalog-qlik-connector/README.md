@@ -2,13 +2,16 @@
 
 Package for ingesting Qlik Sense metadata into Google Cloud Data Catalog,
 currently supporting below asset types:
+
 - Custom Property Definition
 - Stream
 - App (only the published ones)
-- Master Items: Dimension  
+- Master Items: Dimension
 - Master Items: Measure
 - Master Items: Visualization
 - Sheet (only the published ones)
+
+[![License][1]][2] [![PyPi][3]][4]
 
 **Disclaimer: This is not an officially supported Google product.**
 
@@ -28,7 +31,7 @@ currently supporting below asset types:
   * [1.2. Windows](#12-windows)
   * [1.3. Install from source](#13-install-from-source)
     + [1.3.1. Get the code](#131-get-the-code)
-    + [1.3.2. Create and activate a *virtualenv*](#132-create-and-activate-a-virtualenv)
+    + [1.3.2. Create and activate a _virtualenv_](#132-create-and-activate-a-virtualenv)
     + [1.3.3. Install the library](#133-install-the-library)
 - [2. Environment setup](#2-environment-setup)
   * [2.1. Auth credentials](#21-auth-credentials)
@@ -53,18 +56,17 @@ currently supporting below asset types:
 
 ## 1. Installation
 
-Install this library in a [virtualenv][1] using pip. [virtualenv][1] is a tool
+Install this library in a [virtualenv][5] using pip. [virtualenv][5] is a tool
 to create isolated Python environments. The basic problem it addresses is one
 of dependencies and versions, and indirectly permissions.
 
-With [virtualenv][1], it's possible to install this library without needing
+With [virtualenv][5], it's possible to install this library without needing
 system install permissions, and without clashing with the installed system
 dependencies. Make sure you use Python 3.6+.
 
-
 ### 1.1. Mac/Linux
 
-```shell script
+```sh
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 source <your-env>/bin/activate
@@ -73,7 +75,7 @@ source <your-env>/bin/activate
 
 ### 1.2. Windows
 
-```shell script
+```sh
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 <your-env>\Scripts\activate
@@ -84,14 +86,14 @@ virtualenv --python python3.6 <your-env>
 
 #### 1.3.1. Get the code
 
-````shell script
+```sh
 git clone https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/
 cd datacatalog-connectors-bi/google-datacatalog-qlik-connector
-````
+```
 
-#### 1.3.2. Create and activate a *virtualenv*
+#### 1.3.2. Create and activate a _virtualenv_
 
-```shell script
+```sh
 pip3 install virtualenv
 virtualenv --python python3.6 <your-env>
 source <your-env>/bin/activate
@@ -99,7 +101,7 @@ source <your-env>/bin/activate
 
 #### 1.3.3. Install the library
 
-```shell script
+```sh
 pip install .
 ```
 
@@ -112,6 +114,7 @@ pip install .
 - Data Catalog Admin
 
 #### 2.1.2. Download a JSON key and save it as
+
 - `<YOUR-CREDENTIALS_FILES_FOLDER>/qlik2dc-datacatalog-credentials.json`
 
 > Please notice this folder and file will be required in next steps.
@@ -124,7 +127,7 @@ fulfilling the below environment variables, set `QLIK2DC_QLIK_AD_DOMAIN` with
 the Windows Active Directory domain your user belongs to and
 `QLIK2DC_QLIK_USERNAME` with the username (no backslash in both).
 
-```shell script
+```sh
 export GOOGLE_APPLICATION_CREDENTIALS=datacatalog_credentials_file
 
 export QLIK2DC_QLIK_SERVER=qlik_server
@@ -148,7 +151,7 @@ export QLIK2DC_DATACATALOG_LOCATION_ID=google_cloud_location_id
 
 - Virtualenv
 
-```shell script
+```sh
 google-datacatalog-qlik-connector \
   --qlik-server $QLIK2DC_QLIK_SERVER \
   [--qlik-ad-domain $QLIK2DC_QLIK_AD_DOMAIN \]
@@ -160,7 +163,7 @@ google-datacatalog-qlik-connector \
 
 ### 3.2. Docker entry point
 
-```shell script
+```sh
 docker build --rm --tag qlik2datacatalog .
 docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
   qlik2datacatalog \
@@ -176,7 +179,7 @@ docker run --rm --tty -v YOUR-CREDENTIALS_FILES_FOLDER:/data \
 
 ### 4.1. Install and run the YAPF formatter
 
-```shell script
+```sh
 pip install --upgrade yapf
 
 # Auto update files
@@ -194,14 +197,14 @@ mv pre-commit.sh .git/hooks/pre-commit
 
 ### 4.2. Install and run the Flake8 linter
 
-```shell script
+```sh
 pip install --upgrade flake8
 flake8 src tests
 ```
 
 ### 4.3. Run Tests
 
-```shell script
+```sh
 python setup.py test
 ```
 
@@ -220,31 +223,35 @@ already validated:
 
 - Qlik Sense Repository Service API
 
-| VERSION                 | RESULT  |
+| VERSION                 | PASSED? |
 | ----------------------- | :-----: |
-| 34.16.0 (September2020) | SUCCESS |
+| 34.16.0 (September2020) | &check; |
 
 - Qlik Engine JSON API
 
-| VERSION                  | RESULT  |
+| VERSION                  | PASSED? |
 | ------------------------ | :-----: |
-| 12.763.4 (September2020) | SUCCESS |
+| 12.763.4 (September2020) | &check; |
 
 ### 5.2. Data Catalog quota
 
 In case a connector execution hits Data Catalog quota limit, an error will be
 raised and logged with the following details, depending on the performed
-operation (READ/WRITE/SEARCH): 
+operation (READ/WRITE/SEARCH):
 
-```
+```text
 status = StatusCode.RESOURCE_EXHAUSTED
-details = "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'."
-debug_error_string = 
-"{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:1111111111111'.","grpc_status":8}"
+details = "Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:___REDACTED___'."
+debug_error_string =
+"{"created":"@1587396969.506556000", "description":"Error received from peer ipv4:172.217.29.42:443","file":"src/core/lib/surface/call.cc","file_line":1056,"grpc_message":"Quota exceeded for quota metric 'Read requests' and limit 'Read requests per minute' of service 'datacatalog.googleapis.com' for consumer 'project_number:___REDACTED___'.","grpc_status":8}"
 ```
 
 For more information on Data Catalog quota, please refer to the [product
-documentation][2].
+documentation][6].
 
-[1]: https://virtualenv.pypa.io/en/latest/
-[2]: https://cloud.google.com/data-catalog/docs/resources/quotas
+[1]: https://img.shields.io/github/license/GoogleCloudPlatform/datacatalog-connectors-bi.svg
+[2]: https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/blob/master/LICENSE
+[3]: https://img.shields.io/pypi/v/google-datacatalog-qlik-connector.svg
+[4]: https://pypi.org/project/google-datacatalog-qlik-connector/
+[5]: https://virtualenv.pypa.io/en/latest/
+[6]: https://cloud.google.com/data-catalog/docs/resources/quotas

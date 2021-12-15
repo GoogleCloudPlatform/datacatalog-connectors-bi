@@ -6,7 +6,7 @@ Handler for Tableau web hook events.
 
 ### 1.1. Set environment variables
 
-```bash
+```sh
 export TABLEAU2DC_TABLEAU_SERVER=tableau_server
 export TABLEAU2DC_TABLEAU_API_VERSION=tableau_api_version
 export TABLEAU2DC_TABLEAU_USERNAME=tableau_username
@@ -20,6 +20,6 @@ export TABLEAU2DC_API_KEY=your-made-up-api-key
 
 ### 1.2. Run deploy
 
-```bash
+```sh
 ./deploy.sh
 ```

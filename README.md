@@ -5,7 +5,9 @@ BI data sources.
 
 **Disclaimer: This is not an officially supported Google product.**
 
-![Python package](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/workflows/Python%20package/badge.svg?branch=master)
+[![License](https://img.shields.io/github/license/GoogleCloudPlatform/datacatalog-connectors-bi.svg)](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/blob/master/LICENSE)
+[![Python package](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/actions/workflows/pythonpackage.yml/badge.svg)](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/actions/workflows/pythonpackage.yml)
+[![Issues](https://img.shields.io/github/issues/googlecloudplatform/datacatalog-connectors-bi.svg)](https://github.com/GoogleCloudPlatform/datacatalog-connectors-bi/issues)
 
 ## **Breaking Changes in v0.5.0**
 
