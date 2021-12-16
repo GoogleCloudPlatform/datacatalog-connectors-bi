@@ -37,10 +37,15 @@ setuptools.setup(
         ],
     },
     include_package_data=True,
-    install_requires=('requests',
-                      'google-datacatalog-connectors-commons >= 0.6.0'),
+    install_requires=(
+        'google-datacatalog-connectors-commons ~= 0.6.0',
+        'requests',
+    ),
     setup_requires=('pytest-runner',),
-    tests_require=('pytest-cov',),
+    tests_require=(
+        'pytest-cov',
+        'tomli ~= 1.2.2',
+    ),
     classifiers=[
         release_status,
         'Natural Language :: English',
