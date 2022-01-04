@@ -44,7 +44,10 @@ setuptools.setup(
         'websockets ~= 8.1',
     ),
     setup_requires=('pytest-runner',),
-    tests_require=('pytest-cov',),
+    tests_require=(
+        'pytest-cov',
+        'tomli ~= 1.2.2',
+    ),
     classifiers=[
         release_status,
         'Natural Language :: English',
